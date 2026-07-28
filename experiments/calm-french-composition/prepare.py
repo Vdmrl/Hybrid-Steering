@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 import os
+import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
@@ -13,6 +14,12 @@ from typing import Any
 import pyarrow.parquet as pq
 from langdetect import DetectorFactory, detect
 from openai import OpenAI
+
+ROOT = Path(__file__).parents[2]
+sys.path.insert(0, str(ROOT / "judge" / "src"))
+
+from hybrid_judge.config import load_configs
+from hybrid_judge.provider import openrouter_client
 
 DetectorFactory.seed = 0
 LANGUAGES = (
@@ -39,7 +46,6 @@ def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--parquet", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--model", default="deepseek/deepseek-v4-flash")
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument("--seed", type=int, default=20260728)
     parser.add_argument("--self-test", action="store_true")
@@ -180,18 +186,14 @@ def main() -> None:
     done = existing_rows(args.output)
     pending = [row for row in selected if row["id"] not in done]
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    client = OpenAI(
-        api_key=api_key,
-        base_url="https://openrouter.ai/api/v1",
-        timeout=240,
-        max_retries=4,
-    )
+    _, config = load_configs(ROOT / "judge")
+    client = openrouter_client(config, api_key)
     with (
         args.output.open("a", encoding="utf-8") as stream,
         ThreadPoolExecutor(max_workers=args.workers) as pool,
     ):
         futures = {
-            pool.submit(translate, client, args.model, row): row for row in pending
+            pool.submit(translate, client, config.model, row): row for row in pending
         }
         for index, future in enumerate(as_completed(futures), 1):
             result = future.result()

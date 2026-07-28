@@ -21,12 +21,18 @@ Compare A and B on two independent questions:
 2. quality_winner: which answer better fulfills the scenario while remaining
    correct, relevant, and coherent?
 
+Evaluate answers written in any language. Judge quality independently from the
+trait: do not reward or penalize either pole unless the scenario requests it.
+For language traits, assess semantic quality without treating the answer
+language itself as a quality difference.
+
 Use "tie" when the difference is absent, negligible, or unsupported. Do not
 break ties using verbosity, confidence, fluency, answer order, or generic
 positivity.
 
-evidence_A and evidence_B must each be a short, exact, contiguous excerpt from
-that answer, or an empty string when no relevant evidence exists.
+evidence_A and evidence_B must support only the trait comparison. Each must be
+a short, exact, contiguous excerpt from that answer, or an empty string when
+no relevant evidence exists.
 
 Return only this JSON object and no additional keys:
 {{

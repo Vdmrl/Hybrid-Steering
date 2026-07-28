@@ -20,12 +20,18 @@ Quality scales:
 - coherence: 1 incoherent or unusable; 3 understandable with notable defects;
   5 clear and internally coherent.
 
+Evaluate answers written in any language. Judge quality independently from the
+trait: do not reward or penalize either pole unless the scenario requests it.
+For language traits, assess semantic quality without treating the answer
+language itself as a quality difference.
+
 Score the answer independently. Score 3 when the trait is absent or cannot be
 judged; do not reward generic positivity, verbosity, confidence, or style
 unless the rubric explicitly calls for it.
 
-Evidence must contain zero to two short, exact, contiguous excerpts copied
-from the answer. Use an empty list when there is no trait evidence.
+Evidence must support only the trait score and contain zero to two short,
+exact, contiguous excerpts copied from the answer. Use an empty list when
+there is no trait evidence.
 
 Return only this JSON object and no additional keys:
 {{

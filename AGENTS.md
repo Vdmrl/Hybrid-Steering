@@ -19,7 +19,7 @@ must not import experiment code.
 Before changing Judge, read:
 
 1. `judge/README.md`;
-2. the applicable `concepts/features_v*.yaml`;
+2. `concepts/features.yaml`;
 3. the affected Pydantic model in `judge/src/hybrid_judge/models.py`;
 4. `CONTRIBUTING.md`.
 
@@ -31,8 +31,8 @@ Before changing Steering, read:
 
 ## Sources of truth
 
-- Concept meanings live in versioned `concepts/features_v*.yaml` files.
-- Runtime defaults live in versioned `judge/config/judge_v*.yaml` files.
+- Concept meanings live in `concepts/features.yaml`.
+- Runtime defaults live in `judge/config/judge.yaml`.
 - Prompt text is versioned in `judge/prompts/`.
 - Machine-readable interfaces live in `judge/src/hybrid_judge/models.py`.
 - Direction and run interfaces live in `steering/src/hybrid_steering/models.py`.
@@ -42,8 +42,8 @@ Do not duplicate a feature definition inside Python code. Do not silently edit
 an existing prompt version after it has produced reported results; add a new
 version instead.
 
-Judge v2 is the default. Treat every existing rubric, prompt, and config
-version as immutable once results have been shared. Shared Judge changes must
+Treat every existing rubric and prompt version as immutable once results have
+been shared. Shared Judge changes must
 be reviewed through a pull request; direct commits to `main` are not allowed
 for agents.
 
@@ -66,6 +66,8 @@ for agents.
 - Never commit `.env`, API keys, passwords, proxies, or server addresses with
   credentials.
 - Read `OPENROUTER_API_KEY` from the environment.
+- Read the optional `OPENROUTER_PROXY` from the environment; otherwise connect
+  directly.
 - Do not print secrets in logs or exception messages.
 - External calls require an explicit CLI action; imports and tests must be
   side-effect free.

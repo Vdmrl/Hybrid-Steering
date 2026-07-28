@@ -4,7 +4,6 @@ from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-Score = Annotated[int, Field(ge=0, le=4)]
 ScoreV2 = Annotated[int, Field(ge=1, le=5)]
 
 
@@ -36,11 +35,6 @@ class Feature(StrictModel):
     opposite: str
     definition: str
     exclusions: list[str] = Field(default_factory=list)
-
-
-class FeatureConfig(StrictModel):
-    rubric_version: str
-    features: dict[str, Feature]
 
 
 class FeatureV2(Feature):
@@ -94,26 +88,6 @@ class JudgeConfigV2(JudgeConfig):
     require_both_orders: bool = True
 
 
-class ScalarScore(StrictModel):
-    answer_id: str
-    target_score: Score
-    opposite_score: Score
-    task_correctness: Score
-    coherence: Score
-    content_preservation: Score
-    reason: str
-
-
-class ScalarResponse(StrictModel):
-    scores: list[ScalarScore]
-
-
-class PairwiseResponse(StrictModel):
-    feature_winner: Literal["A", "B", "tie"]
-    quality_winner: Literal["A", "B", "tie"]
-    reason: str
-
-
 class ScalarResponseV2(StrictModel):
     answer_id: str
     trait_score: ScoreV2
@@ -135,34 +109,6 @@ class Usage(StrictModel):
     input_tokens: int = 0
     output_tokens: int = 0
     reasoning_tokens: int = 0
-
-
-class Provenance(StrictModel):
-    judge_model: str
-    prompt_version: str
-    rubric_version: str
-    permutation: list[str]
-    usage: Usage
-
-
-class ScalarResult(StrictModel):
-    task_id: str
-    prompt_id: str
-    feature: str
-    scores: list[ScalarScore]
-    provenance: Provenance
-
-
-class PairwiseResult(StrictModel):
-    task_id: str
-    prompt_id: str
-    feature: str
-    left_answer_id: str
-    right_answer_id: str
-    feature_winner: Literal["left", "right", "tie"]
-    quality_winner: Literal["left", "right", "tie"]
-    reason: str
-    provenance: Provenance
 
 
 class ProvenanceV2(StrictModel):

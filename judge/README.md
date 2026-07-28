@@ -3,9 +3,6 @@
 Blind LLM-as-a-Judge for steering ablations. It receives only a scenario and
 anonymous answers: never GDN/residual/SVD, layer, alpha, or method names.
 
-Judge v2 is the default. Judge v1 remains available for reproducing old runs
-and its prompts/configs must not be edited in place.
-
 ## Judge v2
 
 Two complementary modes are intentionally separate:
@@ -27,12 +24,15 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -e "judge[dev]"
 export OPENROUTER_API_KEY="..."
+# Optional:
+# export OPENROUTER_PROXY="http://user:password@host:port"
 ```
 
 PowerShell:
 
 ```powershell
 $env:OPENROUTER_API_KEY="..."
+$env:OPENROUTER_PROXY="http://user:password@host:port" # optional
 ```
 
 ## Input
@@ -56,7 +56,7 @@ One JSON object per scenario:
 
 ## Run
 
-Primary pairwise evaluation (both orders are mandatory in v2):
+Primary pairwise evaluation (both orders are mandatory):
 
 ```bash
 hybrid-judge judge/examples/input.example.jsonl runs/pairwise.jsonl \
@@ -79,25 +79,19 @@ hybrid-judge judge/examples/input.example.jsonl runs/scalar.jsonl \
 Useful options:
 
 ```text
---judge-version v2
---model deepseek/deepseek-v4-flash
 --workers 8
 --seed 20260728
 --config-root judge
 ```
 
-Re-running against the same output resumes by stable `task_id`. v1 can be
-reproduced with `--judge-version v1`; only v1 honors `--both-orders`.
+Re-running against the same output resumes by stable `task_id`. The model is
+set once in `judge/config/judge.yaml`.
 
 ## Versioned sources of truth
 
 ```text
-concepts/features_v1.yaml
-concepts/features_v2.yaml
-judge/config/judge_v1.yaml
-judge/config/judge_v2.yaml
-judge/prompts/scalar_v1.txt
-judge/prompts/pairwise_v1.txt
+concepts/features.yaml
+judge/config/judge.yaml
 judge/prompts/scalar_v2.txt
 judge/prompts/pairwise_v2.txt
 ```
