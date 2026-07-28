@@ -84,7 +84,7 @@ calibration, and resume behavior.
 ## Development
 
 ```bash
-pip install -e "judge[dev]" -e "steering[dev]"
+pip install -r requirements.txt
 python -m pytest judge/tests steering/tests
 ruff check judge steering
 ruff format --check judge steering
