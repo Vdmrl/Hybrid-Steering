@@ -1,0 +1,12 @@
+{
+  "feature": "calm",
+  "class_name": "Affective Polarity (Emotional Opposites)",
+  "leaf": [
+    "fear",
+    "calm"
+  ],
+  "judged": 108,
+  "accepted": 108,
+  "donors": 64,
+  "validation": 40
+}

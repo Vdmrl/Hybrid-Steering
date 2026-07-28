@@ -1,0 +1,315 @@
+{
+  "selected": [
+    "candor",
+    "calm",
+    "concrete"
+  ],
+  "strengths": {
+    "candor": 8.0,
+    "calm": 2.0,
+    "concrete": 2.0
+  },
+  "all_layers": [
+    0,
+    1,
+    2,
+    4,
+    5,
+    6,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    17,
+    18,
+    20,
+    21,
+    22,
+    24,
+    25,
+    26,
+    28,
+    29,
+    30
+  ],
+  "last6_layers": [
+    24,
+    25,
+    26,
+    28,
+    29,
+    30
+  ],
+  "calibration": {
+    "calm": {
+      "feature": "calm",
+      "means": {
+        "baseline": {
+          "target": 3.675,
+          "opposite": 0.275,
+          "coherence": 3.75,
+          "task_correctness": 3.75,
+          "axis": 3.4,
+          "n": 40
+        },
+        "a2": {
+          "target": 3.925,
+          "opposite": 0.025,
+          "coherence": 3.925,
+          "task_correctness": 3.925,
+          "axis": 3.9,
+          "n": 40
+        },
+        "a4": {
+          "target": 3.525,
+          "opposite": 0.075,
+          "coherence": 3.725,
+          "task_correctness": 3.4,
+          "axis": 3.4499999999999997,
+          "n": 40
+        },
+        "a8": {
+          "target": 2.75,
+          "opposite": 0.075,
+          "coherence": 3.35,
+          "task_correctness": 2.625,
+          "axis": 2.675,
+          "n": 40
+        },
+        "a12": {
+          "target": 2.2,
+          "opposite": 0.25,
+          "coherence": 2.45,
+          "task_correctness": 1.9,
+          "axis": 1.9500000000000002,
+          "n": 40
+        }
+      },
+      "candidates": [
+        {
+          "alpha": 2.0,
+          "condition": "a2",
+          "axis_delta": 0.5,
+          "coherence_drop": -0.17499999999999982,
+          "correctness_drop": -0.17499999999999982,
+          "eligible": true
+        },
+        {
+          "alpha": 4.0,
+          "condition": "a4",
+          "axis_delta": 0.04999999999999982,
+          "coherence_drop": 0.02499999999999991,
+          "correctness_drop": 0.3500000000000001,
+          "eligible": false
+        },
+        {
+          "alpha": 8.0,
+          "condition": "a8",
+          "axis_delta": -0.7250000000000001,
+          "coherence_drop": 0.3999999999999999,
+          "correctness_drop": 1.125,
+          "eligible": false
+        },
+        {
+          "alpha": 12.0,
+          "condition": "a12",
+          "axis_delta": -1.4499999999999997,
+          "coherence_drop": 1.2999999999999998,
+          "correctness_drop": 1.85,
+          "eligible": false
+        }
+      ],
+      "passed": true,
+      "selected_alpha": 2.0,
+      "selection": {
+        "alpha": 2.0,
+        "condition": "a2",
+        "axis_delta": 0.5,
+        "coherence_drop": -0.17499999999999982,
+        "correctness_drop": -0.17499999999999982,
+        "eligible": true
+      }
+    },
+    "concrete": {
+      "feature": "concrete",
+      "means": {
+        "baseline": {
+          "target": 3.5,
+          "opposite": 0.625,
+          "coherence": 3.725,
+          "task_correctness": 3.6,
+          "axis": 2.875,
+          "n": 40
+        },
+        "a2": {
+          "target": 3.75,
+          "opposite": 0.35,
+          "coherence": 3.825,
+          "task_correctness": 3.775,
+          "axis": 3.4,
+          "n": 40
+        },
+        "a4": {
+          "target": 3.75,
+          "opposite": 0.275,
+          "coherence": 3.675,
+          "task_correctness": 3.575,
+          "axis": 3.475,
+          "n": 40
+        },
+        "a8": {
+          "target": 0.5,
+          "opposite": 1.875,
+          "coherence": 0.325,
+          "task_correctness": 0.4,
+          "axis": -1.375,
+          "n": 40
+        },
+        "a12": {
+          "target": 0.025,
+          "opposite": 2.45,
+          "coherence": 0.25,
+          "task_correctness": 0.075,
+          "axis": -2.4250000000000003,
+          "n": 40
+        }
+      },
+      "candidates": [
+        {
+          "alpha": 2.0,
+          "condition": "a2",
+          "axis_delta": 0.5249999999999999,
+          "coherence_drop": -0.10000000000000009,
+          "correctness_drop": -0.17499999999999982,
+          "eligible": true
+        },
+        {
+          "alpha": 4.0,
+          "condition": "a4",
+          "axis_delta": 0.6000000000000001,
+          "coherence_drop": 0.050000000000000266,
+          "correctness_drop": 0.02499999999999991,
+          "eligible": true
+        },
+        {
+          "alpha": 8.0,
+          "condition": "a8",
+          "axis_delta": -4.25,
+          "coherence_drop": 3.4,
+          "correctness_drop": 3.2,
+          "eligible": false
+        },
+        {
+          "alpha": 12.0,
+          "condition": "a12",
+          "axis_delta": -5.300000000000001,
+          "coherence_drop": 3.475,
+          "correctness_drop": 3.525,
+          "eligible": false
+        }
+      ],
+      "passed": true,
+      "selected_alpha": 2.0,
+      "selection": {
+        "alpha": 2.0,
+        "condition": "a2",
+        "axis_delta": 0.5249999999999999,
+        "coherence_drop": -0.10000000000000009,
+        "correctness_drop": -0.17499999999999982,
+        "eligible": true
+      }
+    },
+    "casual": {
+      "feature": "casual",
+      "means": {
+        "baseline": {
+          "target": 0.45,
+          "opposite": 3.7,
+          "coherence": 3.975,
+          "task_correctness": 4.0,
+          "axis": -3.25,
+          "n": 40
+        },
+        "a2": {
+          "target": 2.475,
+          "opposite": 1.575,
+          "coherence": 3.925,
+          "task_correctness": 3.95,
+          "axis": 0.9000000000000001,
+          "n": 40
+        },
+        "a4": {
+          "target": 3.525,
+          "opposite": 0.35,
+          "coherence": 3.6,
+          "task_correctness": 3.325,
+          "axis": 3.175,
+          "n": 40
+        },
+        "a8": {
+          "target": 2.575,
+          "opposite": 0.05,
+          "coherence": 0.725,
+          "task_correctness": 0.65,
+          "axis": 2.5250000000000004,
+          "n": 40
+        },
+        "a12": {
+          "target": 1.25,
+          "opposite": 0.0,
+          "coherence": 0.025,
+          "task_correctness": 0.025,
+          "axis": 1.25,
+          "n": 40
+        }
+      },
+      "candidates": [
+        {
+          "alpha": 2.0,
+          "condition": "a2",
+          "axis_delta": 4.15,
+          "coherence_drop": 0.050000000000000266,
+          "correctness_drop": 0.04999999999999982,
+          "eligible": true
+        },
+        {
+          "alpha": 4.0,
+          "condition": "a4",
+          "axis_delta": 6.425,
+          "coherence_drop": 0.375,
+          "correctness_drop": 0.6749999999999998,
+          "eligible": false
+        },
+        {
+          "alpha": 8.0,
+          "condition": "a8",
+          "axis_delta": 5.775,
+          "coherence_drop": 3.25,
+          "correctness_drop": 3.35,
+          "eligible": false
+        },
+        {
+          "alpha": 12.0,
+          "condition": "a12",
+          "axis_delta": 4.5,
+          "coherence_drop": 3.95,
+          "correctness_drop": 3.975,
+          "eligible": false
+        }
+      ],
+      "passed": true,
+      "selected_alpha": 2.0,
+      "selection": {
+        "alpha": 2.0,
+        "condition": "a2",
+        "axis_delta": 4.15,
+        "coherence_drop": 0.050000000000000266,
+        "correctness_drop": 0.04999999999999982,
+        "eligible": true
+      }
+    }
+  }
+}

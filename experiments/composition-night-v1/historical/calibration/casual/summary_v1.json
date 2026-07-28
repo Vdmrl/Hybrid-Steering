@@ -1,0 +1,89 @@
+{
+  "feature": "casual",
+  "means": {
+    "baseline": {
+      "target": 0.45,
+      "opposite": 3.7,
+      "coherence": 3.975,
+      "task_correctness": 4.0,
+      "axis": -3.25,
+      "n": 40
+    },
+    "a2": {
+      "target": 2.475,
+      "opposite": 1.575,
+      "coherence": 3.925,
+      "task_correctness": 3.95,
+      "axis": 0.9000000000000001,
+      "n": 40
+    },
+    "a4": {
+      "target": 3.525,
+      "opposite": 0.35,
+      "coherence": 3.6,
+      "task_correctness": 3.325,
+      "axis": 3.175,
+      "n": 40
+    },
+    "a8": {
+      "target": 2.575,
+      "opposite": 0.05,
+      "coherence": 0.725,
+      "task_correctness": 0.65,
+      "axis": 2.5250000000000004,
+      "n": 40
+    },
+    "a12": {
+      "target": 1.25,
+      "opposite": 0.0,
+      "coherence": 0.025,
+      "task_correctness": 0.025,
+      "axis": 1.25,
+      "n": 40
+    }
+  },
+  "candidates": [
+    {
+      "alpha": 2.0,
+      "condition": "a2",
+      "axis_delta": 4.15,
+      "coherence_drop": 0.050000000000000266,
+      "correctness_drop": 0.04999999999999982,
+      "eligible": true
+    },
+    {
+      "alpha": 4.0,
+      "condition": "a4",
+      "axis_delta": 6.425,
+      "coherence_drop": 0.375,
+      "correctness_drop": 0.6749999999999998,
+      "eligible": false
+    },
+    {
+      "alpha": 8.0,
+      "condition": "a8",
+      "axis_delta": 5.775,
+      "coherence_drop": 3.25,
+      "correctness_drop": 3.35,
+      "eligible": false
+    },
+    {
+      "alpha": 12.0,
+      "condition": "a12",
+      "axis_delta": 4.5,
+      "coherence_drop": 3.95,
+      "correctness_drop": 3.975,
+      "eligible": false
+    }
+  ],
+  "passed": true,
+  "selected_alpha": 2.0,
+  "selection": {
+    "alpha": 2.0,
+    "condition": "a2",
+    "axis_delta": 4.15,
+    "coherence_drop": 0.050000000000000266,
+    "correctness_drop": 0.04999999999999982,
+    "eligible": true
+  }
+}

@@ -1,0 +1,181 @@
+{
+  "selected_features": [
+    "candor",
+    "calm",
+    "concrete"
+  ],
+  "means": {
+    "000": {
+      "n": 128,
+      "candor": 3.7421875,
+      "sycophancy": 0.2109375,
+      "task_correctness": 3.765625,
+      "coherence": 3.8984375,
+      "unwarranted_contradiction": 0.171875,
+      "refusal_or_evasion": 0.1328125,
+      "feature_a": 3.6796875,
+      "feature_a_opposite": 0.203125,
+      "feature_b": 3.296875,
+      "feature_b_opposite": 0.6953125,
+      "actionability": 3.4609375,
+      "content_preservation": 3.6796875
+    },
+    "001": {
+      "n": 128,
+      "candor": 3.6953125,
+      "sycophancy": 0.265625,
+      "task_correctness": 3.796875,
+      "coherence": 3.9453125,
+      "unwarranted_contradiction": 0.0859375,
+      "refusal_or_evasion": 0.09375,
+      "feature_a": 3.7421875,
+      "feature_a_opposite": 0.1640625,
+      "feature_b": 3.515625,
+      "feature_b_opposite": 0.46875,
+      "actionability": 3.6484375,
+      "content_preservation": 3.703125
+    },
+    "010": {
+      "n": 128,
+      "candor": 3.390625,
+      "sycophancy": 0.5078125,
+      "task_correctness": 3.5078125,
+      "coherence": 3.84375,
+      "unwarranted_contradiction": 0.125,
+      "refusal_or_evasion": 0.203125,
+      "feature_a": 3.71875,
+      "feature_a_opposite": 0.140625,
+      "feature_b": 3.140625,
+      "feature_b_opposite": 0.8125,
+      "actionability": 3.3203125,
+      "content_preservation": 3.6796875
+    },
+    "011": {
+      "n": 128,
+      "candor": 3.40625,
+      "sycophancy": 0.515625,
+      "task_correctness": 3.5546875,
+      "coherence": 3.8515625,
+      "unwarranted_contradiction": 0.140625,
+      "refusal_or_evasion": 0.1171875,
+      "feature_a": 3.6875,
+      "feature_a_opposite": 0.1171875,
+      "feature_b": 3.21875,
+      "feature_b_opposite": 0.7265625,
+      "actionability": 3.4453125,
+      "content_preservation": 3.625
+    },
+    "100": {
+      "n": 128,
+      "candor": 3.8828125,
+      "sycophancy": 0.0546875,
+      "task_correctness": 3.765625,
+      "coherence": 3.75,
+      "unwarranted_contradiction": 0.1875,
+      "refusal_or_evasion": 0.0625,
+      "feature_a": 3.6875,
+      "feature_a_opposite": 0.28125,
+      "feature_b": 3.859375,
+      "feature_b_opposite": 0.1484375,
+      "actionability": 3.90625,
+      "content_preservation": 3.8046875
+    },
+    "101": {
+      "n": 128,
+      "candor": 3.890625,
+      "sycophancy": 0.0625,
+      "task_correctness": 3.6640625,
+      "coherence": 3.6640625,
+      "unwarranted_contradiction": 0.1953125,
+      "refusal_or_evasion": 0.0546875,
+      "feature_a": 3.5390625,
+      "feature_a_opposite": 0.390625,
+      "feature_b": 3.875,
+      "feature_b_opposite": 0.1171875,
+      "actionability": 3.9140625,
+      "content_preservation": 3.7578125
+    },
+    "110": {
+      "n": 128,
+      "candor": 3.7734375,
+      "sycophancy": 0.140625,
+      "task_correctness": 3.6875,
+      "coherence": 3.8359375,
+      "unwarranted_contradiction": 0.171875,
+      "refusal_or_evasion": 0.140625,
+      "feature_a": 3.8984375,
+      "feature_a_opposite": 0.078125,
+      "feature_b": 3.84375,
+      "feature_b_opposite": 0.1796875,
+      "actionability": 3.890625,
+      "content_preservation": 3.859375
+    },
+    "111": {
+      "n": 128,
+      "candor": 3.828125,
+      "sycophancy": 0.125,
+      "task_correctness": 3.7109375,
+      "coherence": 3.7734375,
+      "unwarranted_contradiction": 0.15625,
+      "refusal_or_evasion": 0.125,
+      "feature_a": 3.9453125,
+      "feature_a_opposite": 0.046875,
+      "feature_b": 3.8984375,
+      "feature_b_opposite": 0.1171875,
+      "actionability": 3.9296875,
+      "content_preservation": 3.8515625
+    }
+  },
+  "main_effects": {
+    "candor": {
+      "mean": 0.28515625,
+      "low": 0.185546875,
+      "high": 0.396484375
+    },
+    "calm": {
+      "mean": 0.150390625,
+      "low": 0.072265625,
+      "high": 0.224609375
+    },
+    "concrete": {
+      "mean": 0.091796875,
+      "low": 0.021484375,
+      "high": 0.162109375
+    }
+  },
+  "retention": {
+    "candor": {
+      "single_effect": 0.140625,
+      "effect_when_other_two_on": 0.421875,
+      "ratio": 3.0
+    },
+    "calm": {
+      "single_effect": 0.0390625,
+      "effect_when_other_two_on": 0.40625,
+      "ratio": 10.4
+    },
+    "concrete": {
+      "single_effect": 0.21875,
+      "effect_when_other_two_on": 0.0546875,
+      "ratio": 0.25
+    }
+  },
+  "triple_interaction": {
+    "candor": {
+      "mean": -0.015625,
+      "low": -0.234375,
+      "high": 0.1953125
+    },
+    "calm": {
+      "mean": 0.2890625,
+      "low": 0.0859375,
+      "high": 0.5078125
+    },
+    "concrete": {
+      "mean": 0.1796875,
+      "low": -0.0625,
+      "high": 0.4140625
+    }
+  },
+  "joint_success_111": 0.875
+}
