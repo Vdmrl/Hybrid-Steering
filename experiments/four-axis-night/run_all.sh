@@ -60,3 +60,5 @@ run_phase inputs
 run_judge_jobs
 retry "$python_bin" "$experiment/summarize.py" --output-dir "$output"
 touch "$output/DONE"
+retry env CALM_FRENCH_DONORS=62 bash \
+  "$root/experiments/calm-french-composition/run_all.sh"

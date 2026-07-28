@@ -5,9 +5,9 @@ language direction remain independently effective when composed.
 
 ## Design
 
-- 64 calm-vs-panic donor pairs from the archived, strictly filtered
+- 62 calm-vs-panic donor pairs from the archived, strictly filtered
   `feature_stories` subset.
-- 64 multilingual source-to-French matched pairs across 64 distinct concept
+- 62 multilingual source-to-French matched pairs across distinct concept
   axes. `feature_stories` has no French rows, so each selected source story is
   translated without changing its content.
 - 64 held-out English scenarios with independent opportunities to display calm
