@@ -148,10 +148,14 @@ def test_schema_failure_is_retried_and_recorded() -> None:
             ),
         ]
     )
+    requests = []
+
+    def create(**kwargs):
+        requests.append(kwargs)
+        return next(responses)
+
     client = SimpleNamespace(
-        chat=SimpleNamespace(
-            completions=SimpleNamespace(create=lambda **_: next(responses))
-        )
+        chat=SimpleNamespace(completions=SimpleNamespace(create=create))
     )
     parsed, raw, _, response_ids = validated_completion(
         client,
@@ -163,10 +167,15 @@ def test_schema_failure_is_retried_and_recorded() -> None:
         payload={},
         temperature=0,
         max_tokens=10,
+        reasoning_effort="high",
     )
     assert parsed.trait_score == 3
     assert len(raw) == 2
     assert response_ids == ["bad", "good"]
+    assert requests[0]["extra_body"]["reasoning"] == {
+        "effort": "high",
+        "exclude": True,
+    }
 
 
 def test_queue_persists_failures(tmp_path: Path) -> None:

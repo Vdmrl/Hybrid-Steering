@@ -83,16 +83,22 @@ def completion(
     payload: dict[str, Any],
     temperature: float,
     max_tokens: int,
+    reasoning_effort: str | None = None,
 ) -> tuple[str, Usage, str]:
-    response = client.chat.completions.create(
-        model=model,
-        temperature=temperature,
-        max_tokens=max_tokens,
-        messages=[
+    request: dict[str, Any] = {
+        "model": model,
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+        "messages": [
             {"role": "system", "content": system},
             {"role": "user", "content": json.dumps(payload, ensure_ascii=False)},
         ],
-    )
+    }
+    if reasoning_effort and reasoning_effort != "none":
+        request["extra_body"] = {
+            "reasoning": {"effort": reasoning_effort, "exclude": True}
+        }
+    response = client.chat.completions.create(**request)
     content = response.choices[0].message.content
     if not content:
         raise ValueError("judge returned empty content")
@@ -218,6 +224,7 @@ def scalar_task_v2(
     config_version: str,
     config_sha256: str,
     seed: int,
+    reasoning_effort: str | None = None,
 ) -> ScalarResultV2:
     row, answer = task
 
@@ -246,6 +253,7 @@ def scalar_task_v2(
         },
         temperature=temperature,
         max_tokens=max_tokens,
+        reasoning_effort=reasoning_effort,
     )
     return ScalarResultV2(
         task_id=(
@@ -297,6 +305,7 @@ def pairwise_task_v2(
     config_version: str,
     config_sha256: str,
     seed: int,
+    reasoning_effort: str | None = None,
 ) -> PairwiseResultV2:
     row, left, right, orientation = task
 
@@ -326,6 +335,7 @@ def pairwise_task_v2(
         },
         temperature=temperature,
         max_tokens=max_tokens,
+        reasoning_effort=reasoning_effort,
     )
 
     def map_winner(value: str) -> str:

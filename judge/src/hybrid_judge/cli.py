@@ -70,6 +70,7 @@ def main() -> None:
         "provider": config.provider,
         "temperature": config.generation.temperature,
         "max_tokens": config.generation.max_output_tokens,
+        "reasoning_effort": config.generation.reasoning_effort,
         "schema_retries": config.generation.schema_retries,
         "rubric_version": features.rubric_version,
         "prompt_version": prompt_name,

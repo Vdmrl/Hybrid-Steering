@@ -55,6 +55,7 @@ class FeatureConfigV2(StrictModel):
 class GenerationConfig(StrictModel):
     temperature: float = 0
     max_output_tokens: int = Field(default=4096, gt=0)
+    reasoning_effort: Literal["none", "high", "xhigh"] = "high"
     timeout_seconds: float = Field(default=240, gt=0)
     max_retries: int = Field(default=4, ge=0)
     schema_retries: int = Field(default=2, ge=0)
