@@ -176,6 +176,7 @@ def test_schema_failure_is_retried_and_recorded() -> None:
         "effort": "high",
         "exclude": True,
     }
+    assert requests[0]["response_format"] == {"type": "json_object"}
 
 
 def test_queue_persists_failures(tmp_path: Path) -> None:

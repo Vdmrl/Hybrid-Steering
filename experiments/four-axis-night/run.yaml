@@ -16,7 +16,7 @@ stages:
 judge:
   model: deepseek/deepseek-v4-flash
   reasoning: high
-  max_output_tokens: 512
+  max_output_tokens: 1024
   both_orders: true
 statistics:
   cluster_bootstrap_samples: 10000

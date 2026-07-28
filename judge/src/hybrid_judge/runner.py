@@ -93,6 +93,7 @@ def completion(
             {"role": "system", "content": system},
             {"role": "user", "content": json.dumps(payload, ensure_ascii=False)},
         ],
+        "response_format": {"type": "json_object"},
     }
     if reasoning_effort and reasoning_effort != "none":
         request["extra_body"] = {
