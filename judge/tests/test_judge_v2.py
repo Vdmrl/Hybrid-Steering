@@ -62,6 +62,7 @@ def result(
 
 def test_v2_contracts_and_one_answer_scalar_tasks() -> None:
     features, config = load_configs(ROOT, "v2")
+    assert set(features.features["french_language"].anchors) == {1, 2, 3, 4, 5}
     feature = features.features["optimism"]
     prompt = render_prompt(
         (ROOT / "prompts" / config.evaluation.scalar_prompt).read_text(

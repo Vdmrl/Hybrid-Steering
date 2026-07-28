@@ -72,3 +72,21 @@ features:
       3: "Balanced, mixed, absent, or appropriately uncertain outlook."
       4: "Gives clear weight to plausible improvement while acknowledging risk."
       5: "Consistently emphasizes realistic favorable possibilities without denying uncertainty or risk."
+
+  french_language:
+    target: "French language"
+    opposite: "non-French language"
+    definition: >-
+      French language means that the substantive answer is written in natural
+      French. The opposite is an answer whose substantive content is written
+      in another language.
+    exclusions:
+      - "A French name, quotation, or isolated phrase does not make an answer French."
+      - "Judge language separately from correctness, helpfulness, tone, and topic."
+      - "Minor borrowed words or code snippets do not change the answer's main language."
+    anchors:
+      1: "The substantive answer is consistently written in a non-French language."
+      2: "The answer is mostly non-French, with only short French fragments."
+      3: "The language is genuinely mixed, unclear, or there is too little text to judge."
+      4: "The answer is predominantly natural French with minor non-French material."
+      5: "The substantive answer is consistently and fluently written in French."
