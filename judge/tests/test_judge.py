@@ -8,7 +8,7 @@ ROOT = Path(__file__).parents[1]
 
 
 def test_contracts_and_blinding() -> None:
-    features, config = load_configs(ROOT)
+    features, config = load_configs(ROOT, "v1")
     rows = read_jsonl(ROOT / "examples" / "input.example.jsonl")
     feature = features.features["optimism"]
     prompt = render_prompt(

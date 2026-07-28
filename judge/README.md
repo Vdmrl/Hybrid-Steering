@@ -1,21 +1,26 @@
 # Hybrid Judge
 
-Общий blind LLM-as-a-Judge для сравнения steering-абляций. Он не знает про
-GDN, residual stream, SVD, слои или `alpha`: на вход подаются только scenario
-и несколько ответов.
+Blind LLM-as-a-Judge for steering ablations. It receives only a scenario and
+anonymous answers: never GDN/residual/SVD, layer, alpha, or method names.
 
-## Возможности
+Judge v2 is the default. Judge v1 remains available for reproducing old runs
+and its prompts/configs must not be edited in place.
 
-- scalar-оценка target/opposite и трёх quality-метрик;
-- pairwise `A / B / tie`, при необходимости в обоих порядках;
-- определения концептов в общем `concepts/features.yaml`;
-- детерминированная анонимизация и перестановка ответов;
-- 8 параллельных запросов без batch barrier;
-- append-only JSONL и resume по стабильному `task_id`;
-- Pydantic-валидация входа и ответов judge;
-- OpenRouter/DeepSeek V4 Flash по умолчанию.
+## Judge v2
 
-## Установка
+Two complementary modes are intentionally separate:
+
+- **pairwise (primary):** compares A and B in both answer orders. The two calls
+  are aggregated into one prompt-level result. An order disagreement becomes a
+  conservative tie and is marked inconsistent;
+- **scalar (secondary):** scores exactly one answer per call on an anchored
+  1–5 trait scale, task fulfillment, and coherence. Trait score 3 means
+  neutral, mixed, absent, or unclear; `centered_trait_score = score - 3`.
+
+Every judgment must cite exact answer excerpts. Invalid JSON, unexpected IDs,
+or invented excerpts are retried and then written to a failures sidecar.
+
+## Install
 
 ```bash
 python -m venv .venv
@@ -24,15 +29,15 @@ pip install -e "judge[dev]"
 export OPENROUTER_API_KEY="..."
 ```
 
-В PowerShell:
+PowerShell:
 
 ```powershell
 $env:OPENROUTER_API_KEY="..."
 ```
 
-## Вход
+## Input
 
-Одна JSON-строка на scenario:
+One JSON object per scenario:
 
 ```json
 {
@@ -42,70 +47,67 @@ $env:OPENROUTER_API_KEY="..."
     {"answer_id": "baseline", "text": "First answer"},
     {"answer_id": "steered", "text": "Second answer"}
   ],
-  "metadata": {"dataset": "shared-core-v1", "split": "test"}
+  "metadata": {"dataset": "shared-core-v1", "split": "validation"}
 }
 ```
 
-`answer_id` нужен только для обратного соединения результатов. Judge получает
-анонимные `answer_0`, `answer_1` или `A`, `B`.
+`answer_id` is used only to join results. The provider sees anonymous
+`answer_0` or `A`/`B` labels.
 
-## Запуск
+## Run
 
-Scalar:
+Primary pairwise evaluation (both orders are mandatory in v2):
+
+```bash
+hybrid-judge judge/examples/input.example.jsonl runs/pairwise.jsonl \
+  --mode pairwise --feature optimism
+```
+
+This writes:
+
+- `pairwise.jsonl`: raw order-level judgments and full provenance;
+- `pairwise.aggregated.jsonl`: one conservative result per prompt/pair;
+- `pairwise.failures.jsonl`: append-only failed tasks, if any.
+
+Secondary scalar evaluation:
 
 ```bash
 hybrid-judge judge/examples/input.example.jsonl runs/scalar.jsonl \
   --feature optimism
 ```
 
-Pairwise с проверкой перестановки сторон:
-
-```bash
-hybrid-judge judge/examples/input.example.jsonl runs/pairwise.jsonl \
-  --mode pairwise \
-  --feature optimism \
-  --both-orders
-```
-
-Полезные параметры:
+Useful options:
 
 ```text
+--judge-version v2
 --model deepseek/deepseek-v4-flash
 --workers 8
 --seed 20260728
 --config-root judge
 ```
 
-Повторный запуск с тем же output пропускает уже записанные `task_id`.
-Неудачные запросы остаются незаписанными и будут повторены.
+Re-running against the same output resumes by stable `task_id`. v1 can be
+reproduced with `--judge-version v1`; only v1 honors `--both-orders`.
 
-## Структура
+## Versioned sources of truth
 
 ```text
-judge/
-├── config/
-│   └── judge.yaml
-├── examples/input.example.jsonl
-├── prompts/
-│   ├── scalar_v1.txt
-│   └── pairwise_v1.txt
-├── src/hybrid_judge/
-│   ├── cli.py
-│   ├── config.py
-│   ├── models.py
-│   └── runner.py
-└── tests/test_judge.py
+concepts/features_v1.yaml
+concepts/features_v2.yaml
+judge/config/judge_v1.yaml
+judge/config/judge_v2.yaml
+judge/prompts/scalar_v1.txt
+judge/prompts/pairwise_v1.txt
+judge/prompts/scalar_v2.txt
+judge/prompts/pairwise_v2.txt
 ```
 
-Промпт, использованный в результате, не редактируется задним числом:
-создаётся `scalar_v2.txt` или `pairwise_v2.txt`, а filename сохраняется в
-provenance.
+Results store model/provider, prompt and config hashes, rubric/config versions,
+answer order, seed, decoding settings, usage, schema attempts, raw provider
+responses, response IDs, and UTC timestamp.
 
-## Командная работа
+## Before article use
 
-- общий Judge меняется в `feat/...` или `fix/...`;
-- конкретная абляция живёт в `exp/<concept>-<ablation>`;
-- `main` содержит проверенный общий код;
-- большие outputs и API-ключи в Git не добавляются.
-
-Подробнее: корневые `AGENTS.md` и `CONTRIBUTING.md`.
+Read [calibration/README.md](calibration/README.md). A valid API run is only
+exploratory until every feature passes the human calibration and order-bias
+gates. Pairwise is the primary endpoint; scalar scores are diagnostic.

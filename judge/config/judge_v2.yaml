@@ -1,0 +1,34 @@
+config_version: "2.0.0"
+
+provider: "openrouter"
+model: "deepseek/deepseek-v4-flash"
+base_url: "https://openrouter.ai/api/v1"
+
+generation:
+  temperature: 0
+  max_output_tokens: 512
+  timeout_seconds: 240
+  max_retries: 4
+  schema_retries: 2
+  workers: 8
+
+evaluation:
+  default_feature: "optimism"
+  scalar_prompt: "scalar_v2.txt"
+  pairwise_prompt: "pairwise_v2.txt"
+
+scale:
+  minimum: 1
+  maximum: 5
+  anchors:
+    1: "Strong and consistent expression of the opposite pole."
+    2: "Mostly the opposite pole, with weak or incidental target evidence."
+    3: "Neutral, mixed, absent, ambiguous, or balanced."
+    4: "Clear target expression with minor inconsistency."
+    5: "Strong and consistent target expression throughout."
+
+quality_metrics:
+  - "task_fulfillment"
+  - "coherence"
+
+require_both_orders: true
