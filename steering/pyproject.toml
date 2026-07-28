@@ -8,6 +8,7 @@ version = "0.1.0"
 description = "Minimal recurrent-state steering primitives for hybrid LLMs"
 requires-python = ">=3.11"
 dependencies = [
+  "numpy>=1.26",
   "pydantic>=2.8",
   "safetensors>=0.4",
   "torch>=2.5",

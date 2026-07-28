@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import copy
 import hashlib
-import io
 from collections.abc import Iterable, Mapping
 from typing import Any
 
@@ -104,9 +103,8 @@ def _as_tensors(value: Any) -> Iterable[torch.Tensor]:
 
 
 def _tensor_digest(tensor: torch.Tensor) -> str:
-    buffer = io.BytesIO()
-    torch.save(tensor.detach().contiguous().cpu(), buffer)
-    return hashlib.sha256(buffer.getbuffer()).hexdigest()
+    raw = tensor.detach().contiguous().cpu().view(torch.uint8).numpy().tobytes()
+    return hashlib.sha256(raw).hexdigest()
 
 
 def _walk_tensors(
