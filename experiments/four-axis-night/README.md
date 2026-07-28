@@ -6,4 +6,6 @@ and casualness. It runs the signed alpha sweep first, then the complete
 sensitivity, and a last-six-layer ablation.
 
 Every prompt is checkpointed before the next one starts. `run_all.sh` retries
-failed stages and Judge tasks without repeating completed work.
+failed stages and Judge tasks without repeating completed work. To control API
+cost, it evaluates the alpha sweep and factorial immediately but leaves the
+generated ablations ready for later, selective judging.

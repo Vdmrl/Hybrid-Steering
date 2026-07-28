@@ -18,5 +18,10 @@ judge:
   reasoning: high
   max_output_tokens: 1024
   both_orders: true
+  deferred_stages:
+    - negative_singles
+    - norm_controlled_pairs_and_full
+    - composition_beta_0.5_1.5
+    - last_six_layers
 statistics:
   cluster_bootstrap_samples: 10000
