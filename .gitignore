@@ -1,0 +1,22 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+!.env.example
+AGENTS.local.md
+local/
+.pytest_cache/
+.ruff_cache/
+
+# Large or generated experiment artifacts
+artifacts/
+outputs/
+logs/
+*.safetensors
+
+# Shared judge runtime artifacts
+judge/runs/
+judge/results/
+judge/*.jsonl
+!judge/examples/*.jsonl
