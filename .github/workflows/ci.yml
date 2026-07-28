@@ -17,3 +17,16 @@ jobs:
       - run: ruff check judge
       - run: ruff format --check judge
       - run: pytest judge/tests -q
+
+  steering:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -e "steering[dev]"
+      - run: ruff check steering
+      - run: ruff format --check steering
+      - run: pytest steering/tests -q

@@ -1,0 +1,30 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hybrid-steering"
+version = "0.1.0"
+description = "Minimal recurrent-state steering primitives for hybrid LLMs"
+requires-python = ">=3.11"
+dependencies = [
+  "pydantic>=2.8",
+  "safetensors>=0.4",
+  "torch>=2.5",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2",
+  "ruff>=0.6",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hybrid_steering"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"

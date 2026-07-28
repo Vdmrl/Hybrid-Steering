@@ -6,24 +6,36 @@ repository or in ignored `AGENTS.local.md`.
 
 ## Current scope
 
-The shared component is `judge/`. Keep it independent from a particular
-steering implementation, model architecture, or ablation. Experiment-specific
-code may consume Judge inputs and outputs, but Judge must not import experiment
-code.
+The shared components are:
+
+- `judge/`: blind evaluation independent from a steering implementation;
+- `steering/`: minimal recurrent-state extraction and intervention primitives;
+- `concepts/`: the shared meanings of evaluated features;
+- `experiments/`: contracts and small reproducibility manifests, not raw runs.
+
+Experiment-specific code may consume shared components, but shared components
+must not import experiment code.
 
 Before changing Judge, read:
 
 1. `judge/README.md`;
-2. `judge/config/features.yaml`;
-3. the affected schema in `judge/schemas/`;
+2. `concepts/features.yaml`;
+3. the affected Pydantic model in `judge/src/hybrid_judge/models.py`;
 4. `CONTRIBUTING.md`.
+
+Before changing Steering, read:
+
+1. `steering/README.md`;
+2. `steering/src/hybrid_steering/models.py`;
+3. `CONTRIBUTING.md`.
 
 ## Sources of truth
 
-- Concept meanings live in `judge/config/features.yaml`.
+- Concept meanings live in `concepts/features.yaml`.
 - Runtime defaults live in `judge/config/judge.yaml`.
 - Prompt text is versioned in `judge/prompts/`.
 - Machine-readable interfaces live in `judge/src/hybrid_judge/models.py`.
+- Direction and run interfaces live in `steering/src/hybrid_steering/models.py`.
 - Tiny synthetic examples live in `judge/examples/`.
 
 Do not duplicate a feature definition inside Python code. Do not silently edit
@@ -55,9 +67,15 @@ version instead.
 
 ## Change discipline
 
-- In a shared repository, create a dedicated branch before modifying code,
-  prompts, rubrics, schemas, or experiment configs.
+- **Mandatory branch gate:** before editing any tracked file, run
+  `git branch --show-current`. If it is `main` or `master`, stop and create a
+  dedicated branch first.
+- Every experiment, including a smoke test, ablation, changed alpha/layer
+  selection, or new concept combination, must use its own
+  `exp/<concept>-<ablation>` branch. If the environment mandates a namespace,
+  use `<namespace>/exp/<concept>-<ablation>`.
 - Never commit experimental work directly to `main`.
+- Never mix two experiments in one branch, even when they share a dataset.
 - Do not continue, rewrite, rebase, or force-push another agent's branch
   without explicit coordination.
 - Use `exp/<concept>-<ablation>` for an experiment/config/result bundle and
@@ -82,6 +100,9 @@ Once the Python runner exists, the standard local checks will be:
 python -m pytest judge/tests
 ruff check judge
 ruff format --check judge
+python -m pytest steering/tests
+ruff check steering
+ruff format --check steering
 ```
 
 If a command is not available yet, do not invent a passing result; report that
