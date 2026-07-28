@@ -8,7 +8,7 @@ GDN, residual stream, SVD, слои или `alpha`: на вход подаютс
 
 - scalar-оценка target/opposite и трёх quality-метрик;
 - pairwise `A / B / tie`, при необходимости в обоих порядках;
-- определения концептов в одном YAML;
+- определения концептов в общем `concepts/features.yaml`;
 - детерминированная анонимизация и перестановка ответов;
 - 8 параллельных запросов без batch barrier;
 - append-only JSONL и resume по стабильному `task_id`;
@@ -84,7 +84,6 @@ hybrid-judge judge/examples/input.example.jsonl runs/pairwise.jsonl \
 ```text
 judge/
 ├── config/
-│   ├── features.yaml
 │   └── judge.yaml
 ├── examples/input.example.jsonl
 ├── prompts/

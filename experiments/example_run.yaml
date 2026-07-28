@@ -1,0 +1,13 @@
+schema_version: "1.0"
+run_id: "optimism-gdn-all-alpha4-seed42"
+model_id: "Qwen/Qwen3.5-9B"
+model_revision: null
+method: "gdn_additive"
+concept: "optimism"
+alpha: 4.0
+decoder_layer_indices_zero_based: [0, 1, 2, 4, 5, 6]
+seed: 42
+generation_parameters:
+  max_new_tokens: 128
+  temperature: 0
+direction_artifact: "directions/optimism-v1"

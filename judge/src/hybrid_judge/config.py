@@ -15,6 +15,6 @@ def load_yaml(path: Path, model: type[T]) -> T:
 
 def load_configs(root: Path) -> tuple[FeatureConfig, JudgeConfig]:
     return (
-        load_yaml(root / "config" / "features.yaml", FeatureConfig),
+        load_yaml(root.parent / "concepts" / "features.yaml", FeatureConfig),
         load_yaml(root / "config" / "judge.yaml", JudgeConfig),
     )
