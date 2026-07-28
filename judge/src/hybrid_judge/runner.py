@@ -8,30 +8,23 @@ from collections.abc import Callable, Iterable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Literal, TypeVar
+from typing import Any, TypeVar
 
 from openai import OpenAI
 from pydantic import BaseModel, ValidationError
 
 from .models import (
     Answer,
-    Feature,
     FeatureV2,
     JudgeInput,
-    PairwiseResponse,
     PairwiseResponseV2,
-    PairwiseResult,
     PairwiseResultV2,
-    Provenance,
     ProvenanceV2,
-    ScalarResponse,
     ScalarResponseV2,
-    ScalarResult,
     ScalarResultV2,
     Usage,
 )
 
-Mode = Literal["scalar", "pairwise"]
 ResponseT = TypeVar("ResponseT", bound=BaseModel)
 
 
@@ -58,9 +51,7 @@ def stable_random(seed: int, *parts: str) -> random.Random:
     return random.Random(int.from_bytes(digest[:8]))
 
 
-def render_prompt(
-    template: str, feature: Feature | FeatureV2, scale: dict[int, str]
-) -> str:
+def render_prompt(template: str, feature: FeatureV2, scale: dict[int, str]) -> str:
     anchors = "\n".join(f"{score}: {text}" for score, text in sorted(scale.items()))
     exclusions = "\n".join(f"- {item}" for item in feature.exclusions) or "- None"
     return template.format(
@@ -145,62 +136,6 @@ def validated_completion(
     raise SchemaFailure(len(raw_responses), raw_responses)
 
 
-def scalar_task(
-    row: JudgeInput,
-    *,
-    feature_name: str,
-    feature: Feature,
-    template: str,
-    scale: dict[int, str],
-    client: OpenAI,
-    model: str,
-    temperature: float,
-    max_tokens: int,
-    rubric_version: str,
-    prompt_version: str,
-    seed: int,
-) -> ScalarResult:
-    answers = list(row.answers)
-    stable_random(seed, "scalar", feature_name, row.prompt_id).shuffle(answers)
-    local_ids = {f"answer_{i}": answer.answer_id for i, answer in enumerate(answers)}
-    content, usage, _ = completion(
-        client,
-        model=model,
-        system=render_prompt(template, feature, scale),
-        payload={
-            "scenario": row.scenario,
-            "answers": [
-                {"answer_id": local_id, "text": answer.text}
-                for local_id, answer in zip(local_ids, answers, strict=True)
-            ],
-        },
-        temperature=temperature,
-        max_tokens=max_tokens,
-    )
-    parsed = ScalarResponse.model_validate_json(content)
-    if len(parsed.scores) != len(local_ids) or {
-        score.answer_id for score in parsed.scores
-    } != set(local_ids):
-        raise ValueError("judge returned missing or unexpected answer_id")
-    scores = [
-        score.model_copy(update={"answer_id": local_ids[score.answer_id]})
-        for score in parsed.scores
-    ]
-    return ScalarResult(
-        task_id=f"scalar:{rubric_version}:{feature_name}:{row.prompt_id}",
-        prompt_id=row.prompt_id,
-        feature=feature_name,
-        scores=scores,
-        provenance=Provenance(
-            judge_model=model,
-            prompt_version=prompt_version,
-            rubric_version=rubric_version,
-            permutation=[answer.answer_id for answer in answers],
-            usage=usage,
-        ),
-    )
-
-
 def pairwise_tasks(
     rows: Iterable[JudgeInput],
     *,
@@ -224,60 +159,6 @@ def pairwise_tasks(
             if both_orders:
                 tasks.append((row, pair[1], pair[0], "reverse"))
     return tasks
-
-
-def pairwise_task(
-    task: tuple[JudgeInput, Answer, Answer, str],
-    *,
-    feature_name: str,
-    feature: Feature,
-    template: str,
-    client: OpenAI,
-    model: str,
-    temperature: float,
-    max_tokens: int,
-    rubric_version: str,
-    prompt_version: str,
-) -> PairwiseResult:
-    row, left, right, orientation = task
-    content, usage, _ = completion(
-        client,
-        model=model,
-        system=render_prompt(template, feature, {}),
-        payload={
-            "scenario": row.scenario,
-            "answer_A": left.text,
-            "answer_B": right.text,
-        },
-        temperature=temperature,
-        max_tokens=max_tokens,
-    )
-    parsed = PairwiseResponse.model_validate_json(content)
-
-    def map_winner(value: str) -> str:
-        return {"A": "left", "B": "right", "tie": "tie"}[value]
-
-    pair_key = ":".join(sorted([left.answer_id, right.answer_id]))
-    return PairwiseResult(
-        task_id=(
-            f"pairwise:{rubric_version}:{feature_name}:"
-            f"{row.prompt_id}:{pair_key}:{orientation}"
-        ),
-        prompt_id=row.prompt_id,
-        feature=feature_name,
-        left_answer_id=left.answer_id,
-        right_answer_id=right.answer_id,
-        feature_winner=map_winner(parsed.feature_winner),
-        quality_winner=map_winner(parsed.quality_winner),
-        reason=parsed.reason,
-        provenance=Provenance(
-            judge_model=model,
-            prompt_version=prompt_version,
-            rubric_version=rubric_version,
-            permutation=[left.answer_id, right.answer_id],
-            usage=usage,
-        ),
-    )
 
 
 def scalar_v2_tasks(rows: Iterable[JudgeInput]) -> list[tuple[JudgeInput, Answer]]:

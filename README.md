@@ -15,7 +15,7 @@ changing the model's factual context.
 | --- | --- |
 | [`steering/`](steering/) | Reusable GDN recurrent-state extraction and intervention primitives |
 | [`judge/`](judge/) | Blind LLM-as-a-Judge pipeline for evaluating steering results |
-| [`concepts/`](concepts/) | Versioned definitions and anchored rubrics for behavioral features |
+| [`concepts/`](concepts/) | Definitions and anchored rubrics for behavioral features |
 | [`experiments/`](experiments/) | Reproducible experiment manifests, small runners, and compact summaries |
 
 The current feature set covers principled candor vs. sycophancy, calm
@@ -64,14 +64,13 @@ layer selection, alpha, or condition name.
 - Results include prompt/config hashes, answer order, decoding settings, token
   usage, raw responses, and provider response IDs.
 
-Judge v1 remains versioned for reproducing earlier runs. Judge v2 is the
-default.
-
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -e "judge[dev]"
 export OPENROUTER_API_KEY="..."
+# Optional when direct OpenRouter access is unavailable:
+# export OPENROUTER_PROXY="http://user:password@host:port"
 
 hybrid-judge judge/examples/input.example.jsonl runs/pairwise.jsonl \
   --mode pairwise \

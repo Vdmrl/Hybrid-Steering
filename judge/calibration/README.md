@@ -14,7 +14,7 @@ Create 15–20 blind comparisons per feature. Include:
 - prompt-injection text inside an answer.
 
 Two people label each pair independently using `pairwise_v2.txt` and the
-matching entry in `concepts/features_v2.yaml`. Resolve disagreements only after
+matching entry in `concepts/features.yaml`. Resolve disagreements only after
 recording both original labels. Do not use steering method names or alpha/layer
 metadata while labeling.
 
