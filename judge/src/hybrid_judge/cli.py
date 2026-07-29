@@ -15,6 +15,7 @@ from .runner import (
     read_jsonl,
     run_tasks,
     scalar_task_v2,
+    scalar_trait_task_v3,
     scalar_v2_tasks,
 )
 
@@ -25,7 +26,9 @@ def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Blind shared LLM-as-a-Judge v2")
     parser.add_argument("input", type=Path)
     parser.add_argument("output", type=Path)
-    parser.add_argument("--mode", choices=("scalar", "pairwise"), default="scalar")
+    parser.add_argument(
+        "--mode", choices=("trait", "scalar", "pairwise"), default="trait"
+    )
     parser.add_argument("--feature")
     parser.add_argument("--workers", type=int)
     parser.add_argument("--seed", type=int, default=20260728)
@@ -54,11 +57,11 @@ def main() -> None:
     workers = args.workers or config.generation.workers
     client = openrouter_client(config, api_key)
     rows = read_jsonl(args.input)
-    prompt_name = (
-        config.evaluation.scalar_prompt
-        if args.mode == "scalar"
-        else config.evaluation.pairwise_prompt
-    )
+    prompt_name = {
+        "trait": config.evaluation.trait_prompt,
+        "scalar": config.evaluation.scalar_prompt,
+        "pairwise": config.evaluation.pairwise_prompt,
+    }[args.mode]
     prompt_path = args.config_root / "prompts" / prompt_name
     config_path = args.config_root / "config" / "judge.yaml"
     common: dict[str, Any] = {
@@ -79,16 +82,19 @@ def main() -> None:
         "seed": args.seed,
     }
 
-    if args.mode == "scalar":
+    if args.mode in {"trait", "scalar"}:
         tasks = scalar_v2_tasks(rows)
 
         def worker(task: Any, dry_run: bool = False) -> Any:
             row, answer = task
             if dry_run:
+                version = "scalar-v3" if args.mode == "trait" else "scalar-v2"
                 return (
-                    f"scalar-v2:{features.rubric_version}:{feature_name}:"
+                    f"{version}:{features.rubric_version}:{feature_name}:"
                     f"{row.prompt_id}:{answer.answer_id}"
                 )
+            if args.mode == "trait":
+                return scalar_trait_task_v3(task, **common)
             return scalar_task_v2(task, **common)
 
     else:

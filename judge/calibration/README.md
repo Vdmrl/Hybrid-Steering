@@ -39,8 +39,10 @@ recalibrate. Never tune the rubric against the steering test split.
 Use the prompt/scenario as the statistical unit. The two answer orders are one
 comparison, not two samples.
 
-- Primary endpoint: pairwise target-pole win/loss/tie after order aggregation.
-- Secondary endpoint: paired change in centered scalar score (`score - 3`).
+- Primary endpoint: paired change in centered trait score (`score - 3`).
+- Absolute composition endpoint: predeclared proportion of answers where every
+  active trait scores at least 4.
+- Robustness endpoint: pairwise target-pole win/loss/tie after order aggregation.
 - Quality guardrail: report task-fulfillment and coherence changes separately.
 - Uncertainty: bootstrap a 95% confidence interval over prompts.
 - Hypothesis test: two-sided sign test on non-tied prompt-level comparisons.

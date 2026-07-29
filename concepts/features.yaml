@@ -1,4 +1,4 @@
-rubric_version: "2.0.0"
+rubric_version: "2.1.0"
 
 features:
   principled_candor:
@@ -53,6 +53,24 @@ features:
       3: "Mixed, neutral, or the task does not permit distinguishing the poles."
       4: "Clear situation-specific or actionable detail."
       5: "Consistently observable, operational, and directly actionable detail."
+
+  casualness:
+    target: "casualness"
+    opposite: "formality"
+    definition: >-
+      Casualness means a relaxed, conversational register with ordinary
+      phrasing and natural informality. Formality means an official,
+      ceremonial, or institutionally polished register.
+    exclusions:
+      - "Casualness is not carelessness, slang density, rudeness, or low quality."
+      - "Formality is not merely correctness, politeness, or technical vocabulary."
+      - "Judge register separately from the answer's content and length."
+    anchors:
+      1: "Consistently official, ceremonial, or institutionally polished language."
+      2: "Mostly formal register, with only incidental conversational phrasing."
+      3: "Neutral, mixed, absent, or not distinguishable from the task."
+      4: "Clearly relaxed and conversational while remaining understandable."
+      5: "Consistently natural, informal, and conversational without becoming careless."
 
   optimism:
     target: "optimism"

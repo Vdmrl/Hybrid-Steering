@@ -5,9 +5,11 @@ anonymous answers: never GDN/residual/SVD, layer, alpha, or method names.
 
 ## Judge v2
 
-Two complementary modes are intentionally separate:
+Three modes are intentionally separate:
 
-- **pairwise (primary):** compares A and B in both answer orders. The two calls
+- **trait (default):** scores one answer per call on an anchored 1–5 trait
+  scale and returns no unrelated quality judgment;
+- **pairwise (complementary):** compares A and B in both answer orders. The two calls
   are aggregated into one prompt-level result. An order disagreement becomes a
   conservative tie and is marked inconsistent;
 - **scalar (secondary):** scores exactly one answer per call on an anchored
@@ -56,7 +58,7 @@ One JSON object per scenario:
 
 ## Run
 
-Primary pairwise evaluation (both orders are mandatory):
+Complementary pairwise evaluation (both orders are mandatory):
 
 ```bash
 hybrid-judge judge/examples/input.example.jsonl runs/pairwise.jsonl \
@@ -69,12 +71,16 @@ This writes:
 - `pairwise.aggregated.jsonl`: one conservative result per prompt/pair;
 - `pairwise.failures.jsonl`: append-only failed tasks, if any.
 
-Secondary scalar evaluation:
+Trait-only scalar evaluation for new experiments:
 
 ```bash
 hybrid-judge judge/examples/input.example.jsonl runs/scalar.jsonl \
-  --feature optimism
+  --mode trait --feature optimism
 ```
+
+Legacy `--mode scalar` preserves the v2 combined
+trait/task-fulfillment/coherence contract. Evaluate answer quality separately
+once per answer instead of repeating it for every trait.
 
 Useful options:
 
@@ -104,4 +110,5 @@ responses, response IDs, and UTC timestamp.
 
 Read [calibration/README.md](calibration/README.md). A valid API run is only
 exploratory until every feature passes the human calibration and order-bias
-gates. Pairwise is the primary endpoint; scalar scores are diagnostic.
+gates. Trait scores are the primary endpoint for absolute expression and
+composition; pairwise comparisons remain a causal robustness check.

@@ -55,10 +55,10 @@ checks.
 Judge v2 evaluates anonymous answers without seeing the steering method,
 layer selection, alpha, or condition name.
 
-- Pairwise evaluation is the primary endpoint. Every comparison runs in both
-  A/B orders and the two decisions are aggregated into one prompt-level result.
-- Scalar evaluation scores one answer per call on an anchored 1–5 trait scale,
-  task fulfillment, and coherence.
+- Trait evaluation is the primary endpoint for absolute expression and
+  composition. Pairwise A/B evaluation remains a causal robustness check.
+- Trait evaluation scores one answer per call on an anchored 1–5 scale without
+  unrelated quality fields. Legacy scalar mode remains reproducible.
 - Exact answer excerpts are required as evidence.
 - Invalid schemas or invented excerpts are retried and persisted as failures.
 - Results include prompt/config hashes, answer order, decoding settings, token

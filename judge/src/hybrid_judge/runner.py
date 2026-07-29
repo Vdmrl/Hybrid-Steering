@@ -22,6 +22,8 @@ from .models import (
     ProvenanceV2,
     ScalarResponseV2,
     ScalarResultV2,
+    ScalarTraitResponseV3,
+    ScalarTraitResultV3,
     Usage,
 )
 
@@ -259,6 +261,79 @@ def scalar_task_v2(
         centered_trait_score=parsed.trait_score - 3,
         task_fulfillment=parsed.task_fulfillment,
         coherence=parsed.coherence,
+        evidence=parsed.evidence,
+        reason=parsed.reason,
+        provenance=provenance_v2(
+            model=model,
+            provider=provider,
+            response_ids=response_ids,
+            prompt_version=prompt_version,
+            prompt_sha256=prompt_sha256,
+            rubric_version=rubric_version,
+            config_version=config_version,
+            config_sha256=config_sha256,
+            answer_order=[answer.answer_id],
+            seed=seed,
+            temperature=temperature,
+            raw_responses=raw,
+            usage=usage,
+        ),
+    )
+
+
+def scalar_trait_task_v3(
+    task: tuple[JudgeInput, Answer],
+    *,
+    feature_name: str,
+    feature: FeatureV2,
+    template: str,
+    client: OpenAI,
+    model: str,
+    provider: str,
+    temperature: float,
+    max_tokens: int,
+    schema_retries: int,
+    rubric_version: str,
+    prompt_version: str,
+    prompt_sha256: str,
+    config_version: str,
+    config_sha256: str,
+    seed: int,
+) -> ScalarTraitResultV3:
+    row, answer = task
+
+    def validate(parsed: ScalarTraitResponseV3) -> None:
+        if parsed.answer_id != "answer_0":
+            raise ValueError("judge returned an unexpected answer_id")
+        if parsed.evidence and parsed.evidence not in answer.text:
+            parsed.evidence = ""
+        if len(parsed.reason.split()) > 30:
+            raise ValueError("judge reason exceeds 30 words")
+
+    parsed, raw, usage, response_ids = validated_completion(
+        client,
+        response_model=ScalarTraitResponseV3,
+        validate=validate,
+        schema_retries=schema_retries,
+        model=model,
+        system=render_prompt(template, feature, feature.anchors),
+        payload={
+            "scenario": row.scenario,
+            "answer": {"answer_id": "answer_0", "text": answer.text},
+        },
+        temperature=temperature,
+        max_tokens=max_tokens,
+    )
+    return ScalarTraitResultV3(
+        task_id=(
+            f"scalar-v3:{rubric_version}:{feature_name}:"
+            f"{row.prompt_id}:{answer.answer_id}"
+        ),
+        prompt_id=row.prompt_id,
+        answer_id=answer.answer_id,
+        feature=feature_name,
+        trait_score=parsed.trait_score,
+        centered_trait_score=parsed.trait_score - 3,
         evidence=parsed.evidence,
         reason=parsed.reason,
         provenance=provenance_v2(

@@ -7,7 +7,11 @@ from pydantic import ValidationError
 
 from hybrid_judge.aggregate import aggregate_pairwise_v2
 from hybrid_judge.config import load_configs
-from hybrid_judge.models import PairwiseResultV2, ScalarResponseV2
+from hybrid_judge.models import (
+    PairwiseResultV2,
+    ScalarResponseV2,
+    ScalarTraitResponseV3,
+)
 from hybrid_judge.runner import (
     pairwise_tasks,
     read_jsonl,
@@ -100,6 +104,21 @@ def test_v2_contracts_and_one_answer_scalar_tasks() -> None:
                 "reason": "Invalid trait score.",
             }
         )
+
+
+def test_v3_trait_only_contract() -> None:
+    _, config = load_configs(ROOT)
+    parsed = ScalarTraitResponseV3.model_validate(
+        {
+            "answer_id": "answer_0",
+            "trait_score": 3,
+            "evidence": "",
+            "reason": "The trait is absent.",
+        }
+    )
+    assert parsed.trait_score == 3
+    assert "task_fulfillment" not in parsed.model_fields_set
+    assert config.evaluation.trait_prompt == "scalar_v3.txt"
 
 
 def test_pairwise_orders_are_one_experimental_unit() -> None:
