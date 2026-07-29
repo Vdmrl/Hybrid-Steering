@@ -14,10 +14,11 @@ python experiments/meeting-dashboard/build.py \
 ```
 
 The page shows main steering effects, their survival from single to four-way
-composition, the candor/concrete/casual triple, answer-quality effects, 95%
-bootstrap confidence intervals, feature interactions, and the two
-language-composition experiments. Missing summaries are shown as pending. The
-page refreshes every 60 seconds. To rebuild it as results arrive, run:
+composition, every exact pair/triple/four-way conditional effect,
+answer-quality effects, 95% bootstrap confidence intervals, feature
+interactions, and the two language-composition experiments. Missing summaries
+are shown as pending. The page refreshes every 60 seconds. To rebuild it as
+results arrive, run:
 
 ```bash
 bash experiments/meeting-dashboard/watch.sh

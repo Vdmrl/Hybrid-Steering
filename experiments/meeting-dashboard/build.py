@@ -137,36 +137,55 @@ def composition_depth(data: dict | None) -> str:
     return "".join(cells) + "</table>"
 
 
-def working_triple(data: dict | None) -> str:
+def exact_compositions(data: dict | None) -> str:
     if not data or not data.get("effects_by_context"):
         return ""
-    selection = (
-        ("candor", "concrete+casual"),
-        ("concrete", "candor+casual"),
-        ("casual", "candor+concrete"),
-    )
-    cells = [
-        "<h2>Candor + concrete + casual (calm excluded)</h2>",
-        "<p class='hint'>The same triple-steered answer is tested on all three traits.</p>",
-        "<table><tr><th>Trait tested</th><th>Effect inside triple</th><th>95% CI</th>",
-        "<th>Conclusion</th></tr>",
+    blocks = [
+        "<h2>Every exact composition</h2>",
+        (
+            "<p class='hint'>For each target: alone, all three pairs, all three "
+            "triples, and all four features. Effect means adding the target "
+            "while the listed context is already active.</p>"
+        ),
     ]
-    for feature, context in selection:
-        item = data["effects_by_context"][feature][context]
-        low, high = item["ci95"]
-        conclusion = (
-            "reliably present"
-            if low > 0
-            else "positive, but uncertain"
-            if item["effect"] > 0
-            else "absent"
+    for feature, contexts in data["effects_by_context"].items():
+        rows = []
+        for context, item in sorted(
+            contexts.items(),
+            key=lambda pair: (
+                0 if pair[0] == "none" else pair[0].count("+") + 1,
+                pair[0],
+            ),
+        ):
+            low, high = item["ci95"]
+            status = (
+                ("present", "positive")
+                if low > 0
+                else ("suppressed", "negative")
+                if high < 0
+                else ("uncertain", "uncertain")
+            )
+            active = (
+                LABELS[feature]
+                if context == "none"
+                else " + ".join(
+                    [LABELS[feature]]
+                    + [LABELS.get(name, name) for name in context.split("+")]
+                )
+            )
+            rows.append(
+                f"<tr><td>{html.escape(active)}</td>"
+                f"<td class='{status[1]}'><strong>{item['effect']:+.2f}</strong></td>"
+                f"<td>[{low:+.2f}, {high:+.2f}]</td><td>{status[0]}</td></tr>"
+            )
+        blocks.append(
+            f"<details open><summary>Target: {html.escape(LABELS[feature])}</summary>"
+            "<table><tr><th>Active composition</th><th>Target effect</th>"
+            "<th>95% CI</th><th>Conclusion</th></tr>"
+            + "".join(rows)
+            + "</table></details>"
         )
-        cells.append(
-            f"<tr><th>{html.escape(LABELS[feature])}</th>"
-            f"<td><strong>{item['effect']:+.2f}</strong></td>"
-            f"<td>[{low:+.2f}, {high:+.2f}]</td><td>{conclusion}</td></tr>"
-        )
-    return "".join(cells) + "</table>"
+    return "".join(blocks)
 
 
 def composition_cards(title: str, data: dict | None) -> str:
@@ -214,7 +233,7 @@ def build(args: argparse.Namespace) -> str:
         f"{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}</p></header>"
         f"<main><section>{forest('Main steering effects', trait)}</section>"
         f"<section>{composition_depth(base)}</section>"
-        f"<section>{working_triple(base)}</section>"
+        f"<section>{exact_compositions(base)}</section>"
         f"<section>{forest('Answer-quality effects', quality)}</section>"
         f"<section>{interaction_table(main_data)}</section>"
         f"{composition_cards('Calm + French', load(args.calm_french))}"
@@ -237,6 +256,8 @@ th:first-child{{text-align:left}}.na,.pending,.hint{{color:var(--muted)}}.cards{
 grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}}article{{background:#0d1117;
 border-radius:9px;padding:14px}}article h3{{font-size:14px;margin:0 0 10px;text-transform:capitalize}}
 article strong{{display:block;font-size:28px}}article span{{display:block;color:var(--muted)}}
+.positive{{color:#62d394}}.negative{{color:#ff7b72}}.uncertain{{color:#d2a85a}}
+details{{margin:12px 0}}summary{{cursor:pointer;font-weight:700;margin-bottom:8px}}.small{{color:var(--muted)}}
 </style></head><body>{body}</body></html>"""
 
 
