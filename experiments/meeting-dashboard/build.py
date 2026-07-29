@@ -6,7 +6,6 @@ import argparse
 import html
 import json
 from datetime import datetime, timezone
-from itertools import combinations
 from pathlib import Path
 
 LABELS = {
@@ -17,11 +16,23 @@ LABELS = {
     "optimism": "Optimism",
 }
 FEATURES = ("candor", "calm", "concrete", "casual")
-FEATURE_ORDER = {feature: index for index, feature in enumerate(FEATURES)}
-
-
-def composition_order(active: tuple[str, ...]) -> tuple[int, ...]:
-    return tuple(FEATURE_ORDER[feature] for feature in active)
+COMPOSITION_ROWS = (
+    ("candor",),
+    ("candor", "calm"),
+    ("candor", "calm", "concrete"),
+    ("candor", "calm", "casual"),
+    ("candor", "calm", "concrete", "casual"),
+    ("candor", "concrete"),
+    ("candor", "casual"),
+    ("candor", "concrete", "casual"),
+    ("calm",),
+    ("calm", "concrete"),
+    ("calm", "casual"),
+    ("calm", "concrete", "casual"),
+    ("concrete",),
+    ("casual",),
+    ("concrete", "casual"),
+)
 
 
 def load(path: Path | None) -> dict | None:
@@ -172,15 +183,7 @@ def composition_matrix(data: dict | None) -> str:
     ]
     rows += [f"<th>{html.escape(LABELS[feature])}</th>" for feature in FEATURES]
     rows.append("</tr>")
-    active_rows = sorted(
-        (
-            active
-            for size in range(1, len(FEATURES) + 1)
-            for active in combinations(FEATURES, size)
-        ),
-        key=composition_order,
-    )
-    for active in active_rows:
+    for active in COMPOSITION_ROWS:
         title = " + ".join(LABELS[feature] for feature in active)
         rows.append(f"<tr><th>{html.escape(title)}</th>")
         for feature in FEATURES:
@@ -241,15 +244,7 @@ def exact_compositions(data: dict | None) -> str:
             "adds the same feature while all other listed features are active.</p>"
         ),
     ]
-    active_rows = sorted(
-        (
-            active
-            for size in range(2, len(FEATURES) + 1)
-            for active in combinations(FEATURES, size)
-        ),
-        key=composition_order,
-    )
-    for active in active_rows:
+    for active in (row for row in COMPOSITION_ROWS if len(row) > 1):
         rows = []
         for feature in active:
             contexts = data["effects_by_context"][feature]
