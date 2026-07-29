@@ -6,6 +6,7 @@ import argparse
 import html
 import json
 from datetime import datetime, timezone
+from itertools import combinations
 from pathlib import Path
 
 LABELS = {
@@ -15,6 +16,7 @@ LABELS = {
     "casual": "Casualness",
     "optimism": "Optimism",
 }
+FEATURES = ("candor", "calm", "concrete", "casual")
 
 
 def load(path: Path | None) -> dict | None:
@@ -141,50 +143,45 @@ def exact_compositions(data: dict | None) -> str:
     if not data or not data.get("effects_by_context"):
         return ""
     blocks = [
-        "<h2>Every exact composition</h2>",
+        "<h2>Standalone vs. composed effects</h2>",
         (
-            "<p class='hint'>For each target: alone, all three pairs, all three "
-            "triples, and all four features. Effect means adding the target "
-            "while the listed context is already active.</p>"
+            "<p class='hint'>Every active feature is judged separately. "
+            "“Standalone” adds it to the neutral condition; “in composition” "
+            "adds the same feature while all other listed features are active.</p>"
         ),
     ]
-    for feature, contexts in data["effects_by_context"].items():
-        rows = []
-        for context, item in sorted(
-            contexts.items(),
-            key=lambda pair: (
-                0 if pair[0] == "none" else pair[0].count("+") + 1,
-                pair[0],
-            ),
-        ):
-            low, high = item["ci95"]
-            status = (
-                ("present", "positive")
-                if low > 0
-                else ("suppressed", "negative")
-                if high < 0
-                else ("uncertain", "uncertain")
-            )
-            active = (
-                LABELS[feature]
-                if context == "none"
-                else " + ".join(
-                    [LABELS[feature]]
-                    + [LABELS.get(name, name) for name in context.split("+")]
+    for size in range(2, len(FEATURES) + 1):
+        blocks.append(f"<h3>{size}-feature compositions</h3>")
+        for active in combinations(FEATURES, size):
+            rows = []
+            for feature in active:
+                contexts = data["effects_by_context"][feature]
+                standalone = contexts["none"]
+                context = "+".join(
+                    name for name in FEATURES if name in active and name != feature
                 )
+                composed = contexts[context]
+                low, high = composed["ci95"]
+                status = (
+                    "positive" if low > 0 else "negative" if high < 0 else "uncertain"
+                )
+                delta = composed["effect"] - standalone["effect"]
+                rows.append(
+                    f"<tr><th>{html.escape(LABELS[feature])}</th>"
+                    f"<td>{standalone['effect']:+.2f}<br>"
+                    f"<span class='small'>[{standalone['ci95'][0]:+.2f}, "
+                    f"{standalone['ci95'][1]:+.2f}]</span></td>"
+                    f"<td class='{status}'><strong>{composed['effect']:+.2f}</strong><br>"
+                    f"<span class='small'>[{low:+.2f}, {high:+.2f}]</span></td>"
+                    f"<td>{delta:+.2f}</td></tr>"
+                )
+            title = " + ".join(LABELS[feature] for feature in active)
+            blocks.append(
+                f"<details open><summary>{html.escape(title)}</summary>"
+                "<table><tr><th>Feature judged separately</th>"
+                "<th>Standalone effect</th><th>Effect in composition</th>"
+                "<th>Change</th></tr>" + "".join(rows) + "</table></details>"
             )
-            rows.append(
-                f"<tr><td>{html.escape(active)}</td>"
-                f"<td class='{status[1]}'><strong>{item['effect']:+.2f}</strong></td>"
-                f"<td>[{low:+.2f}, {high:+.2f}]</td><td>{status[0]}</td></tr>"
-            )
-        blocks.append(
-            f"<details open><summary>Target: {html.escape(LABELS[feature])}</summary>"
-            "<table><tr><th>Active composition</th><th>Target effect</th>"
-            "<th>95% CI</th><th>Conclusion</th></tr>"
-            + "".join(rows)
-            + "</table></details>"
-        )
     return "".join(blocks)
 
 
