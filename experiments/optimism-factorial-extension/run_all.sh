@@ -32,17 +32,19 @@ flock -n 8 || { echo "optimism factorial queue is already running"; exit 0; }
 
 HTTPS_PROXY= HTTP_PROXY= ALL_PROXY= retry "$python_bin" "$experiment/prepare.py" \
   --output "$pairs"
-phase alpha
-phase alpha-input
-mkdir -p "$output/judge"
-retry "$python_bin" -m hybrid_judge.cli \
-  "$output/judge-inputs/alpha-optimism.jsonl" \
-  "$output/judge/alpha-optimism.jsonl" \
-  --config-root "$root/judge" \
-  --mode scalar \
-  --feature optimism \
-  --workers 8
-phase select
+if [[ ! -f "$output/selection.json" ]]; then
+  phase alpha
+  phase alpha-input
+  mkdir -p "$output/judge"
+  retry "$python_bin" -m hybrid_judge.cli \
+    "$output/judge-inputs/alpha-optimism.jsonl" \
+    "$output/judge/alpha-optimism.jsonl" \
+    --config-root "$root/judge" \
+    --mode scalar \
+    --feature optimism \
+    --workers 8
+  phase select
+fi
 phase factorial
 phase inputs
 
