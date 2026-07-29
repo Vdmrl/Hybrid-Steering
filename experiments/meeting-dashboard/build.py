@@ -197,7 +197,7 @@ def composition_matrix(data: dict | None) -> str:
         )
 
     rows = [
-        "<h2>Composition results at a glance</h2>",
+        "<h2>Composition results at a glance (128 test prompts per comparison)</h2>",
         (
             "<p class='hint'>One row per composition, grouped by the first and "
             "then the second feature. Each feature column is judged separately.</p>"
@@ -301,6 +301,72 @@ def composition_summary(data: dict | None) -> str:
     return "".join(blocks) + "</table>"
 
 
+def joint_composition_tables(data: dict | None) -> str:
+    if not data or not data.get("joint_compositions"):
+        return ""
+    joint = data["joint_compositions"]
+    features = data_features(data)
+    rows = [
+        "<h2>Joint success on the same answers</h2>",
+        (
+            "<p class='hint'>Strict prompt-level intersection: every active "
+            "feature must beat its matching one-feature-OFF answer in both "
+            "answer orders. Ties are not confirmations.</p>"
+        ),
+        "<table><tr><th>Active composition</th><th>Test prompts</th>",
+        "<th>All active features confirmed</th><th>Mean confirmed</th>",
+        "<th>No feature reversed</th></tr>",
+    ]
+    distributions = [
+        "<h2>Number of features confirmed on the same answer</h2>",
+        (
+            "<p class='hint'>Counts and percentages of prompts with exactly "
+            "0, 1, 2, 3, or 4 confirmed active features.</p>"
+        ),
+        "<table><tr><th>Active composition</th>",
+    ]
+    distributions += [
+        f"<th>{count} confirmed</th>" for count in range(len(features) + 1)
+    ]
+    distributions.append("</tr>")
+    for size in range(1, len(features) + 1):
+        for active in combinations(features, size):
+            item = joint.get("+".join(active))
+            if not item:
+                continue
+            title = " + ".join(LABELS[feature] for feature in active)
+            prompts = item["prompts"]
+            low, high = item["all_confirmed_ci95"]
+            rows.append(
+                f"<tr><th>{html.escape(title)}</th><td>{prompts}</td>"
+                f"<td><strong>{item['all_confirmed']}/{prompts} "
+                f"({item['all_confirmed_rate']:.1%})</strong><br>"
+                f"<span class='small'>95% CI [{low:.1%}, {high:.1%}]</span></td>"
+                f"<td>{item['mean_confirmed']:.2f}/{size} "
+                f"({item['mean_confirmed'] / size:.1%})</td>"
+                f"<td>{item['no_reversal']}/{prompts} "
+                f"({item['no_reversal_rate']:.1%})</td></tr>"
+            )
+            distributions.append(f"<tr><th>{html.escape(title)}</th>")
+            for count in range(len(features) + 1):
+                if count > size:
+                    distributions.append("<td class='na'>—</td>")
+                    continue
+                value = item["confirmed_distribution"][str(count)]
+                distributions.append(
+                    f"<td>{value}<br><span class='small'>"
+                    f"{value / prompts:.1%}</span></td>"
+                )
+            distributions.append("</tr>")
+    return (
+        "".join(rows)
+        + "</table><p class='hint'>“No feature reversed” allows ties; it is a "
+        "permissive safety check, not evidence that every feature appeared.</p>"
+        + "".join(distributions)
+        + "</table>"
+    )
+
+
 def language_composition_table(
     title: str,
     data: dict | None,
@@ -401,6 +467,7 @@ def build(args: argparse.Namespace) -> str:
         f"<section>{composition_depth(main_data)}</section>"
         f"<section>{composition_matrix(main_data)}</section>"
         f"<section>{composition_summary(main_data)}</section>"
+        f"<section>{joint_composition_tables(main_data)}</section>"
         f"<section>{forest('Answer-quality effects', quality)}</section>"
         f"<section>{interaction_table(main_data)}</section>"
         f"{language_composition_table('Calm + French', load(args.calm_french), 'calm')}"

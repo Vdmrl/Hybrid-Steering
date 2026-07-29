@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import random
+from itertools import combinations
 from pathlib import Path
 from statistics import mean
 
@@ -134,6 +135,59 @@ def composition_effects(
     return contexts, sizes
 
 
+def joint_compositions(
+    main_edges: dict[str, dict[tuple[str, str], float]],
+    rng: random.Random,
+    samples: int,
+) -> dict:
+    feature_index = {feature: index for index, feature in enumerate(FEATURES)}
+    source_ids = sorted(
+        set.intersection(
+            *(
+                {source_id for source_id, _ in main_edges[feature]}
+                for feature in FEATURES
+            )
+        )
+    )
+    result = {}
+    for size in range(1, len(FEATURES) + 1):
+        for active in combinations(FEATURES, size):
+            active_mask = sum(1 << feature_index[feature] for feature in active)
+            confirmed, reversed_counts = [], []
+            for source_id in source_ids:
+                values = [
+                    main_edges[feature].get(
+                        (
+                            source_id,
+                            f"{active_mask ^ (1 << feature_index[feature]):04b}",
+                        )
+                    )
+                    for feature in active
+                ]
+                if any(value is None for value in values):
+                    continue
+                confirmed.append(sum(value > 0 for value in values))
+                reversed_counts.append(sum(value < 0 for value in values))
+            if not confirmed:
+                continue
+            full = [value == size for value in confirmed]
+            no_reversal = [value == 0 for value in reversed_counts]
+            result["+".join(active)] = {
+                "features": list(active),
+                "prompts": len(confirmed),
+                "confirmed_distribution": {
+                    str(value): confirmed.count(value) for value in range(size + 1)
+                },
+                "all_confirmed": sum(full),
+                "all_confirmed_rate": mean(full),
+                "all_confirmed_ci95": bootstrap(full, rng, samples),
+                "mean_confirmed": mean(confirmed),
+                "no_reversal": sum(no_reversal),
+                "no_reversal_rate": mean(no_reversal),
+            }
+    return result
+
+
 def main() -> None:
     args = arguments()
     rng = random.Random(args.seed)
@@ -184,6 +238,7 @@ def main() -> None:
         "factorial_interactions": interactions,
         "effects_by_context": contexts,
         "effects_by_context_size": sizes,
+        "joint_compositions": joint_compositions(main_edges, rng, args.samples),
         "interpretation": (
             "Positive signed effects favor answer_id=on. Interaction values show "
             "how another active feature changes the target feature's matched effect."

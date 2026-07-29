@@ -6,6 +6,7 @@ import argparse
 import json
 import random
 from collections import defaultdict
+from itertools import combinations
 from pathlib import Path
 from statistics import mean
 
@@ -129,6 +130,54 @@ def composition_effects(
     return contexts, sizes
 
 
+def joint_compositions(
+    edges: dict[str, dict[tuple[str, str], int]],
+) -> dict:
+    feature_index = {feature: index for index, feature in enumerate(FEATURES)}
+    source_ids = sorted(
+        set.intersection(
+            *({source_id for source_id, _ in edges[feature]} for feature in FEATURES)
+        )
+    )
+    result = {}
+    for size in range(1, len(FEATURES) + 1):
+        for active in combinations(FEATURES, size):
+            active_mask = sum(1 << feature_index[feature] for feature in active)
+            confirmed, reversed_counts = [], []
+            for source_id in source_ids:
+                values = [
+                    edges[feature].get(
+                        (
+                            source_id,
+                            f"{active_mask ^ (1 << feature_index[feature]):04b}",
+                        )
+                    )
+                    for feature in active
+                ]
+                if any(value is None for value in values):
+                    continue
+                confirmed.append(sum(value > 0 for value in values))
+                reversed_counts.append(sum(value < 0 for value in values))
+            if not confirmed:
+                continue
+            full = [value == size for value in confirmed]
+            no_reversal = [value == 0 for value in reversed_counts]
+            result["+".join(active)] = {
+                "features": list(active),
+                "prompts": len(confirmed),
+                "confirmed_distribution": {
+                    str(value): confirmed.count(value) for value in range(size + 1)
+                },
+                "all_confirmed": sum(full),
+                "all_confirmed_rate": mean(full),
+                "all_confirmed_ci95": bootstrap(full, 20261229 + active_mask),
+                "mean_confirmed": mean(confirmed),
+                "no_reversal": sum(no_reversal),
+                "no_reversal_rate": mean(no_reversal),
+            }
+    return result
+
+
 def language_effect(path: Path, seed: int) -> dict:
     complete = [row for row in rows(path) if row["status"] == "complete"]
     trait = [score(row) for row in complete]
@@ -172,6 +221,7 @@ def main() -> None:
         "interactions": {},
         "effects_by_context": {},
         "effects_by_context_size": {},
+        "joint_compositions": joint_compositions(trait_edges),
     }
     for target_index, target in enumerate(FEATURES):
         for context_index, context in enumerate(FEATURES):
