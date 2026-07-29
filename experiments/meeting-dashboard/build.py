@@ -275,24 +275,56 @@ def exact_compositions(data: dict | None) -> str:
     return "".join(blocks)
 
 
-def composition_cards(title: str, data: dict | None) -> str:
+def language_composition_table(
+    title: str,
+    data: dict | None,
+    first: str,
+    second: str = "french",
+) -> str:
     if not data:
         return f"<section><h2>{html.escape(title)}</h2><p class='pending'>Pending</p></section>"
-    cards = []
-    for name, item in data.items():
-        if not isinstance(item, dict) or "trait_effect" not in item:
-            continue
-        ci = item["trait_ci95"]
-        cards.append(
-            f"<article><h3>{html.escape(name.replace('_', ' '))}</h3>"
-            f"<strong>{item['trait_effect']:+.2f}</strong>"
-            f"<span>95% CI {ci[0]:+.2f} … {ci[1]:+.2f}</span>"
-            f"<span>quality {item['quality_effect']:+.2f}</span></article>"
+    labels = {**LABELS, "french": "French language"}
+    rows = []
+    for feature, other in ((first, second), (second, first)):
+        standalone = data[f"{feature}_single"]
+        composed = data[f"{feature}_with_{other}"]
+        low, high = composed["trait_ci95"]
+        status = "positive" if low > 0 else "negative" if high < 0 else "uncertain"
+        if standalone["trait_ci95"][1] < 0:
+            verdict = "direction failed"
+        elif low > 0:
+            verdict = "works in composition"
+        else:
+            verdict = "not reliable in composition"
+        rows.append(
+            f"<tr><th>{labels[feature]}</th>"
+            f"<td>{standalone['trait_effect']:+.2f}<br>"
+            f"<span class='small'>[{standalone['trait_ci95'][0]:+.2f}, "
+            f"{standalone['trait_ci95'][1]:+.2f}]</span></td>"
+            f"<td class='{status}'><strong>{composed['trait_effect']:+.2f}</strong><br>"
+            f"<span class='small'>[{low:+.2f}, {high:+.2f}]</span></td>"
+            f"<td>{composed['trait_effect'] - standalone['trait_effect']:+.2f}</td>"
+            f"<td>{verdict}</td></tr>"
         )
+    language = data.get("deterministic_language", {})
+    standalone_rate = language.get(second, {}).get("french_rate")
+    composed_rate = language.get(f"{first}_{second}", {}).get("french_rate")
+    rate_note = (
+        f"<p class='hint'>Deterministic French-text rate: "
+        f"{standalone_rate:.1%} standalone → {composed_rate:.1%} with "
+        f"{labels[first]}.</p>"
+        if standalone_rate is not None and composed_rate is not None
+        else ""
+    )
     return (
-        f"<section><h2>{html.escape(title)}</h2><div class='cards'>"
-        + "".join(cards)
-        + "</div></section>"
+        f"<section><h2>{html.escape(title)}</h2>"
+        "<p class='hint'>Both traits are judged separately on the same composed answers.</p>"
+        "<table><tr><th>Feature judged</th><th>Standalone effect</th>"
+        "<th>Effect with the other feature</th><th>Change</th><th>Verdict</th></tr>"
+        + "".join(rows)
+        + "</table>"
+        + rate_note
+        + "</section>"
     )
 
 
@@ -343,8 +375,8 @@ def build(args: argparse.Namespace) -> str:
         f"<section>{exact_compositions(base)}</section>"
         f"<section>{forest('Answer-quality effects', quality)}</section>"
         f"<section>{interaction_table(main_data)}</section>"
-        f"{composition_cards('Calm + French', load(args.calm_french))}"
-        f"{composition_cards('Candor + French', load(args.candor_french))}</main>"
+        f"{language_composition_table('Calm + French', load(args.calm_french), 'calm')}"
+        f"{language_composition_table('Candor + French', load(args.candor_french), 'candor')}</main>"
     )
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
