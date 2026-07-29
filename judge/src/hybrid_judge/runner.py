@@ -4,6 +4,8 @@ import hashlib
 import itertools
 import json
 import random
+import re
+import unicodedata
 from collections.abc import Callable, Iterable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import UTC, datetime
@@ -32,6 +34,17 @@ class SchemaFailure(ValueError):
     def __init__(self, attempts: int, raw_responses: list[str]) -> None:
         super().__init__(f"judge schema validation failed after {attempts} attempts")
         self.raw_responses = raw_responses
+
+
+def evidence_is_excerpt(evidence: str, answer: str) -> bool:
+    """Match contiguous words while ignoring presentation-only differences."""
+
+    def words(text: str) -> str:
+        normalized = unicodedata.normalize("NFKC", text).casefold()
+        return " ".join(re.findall(r"[^\W_]+", normalized))
+
+    excerpt = words(evidence)
+    return bool(excerpt) and f" {excerpt} " in f" {words(answer)} "
 
 
 def read_jsonl(path: Path) -> list[JudgeInput]:
@@ -234,7 +247,10 @@ def scalar_task_v2(
             raise ValueError("judge returned an unexpected answer_id")
         if any(not quote.strip() for quote in parsed.evidence):
             raise ValueError("use an empty evidence list instead of empty excerpts")
-        if any(quote and quote not in answer.text for quote in parsed.evidence):
+        if any(
+            quote and not evidence_is_excerpt(quote, answer.text)
+            for quote in parsed.evidence
+        ):
             raise ValueError("judge evidence is not an exact answer excerpt")
         if parsed.trait_score != 3 and not parsed.evidence:
             raise ValueError("non-neutral trait scores require exact evidence")
@@ -311,9 +327,9 @@ def pairwise_task_v2(
     row, left, right, orientation = task
 
     def validate(parsed: PairwiseResponseV2) -> None:
-        if parsed.evidence_A and parsed.evidence_A not in left.text:
+        if parsed.evidence_A and not evidence_is_excerpt(parsed.evidence_A, left.text):
             raise ValueError("evidence_A is not an exact answer excerpt")
-        if parsed.evidence_B and parsed.evidence_B not in right.text:
+        if parsed.evidence_B and not evidence_is_excerpt(parsed.evidence_B, right.text):
             raise ValueError("evidence_B is not an exact answer excerpt")
         if parsed.trait_winner == "A" and not parsed.evidence_A:
             raise ValueError("trait winner A requires exact evidence_A")

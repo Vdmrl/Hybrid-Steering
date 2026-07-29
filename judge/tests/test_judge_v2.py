@@ -9,6 +9,7 @@ from hybrid_judge.aggregate import aggregate_pairwise_v2
 from hybrid_judge.config import load_configs
 from hybrid_judge.models import PairwiseResultV2, ScalarResponseV2
 from hybrid_judge.runner import (
+    evidence_is_excerpt,
     pairwise_tasks,
     read_jsonl,
     render_prompt,
@@ -100,6 +101,15 @@ def test_v2_contracts_and_one_answer_scalar_tasks() -> None:
                 "reason": "Invalid trait score.",
             }
         )
+
+
+def test_evidence_matching_ignores_formatting_but_not_words() -> None:
+    answer = '**Present the test data**: the design fails the "break-free" safety test.'
+    assert evidence_is_excerpt(
+        "present the test data: the design fails the 'break-free' safety test",
+        answer,
+    )
+    assert not evidence_is_excerpt("present revised test data", answer)
 
 
 def test_pairwise_orders_are_one_experimental_unit() -> None:

@@ -20,8 +20,16 @@ exec 9>"$output/queue.lock"
 flock -n 9 || { echo "four-axis queue is already running"; exit 0; }
 
 retry() {
-  until "$@"; do
-    echo "failed; retrying in 60 seconds: $*" >&2
+  local attempt
+  for attempt in 1 2 3; do
+    if "$@"; then
+      return 0
+    fi
+    if (( attempt == 3 )); then
+      echo "failed after 3 attempts: $*" >&2
+      return 1
+    fi
+    echo "failed; retrying in 60 seconds ($attempt/3): $*" >&2
     sleep 60
   done
 }
