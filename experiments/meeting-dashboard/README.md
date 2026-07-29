@@ -16,7 +16,14 @@ python experiments/meeting-dashboard/build.py \
 The page shows main steering effects, answer-quality effects, 95% bootstrap
 confidence intervals, feature interactions, and the two language-composition
 experiments. Missing summaries are shown as pending. The page refreshes every
-60 seconds; rerun the command to incorporate new results.
+60 seconds. To rebuild it as results arrive, run:
+
+```bash
+bash experiments/meeting-dashboard/watch.sh
+```
+
+The watcher paths can be overridden with environment variables documented at
+the top of `watch.sh`.
 
 This is intentionally a static report rather than a Streamlit application:
 it is easier to copy, archive, and show during a meeting. Add an interactive
