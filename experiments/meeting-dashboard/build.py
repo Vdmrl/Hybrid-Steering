@@ -157,42 +157,38 @@ def composition_matrix(data: dict | None) -> str:
             f"<span class='small'>[{low:+.2f}, {high:+.2f}]</span><br>"
         )
 
-    blocks = [
+    rows = [
         "<h2>Composition results at a glance</h2>",
         (
-            "<p class='hint'>One cell per unique composition; every line is a "
-            "separate feature-specific judgment. Green: positive CI; yellow: "
-            "uncertain; red: negative CI.</p>"
+            "<p class='hint'>Compositions grow from left to right and are grouped "
+            "by the first, then the second feature. Every result line is a "
+            "separate feature-specific judgment.</p>"
         ),
-        "<h3>Pairs</h3><table class='triangle'><tr><th></th>",
+        "<table class='hierarchy'><tr><th>First feature</th><th>+ second</th>",
+        "<th>+ third</th><th>+ fourth</th><th>Separately judged effects</th></tr>",
     ]
-    blocks += [f"<th>{html.escape(LABELS[feature])}</th>" for feature in FEATURES]
-    blocks.append("</tr>")
-    for left_index, left in enumerate(FEATURES):
-        blocks.append(f"<tr><th>{html.escape(LABELS[left])}</th>")
-        for right_index, right in enumerate(FEATURES):
-            if right_index <= left_index:
-                blocks.append("<td class='na'>—</td>")
+    active_rows = sorted(
+        active
+        for size in range(1, len(FEATURES) + 1)
+        for active in combinations(FEATURES, size)
+    )
+    for active in active_rows:
+        rows.append("<tr>")
+        for position in range(len(FEATURES)):
+            if position < len(active):
+                prefix = "" if position == 0 else "+ "
+                rows.append(
+                    f"<td class='step'>{prefix}"
+                    f"{html.escape(LABELS[active[position]])}</td>"
+                )
             else:
-                active = (left, right)
-                blocks.append(f"<td>{value(active, left)}{value(active, right)}</td>")
-        blocks.append("</tr>")
-    blocks.append("</table><h3>Triples</h3><table>")
-    for active in combinations(FEATURES, 3):
-        title = " + ".join(LABELS[feature] for feature in active)
-        blocks.append(
-            f"<tr><th>{html.escape(title)}</th><td>"
+                rows.append("<td class='na'></td>")
+        rows.append(
+            "<td>"
             + "".join(value(active, feature) for feature in active)
             + "</td></tr>"
         )
-    blocks.append(
-        "</table><h3>All four</h3><table><tr><th>"
-        + " + ".join(LABELS[feature] for feature in FEATURES)
-        + "</th><td>"
-        + "".join(value(FEATURES, feature) for feature in FEATURES)
-        + "</td></tr></table>"
-    )
-    return "".join(blocks)
+    return "".join(rows) + "</table>"
 
 
 def verdict_table(data: dict | None) -> str:
@@ -244,38 +240,39 @@ def exact_compositions(data: dict | None) -> str:
             "adds the same feature while all other listed features are active.</p>"
         ),
     ]
-    for size in range(2, len(FEATURES) + 1):
-        blocks.append(f"<h3>{size}-feature compositions</h3>")
-        for active in combinations(FEATURES, size):
-            rows = []
-            for feature in active:
-                contexts = data["effects_by_context"][feature]
-                standalone = contexts["none"]
-                context = "+".join(
-                    name for name in FEATURES if name in active and name != feature
-                )
-                composed = contexts[context]
-                low, high = composed["ci95"]
-                status = (
-                    "positive" if low > 0 else "negative" if high < 0 else "uncertain"
-                )
-                delta = composed["effect"] - standalone["effect"]
-                rows.append(
-                    f"<tr><th>{html.escape(LABELS[feature])}</th>"
-                    f"<td>{standalone['effect']:+.2f}<br>"
-                    f"<span class='small'>[{standalone['ci95'][0]:+.2f}, "
-                    f"{standalone['ci95'][1]:+.2f}]</span></td>"
-                    f"<td class='{status}'><strong>{composed['effect']:+.2f}</strong><br>"
-                    f"<span class='small'>[{low:+.2f}, {high:+.2f}]</span></td>"
-                    f"<td>{delta:+.2f}</td></tr>"
-                )
-            title = " + ".join(LABELS[feature] for feature in active)
-            blocks.append(
-                f"<details open><summary>{html.escape(title)}</summary>"
-                "<table><tr><th>Feature judged separately</th>"
-                "<th>Standalone effect</th><th>Effect in composition</th>"
-                "<th>Change</th></tr>" + "".join(rows) + "</table></details>"
+    active_rows = sorted(
+        active
+        for size in range(2, len(FEATURES) + 1)
+        for active in combinations(FEATURES, size)
+    )
+    for active in active_rows:
+        rows = []
+        for feature in active:
+            contexts = data["effects_by_context"][feature]
+            standalone = contexts["none"]
+            context = "+".join(
+                name for name in FEATURES if name in active and name != feature
             )
+            composed = contexts[context]
+            low, high = composed["ci95"]
+            status = "positive" if low > 0 else "negative" if high < 0 else "uncertain"
+            delta = composed["effect"] - standalone["effect"]
+            rows.append(
+                f"<tr><th>{html.escape(LABELS[feature])}</th>"
+                f"<td>{standalone['effect']:+.2f}<br>"
+                f"<span class='small'>[{standalone['ci95'][0]:+.2f}, "
+                f"{standalone['ci95'][1]:+.2f}]</span></td>"
+                f"<td class='{status}'><strong>{composed['effect']:+.2f}</strong><br>"
+                f"<span class='small'>[{low:+.2f}, {high:+.2f}]</span></td>"
+                f"<td>{delta:+.2f}</td></tr>"
+            )
+        title = " + ".join(LABELS[feature] for feature in active)
+        blocks.append(
+            f"<details open><summary>{html.escape(title)}</summary>"
+            "<table><tr><th>Feature judged separately</th>"
+            "<th>Standalone effect</th><th>Effect in composition</th>"
+            "<th>Change</th></tr>" + "".join(rows) + "</table></details>"
+        )
     return "".join(blocks)
 
 
