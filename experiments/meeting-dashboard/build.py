@@ -439,20 +439,31 @@ the opposite pole used to construct the direction.</p>
 </table>"""
 
 
+def factorial_report(title: str, data: dict | None) -> str:
+    if not data:
+        return f"<section><h2>{html.escape(title)}</h2><p class='pending'>Pending</p></section>"
+    optimism = "main_effects" in data
+    value_key = "effect" if optimism else "signed_effect"
+    trait = effect_rows(
+        data, "main_effects" if optimism else "pairwise_effects", value_key
+    )
+    quality = effect_rows(data, "quality_effects", value_key)
+    return (
+        f"<section class='factorial-title'><h2>{html.escape(title)}</h2></section>"
+        f"<section>{forest('Main steering effects', trait)}</section>"
+        f"<section>{verdict_table(data)}</section>"
+        f"<section>{composition_depth(data)}</section>"
+        f"<section>{composition_matrix(data)}</section>"
+        f"<section>{composition_summary(data)}</section>"
+        f"<section>{joint_composition_tables(data)}</section>"
+        f"<section>{forest('Answer-quality effects', quality)}</section>"
+        f"<section>{interaction_table(data)}</section>"
+    )
+
+
 def build(args: argparse.Namespace) -> str:
     base = load(args.four_axis)
     optimism = load(args.optimism)
-    main_data = optimism or base
-    trait = effect_rows(
-        main_data,
-        "main_effects" if optimism else "pairwise_effects",
-        "effect" if optimism else "signed_effect",
-    )
-    quality = effect_rows(
-        main_data,
-        "quality_effects",
-        "effect" if optimism else "signed_effect",
-    )
     complete = sum(
         item is not None
         for item in (base, load(args.calm_french), load(args.candor_french), optimism)
@@ -462,14 +473,8 @@ def build(args: argparse.Namespace) -> str:
         f"<p>{complete}/4 summaries available · generated "
         f"{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}</p></header>"
         f"<main><section>{concept_guide()}</section>"
-        f"<section>{forest('Main steering effects', trait)}</section>"
-        f"<section>{verdict_table(main_data)}</section>"
-        f"<section>{composition_depth(main_data)}</section>"
-        f"<section>{composition_matrix(main_data)}</section>"
-        f"<section>{composition_summary(main_data)}</section>"
-        f"<section>{joint_composition_tables(main_data)}</section>"
-        f"<section>{forest('Answer-quality effects', quality)}</section>"
-        f"<section>{interaction_table(main_data)}</section>"
+        f"{factorial_report('Factorial A: Candor + Calm + Concrete + Casual', base)}"
+        f"{factorial_report('Factorial B: Candor + Concrete + Casual + Optimism', optimism)}"
         f"{language_composition_table('Calm + French', load(args.calm_french), 'calm')}"
         f"{language_composition_table('Candor + French', load(args.candor_french), 'candor')}"
         f"{language_composition_table('Optimism + French', optimism.get('optimism_french') if optimism else None, 'optimism')}</main>"
