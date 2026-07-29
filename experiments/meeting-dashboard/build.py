@@ -200,9 +200,15 @@ def verdict_table(data: dict | None) -> str:
         return ""
     contexts = data["effects_by_context"]
     rows = [
-        "<h2>Final composition verdict</h2><table><tr><th>Feature</th>",
+        "<h2>Final composition verdict</h2>",
+        (
+            "<p class='hint'>There are 8 contexts because the other three "
+            "features have 2³ ON/OFF configurations. Each context contains "
+            "up to 128 held-out prompts; 8/8 is not the sample size.</p>"
+        ),
+        "<table><tr><th>Feature</th>",
         "<th>Standalone</th><th>With all four</th>",
-        "<th>Reliable contexts</th><th>Verdict</th></tr>",
+        "<th>Contexts with positive 95% CI (of 8)</th><th>Verdict</th></tr>",
     ]
     for feature in FEATURES:
         items = contexts[feature]
