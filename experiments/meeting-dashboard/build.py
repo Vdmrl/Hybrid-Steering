@@ -21,7 +21,7 @@ FEATURE_ORDER = {feature: index for index, feature in enumerate(FEATURES)}
 
 
 def composition_order(active: tuple[str, ...]) -> tuple[int, ...]:
-    return tuple(FEATURE_ORDER[feature] for feature in active)
+    return (len(active), *(FEATURE_ORDER[feature] for feature in active))
 
 
 def load(path: Path | None) -> dict | None:
