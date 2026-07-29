@@ -6,6 +6,7 @@ import argparse
 import html
 import json
 from datetime import datetime, timezone
+from itertools import combinations
 from pathlib import Path
 
 LABELS = {
@@ -103,7 +104,14 @@ def interaction_table(data: dict | None) -> str:
     )
     if not features:
         return ""
-    cells = ["<h2>Interaction effects</h2><table><tr><th>Target ↓ / context →</th>"]
+    cells = [
+        "<h2>Interaction effects</h2>",
+        (
+            "<p class='hint'>Change in the target feature's effect when the "
+            "context feature is enabled. This is not a joint-effect score.</p>"
+        ),
+        "<table><tr><th>Target ↓ / context →</th>",
+    ]
     cells += [f"<th>{html.escape(LABELS.get(name, name))}</th>" for name in features]
     cells.append("</tr>")
     for target in features:
@@ -233,46 +241,47 @@ def verdict_table(data: dict | None) -> str:
     return "".join(rows) + "</table>"
 
 
-def exact_compositions(data: dict | None) -> str:
+def composition_summary(data: dict | None) -> str:
     if not data or not data.get("effects_by_context"):
         return ""
     blocks = [
-        "<h2>Standalone vs. composed effects</h2>",
+        "<h2>Composition summary</h2>",
         (
-            "<p class='hint'>Every active feature is judged separately. "
-            "“Standalone” adds it to the neutral condition; “in composition” "
-            "adds the same feature while all other listed features are active.</p>"
+            "<p class='hint'>Rows are ordered by 1, 2, 3, then 4 active features. "
+            "Every result line is a separate feature-specific judgment.</p>"
         ),
+        "<table><tr><th>Active composition</th><th>Results</th></tr>",
     ]
-    for active in (row for row in COMPOSITION_ROWS if len(row) > 1):
-        rows = []
-        for feature in active:
-            contexts = data["effects_by_context"][feature]
-            standalone = contexts["none"]
-            context = "+".join(
-                name for name in FEATURES if name in active and name != feature
+    for size in range(1, len(FEATURES) + 1):
+        for active in combinations(FEATURES, size):
+            results = []
+            positive = 0
+            for feature in active:
+                context = (
+                    "+".join(
+                        name for name in FEATURES if name in active and name != feature
+                    )
+                    or "none"
+                )
+                item = data["effects_by_context"][feature][context]
+                low, high = item["ci95"]
+                status = (
+                    "positive" if low > 0 else "negative" if high < 0 else "uncertain"
+                )
+                positive += low > 0
+                results.append(
+                    f"<span class='{status}'><strong>{LABELS[feature]}: "
+                    f"{item['effect']:+.2f}</strong></span> "
+                    f"<span class='small'>[{low:+.2f}, {high:+.2f}]</span>"
+                )
+            title = " + ".join(LABELS[feature] for feature in active)
+            blocks.append(
+                f"<tr><th>{html.escape(title)}</th><td>"
+                f"<span class='small'>{positive}/{len(active)} positive-CI traits</span><br>"
+                + "<br>".join(results)
+                + "</td></tr>"
             )
-            composed = contexts[context]
-            low, high = composed["ci95"]
-            status = "positive" if low > 0 else "negative" if high < 0 else "uncertain"
-            delta = composed["effect"] - standalone["effect"]
-            rows.append(
-                f"<tr><th>{html.escape(LABELS[feature])}</th>"
-                f"<td>{standalone['effect']:+.2f}<br>"
-                f"<span class='small'>[{standalone['ci95'][0]:+.2f}, "
-                f"{standalone['ci95'][1]:+.2f}]</span></td>"
-                f"<td class='{status}'><strong>{composed['effect']:+.2f}</strong><br>"
-                f"<span class='small'>[{low:+.2f}, {high:+.2f}]</span></td>"
-                f"<td>{delta:+.2f}</td></tr>"
-            )
-        title = " + ".join(LABELS[feature] for feature in active)
-        blocks.append(
-            f"<details open><summary>{html.escape(title)}</summary>"
-            "<table><tr><th>Feature judged separately</th>"
-            "<th>Standalone effect</th><th>Effect in composition</th>"
-            "<th>Change</th></tr>" + "".join(rows) + "</table></details>"
-        )
-    return "".join(blocks)
+    return "".join(blocks) + "</table>"
 
 
 def language_composition_table(
@@ -372,7 +381,7 @@ def build(args: argparse.Namespace) -> str:
         f"<section>{verdict_table(base)}</section>"
         f"<section>{composition_depth(base)}</section>"
         f"<section>{composition_matrix(base)}</section>"
-        f"<section>{exact_compositions(base)}</section>"
+        f"<section>{composition_summary(base)}</section>"
         f"<section>{forest('Answer-quality effects', quality)}</section>"
         f"<section>{interaction_table(main_data)}</section>"
         f"{language_composition_table('Calm + French', load(args.calm_french), 'calm')}"

@@ -15,9 +15,8 @@ python experiments/meeting-dashboard/build.py \
 
 The page starts with a bilingual concept glossary and shows main steering
 effects, their survival from single to four-way
-composition, standalone and composed effects for every active feature in every
-pair/triple/four-way configuration, one grouped composition-by-feature matrix,
-a compact final verdict table,
+composition, a grouped composition-by-feature matrix, a compact one-result-column
+summary ordered from single to four-way compositions, a final verdict table,
 answer-quality effects, 95% bootstrap confidence intervals, feature
 interactions, and the two language-composition experiments. Missing summaries
 are shown as pending. The page refreshes every 60 seconds. To rebuild it as
