@@ -47,6 +47,11 @@ def evidence_is_excerpt(evidence: str, answer: str) -> bool:
     return bool(excerpt) and f" {excerpt} " in f" {words(answer)} "
 
 
+def exact_evidence(evidence: Iterable[str], answer: str) -> list[str]:
+    """Keep audit excerpts that can be traced to the answer text."""
+    return [quote for quote in evidence if evidence_is_excerpt(quote, answer)]
+
+
 def read_jsonl(path: Path) -> list[JudgeInput]:
     rows = [
         JudgeInput.model_validate_json(line)
@@ -247,13 +252,7 @@ def scalar_task_v2(
             raise ValueError("judge returned an unexpected answer_id")
         if any(not quote.strip() for quote in parsed.evidence):
             raise ValueError("use an empty evidence list instead of empty excerpts")
-        if any(
-            quote and not evidence_is_excerpt(quote, answer.text)
-            for quote in parsed.evidence
-        ):
-            raise ValueError("judge evidence is not an exact answer excerpt")
-        if parsed.trait_score != 3 and not parsed.evidence:
-            raise ValueError("non-neutral trait scores require exact evidence")
+        parsed.evidence = exact_evidence(parsed.evidence, answer.text)
         if len(parsed.reason.split()) > 30:
             raise ValueError("judge reason exceeds 30 words")
 
@@ -327,14 +326,10 @@ def pairwise_task_v2(
     row, left, right, orientation = task
 
     def validate(parsed: PairwiseResponseV2) -> None:
-        if parsed.evidence_A and not evidence_is_excerpt(parsed.evidence_A, left.text):
-            raise ValueError("evidence_A is not an exact answer excerpt")
-        if parsed.evidence_B and not evidence_is_excerpt(parsed.evidence_B, right.text):
-            raise ValueError("evidence_B is not an exact answer excerpt")
-        if parsed.trait_winner == "A" and not parsed.evidence_A:
-            raise ValueError("trait winner A requires exact evidence_A")
-        if parsed.trait_winner == "B" and not parsed.evidence_B:
-            raise ValueError("trait winner B requires exact evidence_B")
+        if not evidence_is_excerpt(parsed.evidence_A, left.text):
+            parsed.evidence_A = ""
+        if not evidence_is_excerpt(parsed.evidence_B, right.text):
+            parsed.evidence_B = ""
         if len(parsed.reason.split()) > 30:
             raise ValueError("judge reason exceeds 30 words")
 

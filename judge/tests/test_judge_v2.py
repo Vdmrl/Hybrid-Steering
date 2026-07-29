@@ -10,6 +10,7 @@ from hybrid_judge.config import load_configs
 from hybrid_judge.models import PairwiseResultV2, ScalarResponseV2
 from hybrid_judge.runner import (
     evidence_is_excerpt,
+    exact_evidence,
     pairwise_tasks,
     read_jsonl,
     render_prompt,
@@ -110,6 +111,9 @@ def test_evidence_matching_ignores_formatting_but_not_words() -> None:
         answer,
     )
     assert not evidence_is_excerpt("present revised test data", answer)
+    assert exact_evidence(
+        ["present the test data", "present revised test data"], answer
+    ) == ["present the test data"]
 
 
 def test_pairwise_orders_are_one_experimental_unit() -> None:
