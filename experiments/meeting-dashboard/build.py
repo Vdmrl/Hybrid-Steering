@@ -17,6 +17,11 @@ LABELS = {
     "optimism": "Optimism",
 }
 FEATURES = ("candor", "calm", "concrete", "casual")
+FEATURE_ORDER = {feature: index for index, feature in enumerate(FEATURES)}
+
+
+def composition_order(active: tuple[str, ...]) -> tuple[int, ...]:
+    return tuple(FEATURE_ORDER[feature] for feature in active)
 
 
 def load(path: Path | None) -> dict | None:
@@ -168,9 +173,12 @@ def composition_matrix(data: dict | None) -> str:
     rows += [f"<th>{html.escape(LABELS[feature])}</th>" for feature in FEATURES]
     rows.append("</tr>")
     active_rows = sorted(
-        active
-        for size in range(1, len(FEATURES) + 1)
-        for active in combinations(FEATURES, size)
+        (
+            active
+            for size in range(1, len(FEATURES) + 1)
+            for active in combinations(FEATURES, size)
+        ),
+        key=composition_order,
     )
     for active in active_rows:
         title = " + ".join(LABELS[feature] for feature in active)
@@ -234,9 +242,12 @@ def exact_compositions(data: dict | None) -> str:
         ),
     ]
     active_rows = sorted(
-        active
-        for size in range(2, len(FEATURES) + 1)
-        for active in combinations(FEATURES, size)
+        (
+            active
+            for size in range(2, len(FEATURES) + 1)
+            for active in combinations(FEATURES, size)
+        ),
+        key=composition_order,
     )
     for active in active_rows:
         rows = []
