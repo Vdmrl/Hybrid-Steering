@@ -90,6 +90,50 @@ def interaction_effects(
     return effects
 
 
+def composition_effects(
+    edges: dict[tuple[str, str], float],
+    target_index: int,
+    rng: random.Random,
+    samples: int,
+) -> tuple[dict, dict]:
+    source_ids = sorted({source_id for source_id, _ in edges})
+    contexts = {}
+    by_size: dict[int, dict[str, list[float]]] = {}
+    for mask in range(16):
+        if mask & (1 << target_index):
+            continue
+        values = [
+            edges[(source_id, f"{mask:04b}")]
+            for source_id in source_ids
+            if (source_id, f"{mask:04b}") in edges
+        ]
+        active = [
+            feature
+            for index, feature in enumerate(FEATURES)
+            if index != target_index and mask & (1 << index)
+        ]
+        name = "+".join(active) or "none"
+        contexts[name] = {
+            "effect": mean(values),
+            "ci95": bootstrap(values, rng, samples),
+        }
+        size = len(active)
+        for source_id in source_ids:
+            key = (source_id, f"{mask:04b}")
+            if key in edges:
+                by_size.setdefault(size, {}).setdefault(source_id, []).append(
+                    edges[key]
+                )
+    sizes = {}
+    for size, prompts in by_size.items():
+        values = [mean(items) for items in prompts.values()]
+        sizes[str(size)] = {
+            "effect": mean(values),
+            "ci95": bootstrap(values, rng, samples),
+        }
+    return contexts, sizes
+
+
 def main() -> None:
     args = arguments()
     rng = random.Random(args.seed)
@@ -127,10 +171,19 @@ def main() -> None:
                 "ci95": bootstrap(values, rng, args.samples),
             }
 
+    contexts, sizes = {}, {}
+    for target_index, target in enumerate(FEATURES):
+        if target in main_edges:
+            contexts[target], sizes[target] = composition_effects(
+                main_edges[target], target_index, rng, args.samples
+            )
+
     output = {
         "pairwise_effects": pairwise,
         "quality_effects": quality,
         "factorial_interactions": interactions,
+        "effects_by_context": contexts,
+        "effects_by_context_size": sizes,
         "interpretation": (
             "Positive signed effects favor answer_id=on. Interaction values show "
             "how another active feature changes the target feature's matched effect."

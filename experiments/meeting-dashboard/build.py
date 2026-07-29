@@ -113,6 +113,62 @@ def interaction_table(data: dict | None) -> str:
     return "".join(cells) + "</table><p class='hint'>Hover a cell for its 95% CI.</p>"
 
 
+def composition_depth(data: dict | None) -> str:
+    if not data or not data.get("effects_by_context_size"):
+        return ""
+    rows = data["effects_by_context_size"]
+    cells = [
+        "<h2>Does steering survive composition?</h2>",
+        "<p class='hint'>Effect of each target with 0–3 other features already active.</p>",
+        "<table><tr><th>Target</th><th>Alone</th><th>+1 other</th>",
+        "<th>+2 others</th><th>+3 others (all four)</th></tr>",
+    ]
+    for feature, depths in rows.items():
+        cells.append(f"<tr><th>{html.escape(LABELS.get(feature, feature))}</th>")
+        for depth in ("0", "1", "2", "3"):
+            item = depths[depth]
+            low, high = item["ci95"]
+            cells.append(
+                f"<td title='95% CI: {low:+.2f} … {high:+.2f}'>"
+                f"<strong>{item['effect']:+.2f}</strong><br>"
+                f"<span class='small'>[{low:+.2f}, {high:+.2f}]</span></td>"
+            )
+        cells.append("</tr>")
+    return "".join(cells) + "</table>"
+
+
+def working_triple(data: dict | None) -> str:
+    if not data or not data.get("effects_by_context"):
+        return ""
+    selection = (
+        ("candor", "concrete+casual"),
+        ("concrete", "candor+casual"),
+        ("casual", "candor+concrete"),
+    )
+    cells = [
+        "<h2>Candor + concrete + casual (calm excluded)</h2>",
+        "<p class='hint'>The same triple-steered answer is tested on all three traits.</p>",
+        "<table><tr><th>Trait tested</th><th>Effect inside triple</th><th>95% CI</th>",
+        "<th>Conclusion</th></tr>",
+    ]
+    for feature, context in selection:
+        item = data["effects_by_context"][feature][context]
+        low, high = item["ci95"]
+        conclusion = (
+            "reliably present"
+            if low > 0
+            else "positive, but uncertain"
+            if item["effect"] > 0
+            else "absent"
+        )
+        cells.append(
+            f"<tr><th>{html.escape(LABELS[feature])}</th>"
+            f"<td><strong>{item['effect']:+.2f}</strong></td>"
+            f"<td>[{low:+.2f}, {high:+.2f}]</td><td>{conclusion}</td></tr>"
+        )
+    return "".join(cells) + "</table>"
+
+
 def composition_cards(title: str, data: dict | None) -> str:
     if not data:
         return f"<section><h2>{html.escape(title)}</h2><p class='pending'>Pending</p></section>"
@@ -157,6 +213,8 @@ def build(args: argparse.Namespace) -> str:
         f"<p>{complete}/4 summaries available · generated "
         f"{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}</p></header>"
         f"<main><section>{forest('Main steering effects', trait)}</section>"
+        f"<section>{composition_depth(base)}</section>"
+        f"<section>{working_triple(base)}</section>"
         f"<section>{forest('Answer-quality effects', quality)}</section>"
         f"<section>{interaction_table(main_data)}</section>"
         f"{composition_cards('Calm + French', load(args.calm_french))}"
