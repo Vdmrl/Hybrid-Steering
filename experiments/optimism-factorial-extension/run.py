@@ -1,4 +1,4 @@
-"""Extend the existing factorial with optimism replacing casualness."""
+"""Extend the existing factorial with optimism replacing failed calm."""
 
 from __future__ import annotations
 
@@ -10,11 +10,11 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).parents[2]
-FEATURES = ("candor", "calm", "concrete", "optimism")
+FEATURES = ("candor", "concrete", "casual", "optimism")
 RUBRICS = {
     "candor": "principled_candor",
-    "calm": "calm_composure",
     "concrete": "concrete_language",
+    "casual": "casualness",
     "optimism": "optimism",
 }
 ALPHAS = (-8.0, -4.0, -2.0, -1.0, 0.0, 1.0, 2.0, 4.0, 8.0)
@@ -38,12 +38,14 @@ FRENCH = load_module(
 def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "phase", choices=("alpha", "alpha-input", "select", "factorial", "inputs")
+        "phase",
+        choices=("alpha", "alpha-input", "select", "factorial", "inputs", "language"),
     )
     parser.add_argument("--pairs", type=Path, required=True)
     parser.add_argument("--prompts", type=Path, required=True)
     parser.add_argument("--base-directions-dir", type=Path, required=True)
     parser.add_argument("--base-output-dir", type=Path, required=True)
+    parser.add_argument("--french-output", type=Path)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--model", default="Qwen/Qwen3.5-9B")
     parser.add_argument("--donors", type=int, default=64)
@@ -76,9 +78,7 @@ def alpha_phase(args: argparse.Namespace) -> None:
         model=model,
         tokenizer=tokenizer,
         rows=pairs[args.donors : args.donors + args.tuning],
-        conditions={
-            f"a{alpha:g}": [(direction, alpha, None)] for alpha in ALPHAS
-        },
+        conditions={f"a{alpha:g}": [(direction, alpha, None)] for alpha in ALPHAS},
         path=args.output_dir / "alpha" / "optimism.jsonl",
         max_new_tokens=args.max_new_tokens,
         prefix="alpha:optimism",
@@ -175,6 +175,11 @@ def load_base_directions(args: argparse.Namespace) -> dict[str, dict]:
     }
 
 
+def old_base_mask(new_mask: int) -> int:
+    """Map candor/concrete/casual bits to the old candor/calm/concrete/casual mask."""
+    return (new_mask & 1) | ((new_mask & 2) << 1) | ((new_mask & 4) << 1)
+
+
 def factorial_phase(args: argparse.Namespace) -> None:
     directions = load_base_directions(args)
     directions["optimism"] = optimism_direction(args)
@@ -186,9 +191,9 @@ def factorial_phase(args: argparse.Namespace) -> None:
         for feature in FEATURES[:3]
     }
     strengths["optimism"] = float(
-        json.loads(
-            (args.output_dir / "selection.json").read_text(encoding="utf-8")
-        )["optimism"]["selected_alpha"]
+        json.loads((args.output_dir / "selection.json").read_text(encoding="utf-8"))[
+            "optimism"
+        ]["selected_alpha"]
     )
     conditions = {}
     for low_mask in range(8):
@@ -243,7 +248,11 @@ def write_input(
 
 def inputs_phase(args: argparse.Namespace) -> None:
     old = {
-        row["source_id"]: row
+        row["source_id"]: {
+            "source_id": row["source_id"],
+            "scenario": row["scenario"],
+            **{f"{mask:04b}": row[f"{old_base_mask(mask):04b}"] for mask in range(8)},
+        }
         for row in BASE.jsonl(args.base_output_dir / "factorial.jsonl")
     }
     new = {
@@ -295,10 +304,88 @@ def inputs_phase(args: argparse.Namespace) -> None:
     )
 
 
+def language_phase(args: argparse.Namespace) -> None:
+    if args.french_output is None:
+        raise RuntimeError("--french-output is required for language phase")
+    optimism = optimism_direction(args)
+    optimism_alpha = float(
+        json.loads((args.output_dir / "selection.json").read_text(encoding="utf-8"))[
+            "optimism"
+        ]["selected_alpha"]
+    )
+    french = FRENCH.load_direction(
+        args.french_output / "directions" / "french.safetensors"
+    )
+    french_alpha = float(
+        json.loads((args.french_output / "selection.json").read_text(encoding="utf-8"))[
+            "french_alpha"
+        ]
+    )
+    prompts = BASE.jsonl(args.prompts)[:64]
+    tokenizer, model = BASE.load_model(args.model)
+    generated = FRENCH.run_records(
+        model=model,
+        tokenizer=tokenizer,
+        rows=prompts,
+        conditions={
+            "optimism": [(optimism, optimism_alpha)],
+            "optimism_french": [
+                (optimism, optimism_alpha),
+                (french, french_alpha),
+            ],
+        },
+        path=args.output_dir / "language" / "new-generations.jsonl",
+        max_new_tokens=args.max_new_tokens,
+    )
+    reused = {
+        row["prompt_id"]: row
+        for row in BASE.jsonl(args.french_output / "generations.jsonl")
+    }
+    records = [
+        {
+            **row,
+            "source_id": row["prompt_id"],
+            "baseline": reused[row["prompt_id"]]["baseline"],
+            "french": reused[row["prompt_id"]]["french"],
+        }
+        for row in generated
+    ]
+    path = args.output_dir / "language" / "generations.jsonl"
+    path.write_text(
+        "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in records),
+        encoding="utf-8",
+    )
+    comparisons = {
+        "optimism_single": ("baseline", "optimism"),
+        "optimism_with_french": ("french", "optimism_french"),
+        "french_single": ("baseline", "french"),
+        "french_with_optimism": ("optimism", "optimism_french"),
+    }
+    for name, (control, target) in comparisons.items():
+        write_input(
+            args.output_dir / "language" / "judge-inputs" / f"{name}.jsonl",
+            [(row, {}) for row in records],
+            [(control, target)],
+            name,
+        )
+    BASE.atomic_json(
+        args.output_dir / "language" / "language_summary.json",
+        {
+            condition: {
+                "n": len(records),
+                "french_rate": sum(FRENCH.is_french(row[condition]) for row in records)
+                / len(records),
+            }
+            for condition in ("baseline", "optimism", "french", "optimism_french")
+        },
+    )
+
+
 def main() -> None:
     args = arguments()
     if args.self_test:
-        assert len(FEATURES) == 4 and FEATURES[-1] == "optimism"
+        assert FEATURES == ("candor", "concrete", "casual", "optimism")
+        assert old_base_mask(0b111) == 0b1101
         print("optimism extension self-test passed")
         return
     args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -308,6 +395,7 @@ def main() -> None:
         "select": select_phase,
         "factorial": factorial_phase,
         "inputs": inputs_phase,
+        "language": language_phase,
     }[args.phase](args)
 
 

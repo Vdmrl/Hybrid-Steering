@@ -47,10 +47,14 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=20260729)
     args = parser.parse_args()
 
-    if args.output.exists() and sum(
-        bool(line.strip())
-        for line in args.output.read_text(encoding="utf-8").splitlines()
-    ) >= args.count:
+    if (
+        args.output.exists()
+        and sum(
+            bool(line.strip())
+            for line in args.output.read_text(encoding="utf-8").splitlines()
+        )
+        >= args.count
+    ):
         print(f"reuse optimism pairs: {args.output}")
         return
 

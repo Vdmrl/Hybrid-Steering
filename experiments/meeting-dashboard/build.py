@@ -16,8 +16,8 @@ LABELS = {
     "casual": "Casualness",
     "optimism": "Optimism",
 }
-FEATURES = ("candor", "calm", "concrete", "casual")
-COMPOSITION_ROWS = (
+BASE_FEATURES = ("candor", "calm", "concrete", "casual")
+BASE_COMPOSITION_ROWS = (
     ("candor",),
     ("candor", "calm"),
     ("candor", "calm", "concrete"),
@@ -34,6 +34,20 @@ COMPOSITION_ROWS = (
     ("casual",),
     ("concrete", "casual"),
 )
+
+
+def data_features(data: dict) -> tuple[str, ...]:
+    return tuple(data["effects_by_context"])
+
+
+def composition_rows(features: tuple[str, ...]) -> tuple[tuple[str, ...], ...]:
+    if features == BASE_FEATURES:
+        return BASE_COMPOSITION_ROWS
+    return tuple(
+        active
+        for size in range(1, len(features) + 1)
+        for active in combinations(features, size)
+    )
 
 
 def load(path: Path | None) -> dict | None:
@@ -167,10 +181,11 @@ def composition_matrix(data: dict | None) -> str:
     if not data or not data.get("effects_by_context"):
         return ""
     contexts = data["effects_by_context"]
+    features = data_features(data)
 
     def value(active: tuple[str, ...], feature: str) -> str:
         context = (
-            "+".join(name for name in FEATURES if name in active and name != feature)
+            "+".join(name for name in features if name in active and name != feature)
             or "none"
         )
         item = contexts[feature][context]
@@ -189,12 +204,12 @@ def composition_matrix(data: dict | None) -> str:
         ),
         "<table><tr><th>Active composition</th>",
     ]
-    rows += [f"<th>{html.escape(LABELS[feature])}</th>" for feature in FEATURES]
+    rows += [f"<th>{html.escape(LABELS[feature])}</th>" for feature in features]
     rows.append("</tr>")
-    for active in COMPOSITION_ROWS:
+    for active in composition_rows(features):
         title = " + ".join(LABELS[feature] for feature in active)
         rows.append(f"<tr><th>{html.escape(title)}</th>")
-        for feature in FEATURES:
+        for feature in features:
             if feature in active:
                 rows.append(f"<td>{value(active, feature)}</td>")
             else:
@@ -207,6 +222,7 @@ def verdict_table(data: dict | None) -> str:
     if not data or not data.get("effects_by_context"):
         return ""
     contexts = data["effects_by_context"]
+    features = data_features(data)
     rows = [
         "<h2>Final composition verdict</h2>",
         (
@@ -218,10 +234,10 @@ def verdict_table(data: dict | None) -> str:
         "<th>Standalone</th><th>With all four</th>",
         "<th>Contexts with positive 95% CI (of 8)</th><th>Verdict</th></tr>",
     ]
-    for feature in FEATURES:
+    for feature in features:
         items = contexts[feature]
         standalone = items["none"]
-        all_others = "+".join(name for name in FEATURES if name != feature)
+        all_others = "+".join(name for name in features if name != feature)
         composed = items[all_others]
         reliable = sum(item["ci95"][0] > 0 for item in items.values())
         if reliable == len(items):
@@ -252,14 +268,15 @@ def composition_summary(data: dict | None) -> str:
         ),
         "<table><tr><th>Active composition</th><th>Results</th></tr>",
     ]
-    for size in range(1, len(FEATURES) + 1):
-        for active in combinations(FEATURES, size):
+    features = data_features(data)
+    for size in range(1, len(features) + 1):
+        for active in combinations(features, size):
             results = []
             positive = 0
             for feature in active:
                 context = (
                     "+".join(
-                        name for name in FEATURES if name in active and name != feature
+                        name for name in features if name in active and name != feature
                     )
                     or "none"
                 )
@@ -351,6 +368,8 @@ the opposite pole used to construct the direction.</p>
 <td>Abstract language — абстрактный язык</td><td>4</td></tr>
 <tr><th>Casualness</th><td>Неформальный, разговорный стиль</td>
 <td>Formality — формальный стиль</td><td>1</td></tr>
+<tr><th>Optimism</th><td>Оптимистичная оценка будущего и возможностей</td>
+<td>Pessimism — пессимистичная оценка</td><td>selected by sweep</td></tr>
 </table>"""
 
 
@@ -378,14 +397,15 @@ def build(args: argparse.Namespace) -> str:
         f"{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}</p></header>"
         f"<main><section>{concept_guide()}</section>"
         f"<section>{forest('Main steering effects', trait)}</section>"
-        f"<section>{verdict_table(base)}</section>"
-        f"<section>{composition_depth(base)}</section>"
-        f"<section>{composition_matrix(base)}</section>"
-        f"<section>{composition_summary(base)}</section>"
+        f"<section>{verdict_table(main_data)}</section>"
+        f"<section>{composition_depth(main_data)}</section>"
+        f"<section>{composition_matrix(main_data)}</section>"
+        f"<section>{composition_summary(main_data)}</section>"
         f"<section>{forest('Answer-quality effects', quality)}</section>"
         f"<section>{interaction_table(main_data)}</section>"
         f"{language_composition_table('Calm + French', load(args.calm_french), 'calm')}"
-        f"{language_composition_table('Candor + French', load(args.candor_french), 'candor')}</main>"
+        f"{language_composition_table('Candor + French', load(args.candor_french), 'candor')}"
+        f"{language_composition_table('Optimism + French', optimism.get('optimism_french') if optimism else None, 'optimism')}</main>"
     )
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">

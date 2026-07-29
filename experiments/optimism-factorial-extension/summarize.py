@@ -1,4 +1,4 @@
-"""Summarize the candor/calm/concrete/optimism factorial extension."""
+"""Summarize the candor/concrete/casual/optimism factorial extension."""
 
 from __future__ import annotations
 
@@ -9,7 +9,11 @@ from collections import defaultdict
 from pathlib import Path
 from statistics import mean
 
-FEATURES = ("candor", "calm", "concrete", "optimism")
+FEATURES = ("candor", "concrete", "casual", "optimism")
+
+
+def old_to_new_mask(old_mask: int) -> int:
+    return (old_mask & 1) | ((old_mask & 4) >> 1) | ((old_mask & 8) >> 1)
 
 
 def rows(path: Path) -> list[dict]:
@@ -30,13 +34,11 @@ def edges_for(
 ) -> dict[tuple[str, str], int]:
     result = {}
     if feature != "optimism":
-        for row in rows(
-            base_output_dir / "judge" / f"main-{feature}.aggregated.jsonl"
-        ):
-            mask = row["prompt_id"].rsplit(":", 1)[-1]
-            if int(mask, 2) < 8:
+        for row in rows(base_output_dir / "judge" / f"main-{feature}.aggregated.jsonl"):
+            old_mask = int(row["prompt_id"].rsplit(":", 1)[-1], 2)
+            if not old_mask & 0b0010:
                 source = ":".join(row["prompt_id"].split(":")[1:-1])
-                result[(source, mask)] = score(row, field)
+                result[(source, f"{old_to_new_mask(old_mask):04b}")] = score(row, field)
     for row in rows(output_dir / "judge" / f"main-{feature}.aggregated.jsonl"):
         mask = row["prompt_id"].rsplit(":", 1)[-1]
         source = ":".join(row["prompt_id"].split(":")[1:-1])
@@ -89,6 +91,57 @@ def interaction(
     }
 
 
+def composition_effects(
+    edges: dict[tuple[str, str], int],
+    target_index: int,
+    seed: int,
+) -> tuple[dict, dict]:
+    sources = sorted({source for source, _ in edges})
+    contexts, by_size = {}, defaultdict(lambda: defaultdict(list))
+    for mask in range(16):
+        if mask & (1 << target_index):
+            continue
+        values = [
+            edges[(source, f"{mask:04b}")]
+            for source in sources
+            if (source, f"{mask:04b}") in edges
+        ]
+        active = [
+            feature
+            for index, feature in enumerate(FEATURES)
+            if index != target_index and mask & (1 << index)
+        ]
+        contexts["+".join(active) or "none"] = {
+            "effect": mean(values),
+            "ci95": bootstrap(values, seed + mask),
+        }
+        for source in sources:
+            key = (source, f"{mask:04b}")
+            if key in edges:
+                by_size[len(active)][source].append(edges[key])
+    sizes = {}
+    for size, prompts in by_size.items():
+        values = [mean(items) for items in prompts.values()]
+        sizes[str(size)] = {
+            "effect": mean(values),
+            "ci95": bootstrap(values, seed + 100 + size),
+        }
+    return contexts, sizes
+
+
+def language_effect(path: Path, seed: int) -> dict:
+    complete = [row for row in rows(path) if row["status"] == "complete"]
+    trait = [score(row) for row in complete]
+    quality = [score(row, "quality_winner_answer_id") for row in complete]
+    return {
+        "n": len(complete),
+        "trait_effect": mean(trait),
+        "trait_ci95": bootstrap(trait, seed),
+        "quality_effect": mean(quality),
+        "quality_ci95": bootstrap(quality, seed + 100),
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output-dir", type=Path, required=True)
@@ -117,6 +170,8 @@ def main() -> None:
             for index, feature in enumerate(FEATURES)
         },
         "interactions": {},
+        "effects_by_context": {},
+        "effects_by_context_size": {},
     }
     for target_index, target in enumerate(FEATURES):
         for context_index, context in enumerate(FEATURES):
@@ -128,6 +183,32 @@ def main() -> None:
                 context_index,
                 20260929 + target_index * 4 + context_index,
             )
+        (
+            summary["effects_by_context"][target],
+            summary["effects_by_context_size"][target],
+        ) = composition_effects(
+            trait_edges[target],
+            target_index,
+            20261029 + target_index * 100,
+        )
+    language_dir = args.output_dir / "language"
+    summary["optimism_french"] = {
+        name: language_effect(
+            language_dir / "judge" / f"{name}.raw.aggregated.jsonl",
+            20261129 + index,
+        )
+        for index, name in enumerate(
+            (
+                "optimism_single",
+                "optimism_with_french",
+                "french_single",
+                "french_with_optimism",
+            )
+        )
+    }
+    summary["optimism_french"]["deterministic_language"] = json.loads(
+        (language_dir / "language_summary.json").read_text(encoding="utf-8")
+    )
     path = args.output_dir / "summary.json"
     path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
     print(path)

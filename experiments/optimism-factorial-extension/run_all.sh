@@ -22,6 +22,7 @@ phase() {
     --prompts "${PROMPTS_FILE:?set PROMPTS_FILE}" \
     --base-directions-dir "${BASE_DIRECTIONS_DIR:?set BASE_DIRECTIONS_DIR}" \
     --base-output-dir "${BASE_OUTPUT_DIR:?set BASE_OUTPUT_DIR}" \
+    --french-output "${FRENCH_OUTPUT_DIR:?set FRENCH_OUTPUT_DIR}" \
     --output-dir "$output"
 }
 
@@ -53,6 +54,27 @@ while IFS=$'\t' read -r rubric input_path output_path; do
     --feature "$rubric" \
     --workers 8
 done < "$output/judge-jobs.tsv"
+
+phase language
+mkdir -p "$output/language/judge"
+for comparison in optimism_single optimism_with_french; do
+  retry "$python_bin" -m hybrid_judge.cli \
+    "$output/language/judge-inputs/$comparison.jsonl" \
+    "$output/language/judge/$comparison.raw.jsonl" \
+    --config-root "$root/judge" \
+    --mode pairwise \
+    --feature optimism \
+    --workers 8
+done
+for comparison in french_single french_with_optimism; do
+  retry "$python_bin" -m hybrid_judge.cli \
+    "$output/language/judge-inputs/$comparison.jsonl" \
+    "$output/language/judge/$comparison.raw.jsonl" \
+    --config-root "$root/judge" \
+    --mode pairwise \
+    --feature french_language \
+    --workers 8
+done
 
 "$python_bin" "$experiment/summarize.py" \
   --output-dir "$output" \
