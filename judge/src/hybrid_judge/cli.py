@@ -23,7 +23,7 @@ ROOT = Path(__file__).parents[2]
 
 
 def arguments() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Blind shared LLM-as-a-Judge v2")
+    parser = argparse.ArgumentParser(description="Blind shared LLM-as-a-Judge")
     parser.add_argument("input", type=Path)
     parser.add_argument("output", type=Path)
     parser.add_argument(
