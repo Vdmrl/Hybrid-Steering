@@ -6,8 +6,6 @@ import argparse
 import gc
 import importlib.util
 import itertools
-import json
-import math
 from contextlib import contextmanager, nullcontext
 from pathlib import Path
 from typing import Any
@@ -127,10 +125,7 @@ def scaled_sum(
 ) -> dict[int, torch.Tensor]:
     return {
         layer: sum(
-            (
-                directions[name][layer] * STRENGTHS[name]
-                for name in active[1:]
-            ),
+            (directions[name][layer] * STRENGTHS[name] for name in active[1:]),
             directions[active[0]][layer] * STRENGTHS[active[0]],
         )
         for layer in directions[active[0]]
@@ -172,16 +167,12 @@ def svd_phase(args: argparse.Namespace) -> None:
 
     conditions = {}
     for mask in range(1, 16):
-        active = [
-            name for index, name in enumerate(FEATURES) if mask & (1 << index)
-        ]
+        active = [name for index, name in enumerate(FEATURES) if mask & (1 << index)]
         conditions[f"per_r1_{mask:04b}"] = [
             (low_rank[1][name], STRENGTHS[name], None) for name in active
         ]
     for mask in (1, 2, 4, 8, 15):
-        active = [
-            name for index, name in enumerate(FEATURES) if mask & (1 << index)
-        ]
+        active = [name for index, name in enumerate(FEATURES) if mask & (1 << index)]
         conditions[f"per_r4_{mask:04b}"] = [
             (low_rank[4][name], STRENGTHS[name], None) for name in active
         ]
@@ -224,6 +215,7 @@ def residual_for_text(
     layers = decoder_layers(model)
     handles = []
     for layer_id in layer_ids:
+
         def hook(_module: Any, _inputs: Any, output: torch.Tensor, i: int = layer_id):
             captured[i] = output[:, -1, :].detach().float().cpu()
 
@@ -356,9 +348,7 @@ def activation_phase(args: argparse.Namespace) -> None:
     directions = build_residual_directions(args, model, tokenizer)
     rows = test_rows(args, args.activation_test)
     path = args.output_dir / "activation.jsonl"
-    done = {
-        row["task_id"] for row in BASE.jsonl(path)
-    } if path.exists() else set()
+    done = {row["task_id"] for row in BASE.jsonl(path)} if path.exists() else set()
 
     for index, row in enumerate(rows, 1):
         prompt = BASE.row_prompt(row)
@@ -464,9 +454,7 @@ def norm_phase(args: argparse.Namespace) -> None:
     masks.append(15)
     conditions = {}
     for mask in masks:
-        active = [
-            name for index, name in enumerate(FEATURES) if mask & (1 << index)
-        ]
+        active = [name for index, name in enumerate(FEATURES) if mask & (1 << index)]
         conditions[f"norm_{mask:04b}"] = [
             (BASE.norm_controlled(directions, STRENGTHS, active), 1.0, None)
         ]
@@ -531,9 +519,7 @@ def smoke_phase(args: argparse.Namespace) -> None:
 def self_test() -> None:
     assert len(list(itertools.combinations(FEATURES, 2))) == 6
     assert len(ACTIVATION_LAYERS) * len(ACTIVATION_ALPHAS) == 12
-    toy = {
-        name: {0: torch.eye(4).reshape(1, 1, 4, 4)} for name in FEATURES
-    }
+    toy = {name: {0: torch.eye(4).reshape(1, 1, 4, 4)} for name in FEATURES}
     assert scaled_sum(toy, FEATURES)[0].shape == (1, 1, 4, 4)
     print("composition generation queue self-test passed")
 
