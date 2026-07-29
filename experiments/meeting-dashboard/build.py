@@ -435,7 +435,7 @@ the opposite pole used to construct the direction.</p>
 <tr><th>Casualness</th><td>Неформальный, разговорный стиль</td>
 <td>Formality — формальный стиль</td><td>1</td></tr>
 <tr><th>Optimism</th><td>Оптимистичная оценка будущего и возможностей</td>
-<td>Pessimism — пессимистичная оценка</td><td>selected by sweep</td></tr>
+<td>Pessimism — пессимистичная оценка</td><td>2</td></tr>
 </table>"""
 
 
