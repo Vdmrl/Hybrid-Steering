@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import random
 from pathlib import Path
+from statistics import mean
 from typing import Any
 
 
@@ -24,6 +26,20 @@ def jsonl(path: Path) -> list[dict[str, Any]]:
 
 def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
     complete = [row for row in rows if row["status"] == "complete"]
+
+    def scores(field: str) -> list[int]:
+        return [
+            1 if row[field] == "target" else -1 if row[field] == "control" else 0
+            for row in complete
+        ]
+
+    def interval(values: list[int], seed: int) -> list[float]:
+        rng = random.Random(seed)
+        draws = sorted(mean(rng.choices(values, k=len(values))) for _ in range(10000))
+        return [draws[250], draws[9750]]
+
+    trait = scores("trait_winner_answer_id")
+    quality = scores("quality_winner_answer_id")
     return {
         "n": len(rows),
         "complete": len(complete),
@@ -46,6 +62,10 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "quality_ties": sum(
             row["quality_winner_answer_id"] == "tie" for row in complete
         ),
+        "trait_effect": mean(trait),
+        "trait_ci95": interval(trait, 20260729),
+        "quality_effect": mean(quality),
+        "quality_ci95": interval(quality, 20260829),
     }
 
 

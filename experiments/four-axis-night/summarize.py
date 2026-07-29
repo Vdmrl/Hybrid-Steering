@@ -27,8 +27,8 @@ def arguments() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def score(row: dict) -> float:
-    winner = row["trait_winner_answer_id"]
+def score(row: dict, field: str) -> float:
+    winner = row[field]
     return 1.0 if winner == "on" else -1.0 if winner == "off" else 0.0
 
 
@@ -38,7 +38,10 @@ def bootstrap(values: list[float], rng: random.Random, samples: int) -> list[flo
 
 
 def summarize_file(
-    path: Path, rng: random.Random, samples: int
+    path: Path,
+    rng: random.Random,
+    samples: int,
+    field: str = "trait_winner_answer_id",
 ) -> tuple[dict, dict[tuple[str, str], float]]:
     by_prompt: dict[str, list[float]] = {}
     edges: dict[tuple[str, str], float] = {}
@@ -47,10 +50,11 @@ def summarize_file(
         parts = row["prompt_id"].split(":")
         source_id = ":".join(parts[1:-1])
         comparison = parts[-1]
-        value = score(row)
+        value = score(row, field)
         by_prompt.setdefault(source_id, []).append(value)
         edges[source_id, comparison] = value
-        consistency.append(row["trait_order_consistent"] is not False)
+        prefix = field.removesuffix("_winner_answer_id")
+        consistency.append(row[f"{prefix}_order_consistent"] is not False)
     prompt_effects = [mean(values) for values in by_prompt.values()]
     return (
         {
@@ -90,10 +94,18 @@ def main() -> None:
     args = arguments()
     rng = random.Random(args.seed)
     pairwise = {}
+    quality = {}
     main_edges = {}
     for path in sorted((args.output_dir / "judge").glob("*.aggregated.jsonl")):
         result, edges = summarize_file(path, rng, args.samples)
-        pairwise[path.stem.removesuffix(".aggregated")] = result
+        name = path.stem.removesuffix(".aggregated")
+        pairwise[name] = result
+        quality[name], _ = summarize_file(
+            path,
+            rng,
+            args.samples,
+            field="quality_winner_answer_id",
+        )
         if path.stem.startswith("main-"):
             main_edges[path.stem.removeprefix("main-").removesuffix(".aggregated")] = (
                 edges
@@ -117,6 +129,7 @@ def main() -> None:
 
     output = {
         "pairwise_effects": pairwise,
+        "quality_effects": quality,
         "factorial_interactions": interactions,
         "interpretation": (
             "Positive signed effects favor answer_id=on. Interaction values show "
