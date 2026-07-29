@@ -51,6 +51,14 @@ for agents.
 
 - Evaluation must be blind: the judge must not see intervention or method
   names.
+- For every new experiment, use the default `trait` mode as the primary
+  endpoint: independently score each answer and each active feature on the
+  anchored 1–5 scale. For compositions, report every feature score and joint
+  metrics such as all active scores being at least 4.
+- Treat `pairwise` as an optional causal robustness check, never as the sole
+  composition metric. Treat `scalar` as a legacy v2 compatibility mode.
+- Evaluate answer quality separately once per answer; do not repeat or combine
+  quality judgments with every feature score.
 - Shuffle answer order deterministically and save the seed or permutation.
 - Save judge model, prompt version, rubric version, decoding parameters, and
   token usage with every run.
