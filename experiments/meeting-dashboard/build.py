@@ -142,39 +142,89 @@ def composition_depth(data: dict | None) -> str:
 def composition_matrix(data: dict | None) -> str:
     if not data or not data.get("effects_by_context"):
         return ""
-    cells = [
+    contexts = data["effects_by_context"]
+
+    def value(active: tuple[str, ...], feature: str) -> str:
+        context = "+".join(
+            name for name in FEATURES if name in active and name != feature
+        )
+        item = contexts[feature][context]
+        low, high = item["ci95"]
+        status = "positive" if low > 0 else "negative" if high < 0 else "uncertain"
+        return (
+            f"<span class='{status}'><strong>{LABELS[feature]} "
+            f"{item['effect']:+.2f}</strong></span><br>"
+            f"<span class='small'>[{low:+.2f}, {high:+.2f}]</span><br>"
+        )
+
+    blocks = [
         "<h2>Composition results at a glance</h2>",
         (
-            "<p class='hint'>Each active feature is judged separately inside "
-            "the same composed answer. Green: positive CI; yellow: uncertain; "
-            "red: negative CI.</p>"
+            "<p class='hint'>One cell per unique composition; every line is a "
+            "separate feature-specific judgment. Green: positive CI; yellow: "
+            "uncertain; red: negative CI.</p>"
         ),
-        "<table><tr><th>Active composition</th>",
+        "<h3>Pairs</h3><table class='triangle'><tr><th></th>",
     ]
-    cells += [f"<th>{html.escape(LABELS[feature])}</th>" for feature in FEATURES]
-    cells.append("</tr>")
-    for size in range(2, len(FEATURES) + 1):
-        for active in combinations(FEATURES, size):
-            title = " + ".join(LABELS[feature] for feature in active)
-            cells.append(f"<tr><th>{html.escape(title)}</th>")
-            for feature in FEATURES:
-                if feature not in active:
-                    cells.append("<td class='na'>—</td>")
-                    continue
-                context = "+".join(
-                    name for name in FEATURES if name in active and name != feature
-                )
-                item = data["effects_by_context"][feature][context]
-                low, high = item["ci95"]
-                status = (
-                    "positive" if low > 0 else "negative" if high < 0 else "uncertain"
-                )
-                cells.append(
-                    f"<td class='{status}'><strong>{item['effect']:+.2f}</strong><br>"
-                    f"<span class='small'>[{low:+.2f}, {high:+.2f}]</span></td>"
-                )
-            cells.append("</tr>")
-    return "".join(cells) + "</table>"
+    blocks += [f"<th>{html.escape(LABELS[feature])}</th>" for feature in FEATURES]
+    blocks.append("</tr>")
+    for left_index, left in enumerate(FEATURES):
+        blocks.append(f"<tr><th>{html.escape(LABELS[left])}</th>")
+        for right_index, right in enumerate(FEATURES):
+            if right_index <= left_index:
+                blocks.append("<td class='na'>—</td>")
+            else:
+                active = (left, right)
+                blocks.append(f"<td>{value(active, left)}{value(active, right)}</td>")
+        blocks.append("</tr>")
+    blocks.append("</table><h3>Triples</h3><table>")
+    for active in combinations(FEATURES, 3):
+        title = " + ".join(LABELS[feature] for feature in active)
+        blocks.append(
+            f"<tr><th>{html.escape(title)}</th><td>"
+            + "".join(value(active, feature) for feature in active)
+            + "</td></tr>"
+        )
+    blocks.append(
+        "</table><h3>All four</h3><table><tr><th>"
+        + " + ".join(LABELS[feature] for feature in FEATURES)
+        + "</th><td>"
+        + "".join(value(FEATURES, feature) for feature in FEATURES)
+        + "</td></tr></table>"
+    )
+    return "".join(blocks)
+
+
+def verdict_table(data: dict | None) -> str:
+    if not data or not data.get("effects_by_context"):
+        return ""
+    contexts = data["effects_by_context"]
+    rows = [
+        "<h2>Final composition verdict</h2><table><tr><th>Feature</th>",
+        "<th>Standalone</th><th>With all four</th>",
+        "<th>Reliable contexts</th><th>Verdict</th></tr>",
+    ]
+    for feature in FEATURES:
+        items = contexts[feature]
+        standalone = items["none"]
+        all_others = "+".join(name for name in FEATURES if name != feature)
+        composed = items[all_others]
+        reliable = sum(item["ci95"][0] > 0 for item in items.values())
+        if reliable == len(items):
+            verdict = "robustly composes"
+        elif composed["ci95"][0] > 0:
+            verdict = "composes, context-sensitive"
+        elif reliable:
+            verdict = "weak / context-dependent"
+        else:
+            verdict = "direction failed"
+        rows.append(
+            f"<tr><th>{html.escape(LABELS[feature])}</th>"
+            f"<td>{standalone['effect']:+.2f}</td>"
+            f"<td>{composed['effect']:+.2f}</td>"
+            f"<td>{reliable}/{len(items)}</td><td>{verdict}</td></tr>"
+        )
+    return "".join(rows) + "</table>"
 
 
 def exact_compositions(data: dict | None) -> str:
@@ -267,6 +317,7 @@ def build(args: argparse.Namespace) -> str:
         f"<p>{complete}/4 summaries available · generated "
         f"{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}</p></header>"
         f"<main><section>{forest('Main steering effects', trait)}</section>"
+        f"<section>{verdict_table(base)}</section>"
         f"<section>{composition_depth(base)}</section>"
         f"<section>{composition_matrix(base)}</section>"
         f"<section>{exact_compositions(base)}</section>"
