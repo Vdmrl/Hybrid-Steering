@@ -147,7 +147,7 @@ def composition_matrix(data: dict | None) -> str:
     def value(active: tuple[str, ...], feature: str) -> str:
         context = "+".join(
             name for name in FEATURES if name in active and name != feature
-        )
+        ) or "none"
         item = contexts[feature][context]
         low, high = item["ci95"]
         status = "positive" if low > 0 else "negative" if high < 0 else "uncertain"
