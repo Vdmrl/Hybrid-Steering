@@ -145,49 +145,42 @@ def composition_matrix(data: dict | None) -> str:
     contexts = data["effects_by_context"]
 
     def value(active: tuple[str, ...], feature: str) -> str:
-        context = "+".join(
-            name for name in FEATURES if name in active and name != feature
-        ) or "none"
+        context = (
+            "+".join(name for name in FEATURES if name in active and name != feature)
+            or "none"
+        )
         item = contexts[feature][context]
         low, high = item["ci95"]
         status = "positive" if low > 0 else "negative" if high < 0 else "uncertain"
         return (
-            f"<span class='{status}'><strong>{LABELS[feature]} "
-            f"{item['effect']:+.2f}</strong></span><br>"
-            f"<span class='small'>[{low:+.2f}, {high:+.2f}]</span><br>"
+            f"<span class='{status}'><strong>{item['effect']:+.2f}</strong></span><br>"
+            f"<span class='small'>[{low:+.2f}, {high:+.2f}]</span>"
         )
 
     rows = [
         "<h2>Composition results at a glance</h2>",
         (
-            "<p class='hint'>Compositions grow from left to right and are grouped "
-            "by the first, then the second feature. Every result line is a "
-            "separate feature-specific judgment.</p>"
+            "<p class='hint'>One row per composition, grouped by the first and "
+            "then the second feature. Each feature column is judged separately.</p>"
         ),
-        "<table class='hierarchy'><tr><th>First feature</th><th>+ second</th>",
-        "<th>+ third</th><th>+ fourth</th><th>Separately judged effects</th></tr>",
+        "<table><tr><th>Active composition</th>",
     ]
+    rows += [f"<th>{html.escape(LABELS[feature])}</th>" for feature in FEATURES]
+    rows.append("</tr>")
     active_rows = sorted(
         active
         for size in range(1, len(FEATURES) + 1)
         for active in combinations(FEATURES, size)
     )
     for active in active_rows:
-        rows.append("<tr>")
-        for position in range(len(FEATURES)):
-            if position < len(active):
-                prefix = "" if position == 0 else "+ "
-                rows.append(
-                    f"<td class='step'>{prefix}"
-                    f"{html.escape(LABELS[active[position]])}</td>"
-                )
+        title = " + ".join(LABELS[feature] for feature in active)
+        rows.append(f"<tr><th>{html.escape(title)}</th>")
+        for feature in FEATURES:
+            if feature in active:
+                rows.append(f"<td>{value(active, feature)}</td>")
             else:
-                rows.append("<td class='na'></td>")
-        rows.append(
-            "<td>"
-            + "".join(value(active, feature) for feature in active)
-            + "</td></tr>"
-        )
+                rows.append("<td class='na'>—</td>")
+        rows.append("</tr>")
     return "".join(rows) + "</table>"
 
 
