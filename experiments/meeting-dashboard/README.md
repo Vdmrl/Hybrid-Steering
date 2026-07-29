@@ -13,7 +13,8 @@ python experiments/meeting-dashboard/build.py \
   --output outputs/meeting-dashboard/index.html
 ```
 
-The page shows main steering effects, their survival from single to four-way
+The page starts with a bilingual concept glossary and shows main steering
+effects, their survival from single to four-way
 composition, standalone and composed effects for every active feature in every
 pair/triple/four-way configuration, a triangular pair matrix, a compact final
 verdict table,

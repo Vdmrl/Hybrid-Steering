@@ -294,6 +294,23 @@ def composition_cards(title: str, data: dict | None) -> str:
     )
 
 
+def concept_guide() -> str:
+    return """<h2>Steering concepts / Что означают признаки</h2>
+<p class="hint">Positive effects favor the first pole; negative effects favor
+the opposite pole used to construct the direction.</p>
+<table>
+<tr><th>Feature</th><th>Положительный полюс</th><th>Противоположный полюс</th><th>α</th></tr>
+<tr><th>Principled candor</th><td>Принципиальная прямота: вежливо указывать на
+ошибки и не поддакивать</td><td>Sycophancy — угодливое согласие</td><td>8</td></tr>
+<tr><th>Calm composure</th><td>Спокойствие и самообладание</td>
+<td>Fear / panic — страх и паника</td><td>2</td></tr>
+<tr><th>Concrete language</th><td>Конкретный, предметный язык</td>
+<td>Abstract language — абстрактный язык</td><td>4</td></tr>
+<tr><th>Casualness</th><td>Неформальный, разговорный стиль</td>
+<td>Formality — формальный стиль</td><td>1</td></tr>
+</table>"""
+
+
 def build(args: argparse.Namespace) -> str:
     base = load(args.four_axis)
     optimism = load(args.optimism)
@@ -316,7 +333,8 @@ def build(args: argparse.Namespace) -> str:
         f"<header><p>Hybrid Steering · Qwen3.5-9B</p><h1>Meeting dashboard</h1>"
         f"<p>{complete}/4 summaries available · generated "
         f"{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}</p></header>"
-        f"<main><section>{forest('Main steering effects', trait)}</section>"
+        f"<main><section>{concept_guide()}</section>"
+        f"<section>{forest('Main steering effects', trait)}</section>"
         f"<section>{verdict_table(base)}</section>"
         f"<section>{composition_depth(base)}</section>"
         f"<section>{composition_matrix(base)}</section>"
