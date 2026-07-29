@@ -139,6 +139,44 @@ def composition_depth(data: dict | None) -> str:
     return "".join(cells) + "</table>"
 
 
+def composition_matrix(data: dict | None) -> str:
+    if not data or not data.get("effects_by_context"):
+        return ""
+    cells = [
+        "<h2>Composition results at a glance</h2>",
+        (
+            "<p class='hint'>Each active feature is judged separately inside "
+            "the same composed answer. Green: positive CI; yellow: uncertain; "
+            "red: negative CI.</p>"
+        ),
+        "<table><tr><th>Active composition</th>",
+    ]
+    cells += [f"<th>{html.escape(LABELS[feature])}</th>" for feature in FEATURES]
+    cells.append("</tr>")
+    for size in range(2, len(FEATURES) + 1):
+        for active in combinations(FEATURES, size):
+            title = " + ".join(LABELS[feature] for feature in active)
+            cells.append(f"<tr><th>{html.escape(title)}</th>")
+            for feature in FEATURES:
+                if feature not in active:
+                    cells.append("<td class='na'>—</td>")
+                    continue
+                context = "+".join(
+                    name for name in FEATURES if name in active and name != feature
+                )
+                item = data["effects_by_context"][feature][context]
+                low, high = item["ci95"]
+                status = (
+                    "positive" if low > 0 else "negative" if high < 0 else "uncertain"
+                )
+                cells.append(
+                    f"<td class='{status}'><strong>{item['effect']:+.2f}</strong><br>"
+                    f"<span class='small'>[{low:+.2f}, {high:+.2f}]</span></td>"
+                )
+            cells.append("</tr>")
+    return "".join(cells) + "</table>"
+
+
 def exact_compositions(data: dict | None) -> str:
     if not data or not data.get("effects_by_context"):
         return ""
@@ -230,6 +268,7 @@ def build(args: argparse.Namespace) -> str:
         f"{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}</p></header>"
         f"<main><section>{forest('Main steering effects', trait)}</section>"
         f"<section>{composition_depth(base)}</section>"
+        f"<section>{composition_matrix(base)}</section>"
         f"<section>{exact_compositions(base)}</section>"
         f"<section>{forest('Answer-quality effects', quality)}</section>"
         f"<section>{interaction_table(main_data)}</section>"
