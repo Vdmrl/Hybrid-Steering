@@ -72,13 +72,14 @@ export OPENROUTER_API_KEY="..."
 # Optional when direct OpenRouter access is unavailable:
 # export OPENROUTER_PROXY="http://user:password@host:port"
 
-hybrid-judge judge/examples/input.example.jsonl runs/pairwise.jsonl \
-  --mode pairwise \
+hybrid-judge judge/examples/input.example.jsonl runs/trait.jsonl \
   --feature optimism
 ```
 
-See [`judge/README.md`](judge/README.md) for input/output schemas, scalar mode,
-calibration, and resume behavior.
+This default command independently scores every answer on the anchored 1–5
+trait scale. Pairwise A/B evaluation is optional secondary evidence, not the
+primary composition metric. See [`judge/README.md`](judge/README.md) for
+input/output schemas, calibration, and resume behavior.
 
 ## Development
 

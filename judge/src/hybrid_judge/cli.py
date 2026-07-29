@@ -27,7 +27,13 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("input", type=Path)
     parser.add_argument("output", type=Path)
     parser.add_argument(
-        "--mode", choices=("trait", "scalar", "pairwise"), default="trait"
+        "--mode",
+        choices=("trait", "scalar", "pairwise"),
+        default="trait",
+        help=(
+            "trait: primary independent 1-5 score (default); "
+            "pairwise: optional A/B check; scalar: legacy v2"
+        ),
     )
     parser.add_argument("--feature")
     parser.add_argument("--workers", type=int)
