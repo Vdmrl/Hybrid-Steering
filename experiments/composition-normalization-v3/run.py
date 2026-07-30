@@ -326,7 +326,7 @@ def prepare_judge(args: argparse.Namespace, split: str) -> None:
             answers = [
                 {"answer_id": name, "text": text}
                 for name, text in row.items()
-                if name not in {"source_id", "scenario"}
+                if name not in METADATA
                 and (split == "main" or name == "baseline" or f"_{feature}_" in name)
             ]
             prepared.append(
@@ -347,7 +347,7 @@ def prepare_judge(args: argparse.Namespace, split: str) -> None:
                 "answers": [
                     {"answer_id": name, "text": text}
                     for name, text in row.items()
-                    if name not in {"source_id", "scenario"}
+                    if name not in METADATA
                 ],
                 "metadata": {"experiment": "composition-normalization-v3"},
             }
