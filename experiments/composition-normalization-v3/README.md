@@ -31,6 +31,8 @@ direction.
 - The test prompts exclude the four target feature families.
 - The Judge receives anonymous answers and scores every answer on all four
   traits. Quality is evaluated once on a 32-prompt subset.
+- Final summaries include deterministic 95% paired-bootstrap intervals and
+  prompt-paired contrasts for normalization, rank, and steering method.
 
 ## Run
 

@@ -9,3 +9,10 @@ SPEC.loader.exec_module(RUN)
 
 def test_composition_helpers():
     RUN.self_test()
+
+
+def test_bootstrap_mean_is_deterministic():
+    first = RUN.bootstrap_mean([1.0, 2.0, 3.0], samples=100)
+    second = RUN.bootstrap_mean([1.0, 2.0, 3.0], samples=100)
+    assert first == second
+    assert first["mean"] == 2.0

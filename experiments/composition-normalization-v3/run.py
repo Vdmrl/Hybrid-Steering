@@ -518,6 +518,18 @@ def condition_features(answer_id: str) -> tuple[str, ...]:
     return active(int(answer_id.rsplit("_", 1)[-1], 2))
 
 
+def bootstrap_mean(values: list[float], samples: int = 10_000) -> dict[str, float]:
+    tensor = torch.tensor(values, dtype=torch.float64)
+    generator = torch.Generator().manual_seed(20260730)
+    indices = torch.randint(len(tensor), (samples, len(tensor)), generator=generator)
+    means = tensor[indices].mean(dim=1)
+    return {
+        "mean": tensor.mean().item(),
+        "ci95_low": torch.quantile(means, 0.025).item(),
+        "ci95_high": torch.quantile(means, 0.975).item(),
+    }
+
+
 def summarize_phase(args: argparse.Namespace) -> None:
     root = args.output_dir / "judge" / "main" / "results"
     scores = defaultdict(dict)
@@ -531,9 +543,11 @@ def summarize_phase(args: argparse.Namespace) -> None:
             usage = row["provenance"]["usage"]
             costs["input_tokens"] += usage["input_tokens"]
             costs["output_tokens"] += usage["output_tokens"]
-    quality = defaultdict(list)
+    quality = defaultdict(dict)
     for row in result_rows(root / "quality.jsonl"):
-        quality[row["answer_id"]].append(min(row["task_fulfillment"], row["coherence"]))
+        quality[row["answer_id"]][row["prompt_id"]] = min(
+            row["task_fulfillment"], row["coherence"]
+        )
         usage = row["provenance"]["usage"]
         costs["input_tokens"] += usage["input_tokens"]
         costs["output_tokens"] += usage["output_tokens"]
@@ -542,9 +556,14 @@ def summarize_phase(args: argparse.Namespace) -> None:
         if set(values) == set(FEATURES):
             by_answer[answer_id].append((prompt_id, values))
     conditions = []
+    joint_by_answer = {}
     for answer_id, rows in sorted(by_answer.items()):
         enabled = condition_features(answer_id)
         minimums = [min(values[name]["soft"] for name in enabled) for _, values in rows]
+        joint_by_answer[answer_id] = {
+            prompt_id: min(values[name]["soft"] for name in enabled)
+            for prompt_id, values in rows
+        }
         hard = [
             all(values[name]["hard"] >= 4 for name in enabled) for _, values in rows
         ]
@@ -555,6 +574,7 @@ def summarize_phase(args: argparse.Namespace) -> None:
                 "active_features": list(enabled),
                 "n": len(rows),
                 "mean_minimum_expected": sum(minimums) / len(minimums),
+                "mean_minimum_expected_ci95": bootstrap_mean(minimums),
                 "all_active_ge4": sum(hard) / len(hard),
                 "feature_expected_means": {
                     name: sum(values[name]["soft"] for _, values in rows) / len(rows)
@@ -567,18 +587,53 @@ def summarize_phase(args: argparse.Namespace) -> None:
                     else None
                 ),
                 "quality_mean": (
-                    sum(quality[answer_id]) / len(quality[answer_id])
+                    sum(quality[answer_id].values()) / len(quality[answer_id])
+                    if quality[answer_id]
+                    else None
+                ),
+                "quality_ci95": (
+                    bootstrap_mean(list(quality[answer_id].values()))
                     if quality[answer_id]
                     else None
                 ),
             }
         )
+    contrasts = []
+    comparisons = (
+        ("gdn_rss_r1", "gdn_raw_r1", "gdn_rss_r1_minus_raw"),
+        ("gdn_rss_r4", "gdn_rss_r1", "gdn_rank4_minus_rank1"),
+        ("act_rss", "act_raw", "activation_rss_minus_raw"),
+        ("gdn_rss_r1", "act_rss", "gdn_minus_activation_rss"),
+        ("gdn_raw_r1", "act_raw", "gdn_minus_activation_raw"),
+    )
+    for mask in range(1, 16):
+        if len(active(mask)) < 2:
+            continue
+        for left, right, name in comparisons:
+            left_id, right_id = f"{left}_{mask:04b}", f"{right}_{mask:04b}"
+            prompt_ids = sorted(
+                set(joint_by_answer[left_id]) & set(joint_by_answer[right_id])
+            )
+            differences = [
+                joint_by_answer[left_id][prompt_id]
+                - joint_by_answer[right_id][prompt_id]
+                for prompt_id in prompt_ids
+            ]
+            contrasts.append(
+                {
+                    "contrast": name,
+                    "mask": f"{mask:04b}",
+                    "active_features": list(active(mask)),
+                    "n": len(differences),
+                    "paired_difference": bootstrap_mean(differences),
+                }
+            )
     costs["estimated_usd"] = (
         costs["input_tokens"] * 0.15 + costs["output_tokens"] * 0.60
     ) / 1_000_000
     BASE.atomic_json(
         args.output_dir / "summary.json",
-        {"conditions": conditions, "judge_usage": costs},
+        {"conditions": conditions, "contrasts": contrasts, "judge_usage": costs},
     )
     print(f"conditions={len(conditions)} estimated_cost=${costs['estimated_usd']:.3f}")
 
