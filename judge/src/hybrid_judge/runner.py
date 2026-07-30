@@ -305,8 +305,12 @@ def scalar_trait_task_v3(
     def validate(parsed: ScalarTraitResponseV3) -> None:
         if parsed.answer_id != "answer_0":
             raise ValueError("judge returned an unexpected answer_id")
+        if parsed.evidence and not parsed.evidence.strip():
+            raise ValueError("use an empty string instead of whitespace evidence")
         if parsed.evidence and parsed.evidence not in answer.text:
-            parsed.evidence = ""
+            raise ValueError("judge evidence is not an exact answer excerpt")
+        if parsed.trait_score != 3 and not parsed.evidence:
+            raise ValueError("non-neutral trait scores require exact evidence")
         if len(parsed.reason.split()) > 30:
             raise ValueError("judge reason exceeds 30 words")
 
@@ -447,15 +451,31 @@ def run_tasks(
     output: Path,
     workers: int,
     failures_output: Path | None = None,
+    resume_provenance: dict[str, Any] | None = None,
 ) -> tuple[int, int]:
     output.parent.mkdir(parents=True, exist_ok=True)
-    done = set()
+    existing = []
     if output.exists():
-        done = {
-            json.loads(line)["task_id"]
+        existing = [
+            json.loads(line)
             for line in output.read_text(encoding="utf-8").splitlines()
             if line.strip()
-        }
+        ]
+    if resume_provenance:
+        for row in existing:
+            provenance = row.get("provenance", {})
+            mismatches = [
+                key
+                for key, expected in resume_provenance.items()
+                if provenance.get(key) != expected
+            ]
+            if mismatches:
+                fields = ", ".join(mismatches)
+                raise ValueError(
+                    f"cannot resume {output}: incompatible provenance fields "
+                    f"({fields}); use a new output file"
+                )
+    done = {row["task_id"] for row in existing}
     pending = [task for task in tasks if worker(task, dry_run=True) not in done]
     failures = 0
     failures_output = failures_output or output.with_name(

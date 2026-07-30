@@ -126,6 +126,17 @@ def main() -> None:
         worker,
         output=args.output,
         workers=workers,
+        resume_provenance={
+            "judge_model": config.model,
+            "provider": config.provider,
+            "prompt_version": prompt_name,
+            "prompt_sha256": common["prompt_sha256"],
+            "rubric_version": features.rubric_version,
+            "config_version": config.config_version,
+            "config_sha256": common["config_sha256"],
+            "seed": args.seed,
+            "temperature": config.generation.temperature,
+        },
     )
     print(f"complete={completed} failed={failed}", flush=True)
     if args.mode == "pairwise":
