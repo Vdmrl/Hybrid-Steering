@@ -12,12 +12,15 @@ DEFAULT_SUMMARY = ROOT / "experiments/composition-generation-queue/results/summa
 DEFAULT_COMPARISONS = (
     ROOT / "experiments/composition-generation-queue/results/comparisons.json"
 )
+DEFAULT_ANALYSIS = (
+    ROOT / "experiments/composition-generation-queue/results/composition-analysis.json"
+)
 DEFAULT_OUTPUT = ROOT / "outputs/meeting-dashboard-2/index.html"
 
 
-def build(summary: dict, comparisons: dict) -> str:
+def build(summary: dict, comparisons: dict, analysis: dict) -> str:
     payload = json.dumps(
-        {"summary": summary, "comparisons": comparisons},
+        {"summary": summary, "comparisons": comparisons, "analysis": analysis},
         ensure_ascii=False,
         separators=(",", ":"),
     ).replace("</", "<\\/")
@@ -29,6 +32,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--summary", type=Path, default=DEFAULT_SUMMARY)
     parser.add_argument("--comparisons", type=Path, default=DEFAULT_COMPARISONS)
+    parser.add_argument("--analysis", type=Path, default=DEFAULT_ANALYSIS)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     args = parser.parse_args()
     args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -36,6 +40,7 @@ def main() -> None:
         build(
             json.loads(args.summary.read_text(encoding="utf-8")),
             json.loads(args.comparisons.read_text(encoding="utf-8")),
+            json.loads(args.analysis.read_text(encoding="utf-8")),
         ),
         encoding="utf-8",
     )
@@ -100,19 +105,25 @@ var(--cyan);padding-left:12px;margin:12px 0}.ranked td:nth-child(3){font-weight:
 </header>
 <main class="grid">
   <section class="panel" id="overview"></section>
+  <section class="panel" id="bridge"></section>
   <section class="panel half" id="method-bars"></section>
   <section class="panel half" id="bottleneck"></section>
   <section class="panel half" id="svd"></section>
   <section class="panel half" id="activation"></section>
+  <section class="panel" id="holdout"></section>
+  <section class="panel half" id="compatibility"></section>
+  <section class="panel half" id="retention"></section>
   <section class="panel half" id="composition"></section>
   <section class="panel half" id="joy"></section>
   <section class="panel" id="ranked"></section>
+  <section class="panel" id="next"></section>
   <section class="panel" id="notes"></section>
 </main>
 <script>
 const DATA=__DATA__;
 const conditions=DATA.summary.conditions;
 const comparisons=DATA.comparisons;
+const analysis=DATA.analysis;
 const FEATURES=["principled_candor","concrete_language","casualness","optimism"];
 const F={principled_candor:"Candor",concrete_language:"Concrete",casualness:"Casualness",optimism:"Optimism",joy:"Joy"};
 const METHODS={
@@ -148,7 +159,20 @@ document.querySelector("#overview").innerHTML=`<h2>What do the results say?</h2>
 </div>
 <p class="callout"><b>Strongest current result:</b> norm control improves four-way GDN joint success by
 14.8 percentage points over per-feature rank 1; paired bootstrap 95% CI [+5.5, +24.2] pp.
-Activation looks stronger, and ${activationConfirmed.length?"the separate 96-prompt holdout below preserves the exploratory/confirmatory boundary":"its best setting was selected on the same 32 prompts and still needs holdout confirmation"}.</p>`;
+On the same 96-prompt holdout, activation beats raw rank-1 GDN but not norm-controlled GDN conclusively.</p>
+<div class="grid">
+ <div class="third"><h3 class="good">Supported</h3><p class="note">Several features coexist in one answer; rank 1 is sufficient for the clean Candor + Concrete + Optimism triple; norm control improves raw GDN composition.</p></div>
+ <div class="third"><h3 class="warn">Not established</h3><p class="note">Rank 4 is better than rank 1; activation is better than norm-controlled GDN; directions are linearly independent.</p></div>
+ <div class="third"><h3>Still unknown</h3><p class="note">Answer-quality cost, generalisation beyond this prompt distribution, inactive-trait leakage, and probability-weighted Judge results.</p></div>
+</div>`;
+
+document.querySelector("#bridge").innerHTML=`<h2>How dashboard 1 and dashboard 2 fit together</h2>
+<table><tr><th>Dashboard</th><th>Question answered</th><th>Main reading</th></tr>
+<tr><td>1 · strict A/B</td><td>Does turning one direction ON causally move the answer toward that feature?</td><td>Candor and Casualness move reliably; Concrete moves more weakly; Calm fails. Order disagreement makes the binary magnitude conservative and noisy.</td></tr>
+<tr><td>2 · independent 1-5 scores</td><td>Are all requested features visibly present in the same final answer, and how do methods compare?</td><td>Candor, Concrete, and Optimism coexist well. Casualness often moves in the right direction but remains below the absolute 4/5 threshold.</td></tr>
+</table>
+<p class="callout"><b>These are not contradictory:</b> a direction can cause a real positive shift and still be too weak to make the feature clearly present.
+Dashboard 1 measures movement; dashboard 2 measures the achieved level and simultaneous co-occurrence.</p>`;
 
 document.querySelector("#method-bars").innerHTML=`<h2>Which GDN composition method works best?</h2>
 <p class="note">Strict joint endpoint: all four independently scored traits are at least 4/5 on the same answer.</p>
@@ -175,6 +199,26 @@ if(activationConfirmed.length){act+=`<h3 style="margin-top:18px">Held-out confir
 else act+=`<p class="callout warn">Holdout is pending for layer 10 / α=4 and layer 20 / α=1. Do not present 62.5% as confirmatory yet.</p>`;
 document.querySelector("#activation").innerHTML=act;
 
+const HM=analysis.holdout.methods;
+const HL={
+ baseline:"No steering",
+ gdn_rank1:"GDN rank 1",
+ gdn_rank4:"GDN rank 4",
+ gdn_norm:"GDN rank 1 + norm control",
+ activation_l10_a4:"Activation L10 / alpha=4",
+ activation_l20_a1:"Activation L20 / alpha=1"
+};
+const holdoutOrder=["baseline","gdn_rank1","gdn_rank4","gdn_norm","activation_l10_a4","activation_l20_a1"];
+let holdout=`<h2>Fair head-to-head on the same 96 held-out prompts</h2>
+<p class="note">Every row uses the identical prompt set. “All four” is strict co-occurrence in one answer, not an average across answers.</p>
+<table class="heat"><tr><th>Method</th><th>All four ≥4/5</th><th>Mean minimum</th>${FEATURES.map(x=>`<th>${F[x]}</th>`).join("")}</tr>`;
+holdoutOrder.forEach(name=>{const x=HM[name];holdout+=`<tr><td>${HL[name]}</td><td style="background:${heat(x.joint_ge4.rate)}">${pct(x.joint_ge4.rate)}<br><small>[${pct(x.joint_ge4.ci95_low)}, ${pct(x.joint_ge4.ci95_high)}]</small></td><td>${x.minimum.mean.toFixed(2)}</td>${FEATURES.map(f=>`<td style="background:${heat(x.feature_means[f],1,5)}">${x.feature_means[f].toFixed(2)}</td>`).join("")}</tr>`});
+document.querySelector("#holdout").innerHTML=holdout+`</table>
+<p class="callout"><b>What is supported:</b> activation steering clearly beats unnormalised rank-1 GDN
+(+24.0 pp, paired 95% CI [+11.5, +36.5]). Norm control closes most of that gap:
+activation versus norm-controlled GDN is only +8.3 pp (CI [-4.2, +20.8]), so the present data do not establish a winner between those two.</p>
+<p class="note">Activation reaches the strict endpoint mainly by raising Casualness (3.92), while its Candor and Optimism scores are below the GDN variants. It is stronger on the current bottleneck, not uniformly stronger on every feature.</p>`;
+
 function compositionRows(prefix,phase){
  return conditions.filter(x=>x.phase===phase&&x.condition.startsWith(prefix)&&x.active_features.length>=2)
 }
@@ -185,6 +229,31 @@ let comp=`<h2>Does performance decay with more traits?</h2><p class="note">Mean 
 <table><tr><th>Method</th>${depths.map(x=>`<th>${x} traits</th>`).join("")}</tr>`;
 [[METHODS.per_r1_1111,rank1],[METHODS.norm_1111,norm]].forEach(([label,rows])=>{comp+=`<tr><td>${label}</td>${depths.map(n=>{const value=depth(rows,n);return value===null?'<td>—</td>':`<td style="background:${heat(value)}">${pct(value)}</td>`}).join("")}</tr>`});
 document.querySelector("#composition").innerHTML=comp+`</table><p class="callout">Composition is not uniformly hard: combinations containing Casualness dominate failures. Use the ranked table below before attributing decay only to the number of traits.</p>`;
+
+const rc=analysis.rank1_composition.conditions;
+function group(size,hasCasual){
+ const xs=rc.filter(x=>x.active_features.length===size&&x.active_features.includes("casualness")===hasCasual);
+ return xs.length?xs.reduce((sum,x)=>sum+x.joint_ge4,0)/xs.length:null;
+}
+let compatibility=`<h2>Does rank-1 compose?</h2>
+<p class="note">Mean strict joint success across rank-1 combinations, split by whether they contain the weak Casualness direction.</p>
+<table class="heat"><tr><th>Combination</th><th>Without Casualness</th><th>With Casualness</th></tr>`;
+[1,2,3,4].forEach(n=>{const no=group(n,false),yes=group(n,true);compatibility+=`<tr><td>${n} feature${n>1?"s":""}</td><td>${no===null?"—":pct(no)}</td><td style="${yes===null?"":`background:${heat(yes)}`}">${yes===null?"—":pct(yes)}</td></tr>`});
+const noCasualTriple=rc.find(x=>x.condition==="per_r1_1011");
+const fullRank1=rc.find(x=>x.condition==="per_r1_1111");
+document.querySelector("#compatibility").innerHTML=compatibility+`</table>
+<p class="callout"><b>Yes, for compatible features.</b> Candor + Concrete + Optimism reaches ${pct(noCasualTriple.joint_ge4)} with rank 1.
+The four-way condition reaches ${pct(fullRank1.joint_ge4)}, close to the ${pct(fullRank1.independence_product)}
+product predicted by an independence baseline from its four marginal success rates. This does not prove independence,
+but it argues against a large extra co-occurrence penalty. The failure is concentrated in Casualness, not a general collapse of simultaneous rank-1 steering.</p>`;
+
+const RET=analysis.rank1_four_way_retention;
+let retention=`<h2>What survives from single to four-way?</h2>
+<p class="note">Paired score change: the same feature in rank-1 four-way steering minus that feature alone.</p>
+<table><tr><th>Feature</th><th>Mean delta</th><th>Paired 95% CI</th><th>Reading</th></tr>`;
+FEATURES.forEach(f=>{const x=RET[f];const clear=x.ci95_low>0||x.ci95_high<0;retention+=`<tr><td>${F[f]}</td><td class="${x.difference>=0?"good":"bad"}">${x.difference>=0?"+":""}${x.difference.toFixed(2)}</td><td>[${x.ci95_low.toFixed(2)}, ${x.ci95_high.toFixed(2)}]</td><td>${clear?(x.difference>0?"stronger":"weaker"):"roughly retained"}</td></tr>`});
+document.querySelector("#retention").innerHTML=retention+`</table>
+<p class="callout">Adding directions does not simply erase earlier ones: Concrete and Casualness strengthen, Optimism is retained, and Candor falls modestly. This supports approximate compositionality, but not clean linear independence.</p>`;
 
 const joys=[1,2,4,8].map(a=>({a,single:by("joy",`joy_a${a}`),pair:by("joy",`joy_a${a}_optimism`)}));
 function lineChart(series){
@@ -205,10 +274,29 @@ let ranked=`<h2>Which concrete combinations work?</h2><p class="note">This separ
 rankedRows.forEach(x=>ranked+=`<tr><td>${x.phase==="norm"?"Norm-controlled":"SVD rank 1"}</td><td>${x.active_features.map(f=>F[f]).join(" + ")}</td><td>${pct(x.all_active_ge_4.rate)}</td><td>[${pct(x.all_active_ge_4.ci95_low)}, ${pct(x.all_active_ge_4.ci95_high)}]</td><td>${x.minimum_active_score.mean.toFixed(2)}</td><td>${x.n_joint}</td></tr>`);
 document.querySelector("#ranked").innerHTML=ranked+"</table>";
 
+document.querySelector("#next").innerHTML=`<h2>Next confirmatory experiment</h2>
+<p class="note">One untouched 192-prompt test set drawn from unrelated feature labels (not Candor stories and not direction/dev examples);
+Qwen3.5-9B; identical prompts and decoding for every condition.</p>
+<table><tr><th>Block</th><th>Conditions</th><th>Why it is needed</th></tr>
+<tr><td>Frozen tuning</td><td>Choose alphas on a separate 64-prompt dev split</td><td>Keep the 192 test prompts untouched and avoid another winner's-curse sweep.</td></tr>
+<tr><td>Controls</td><td>Baseline</td><td>Measure how much each trait is already present before steering.</td></tr>
+<tr><td>GDN</td><td>rank-1 raw · rank-1 norm-controlled · rank-4 norm-controlled</td><td>Separate rank from norm control instead of changing both at once.</td></tr>
+<tr><td>Classical</td><td>Activation L10 / alpha=4</td><td>Direct method comparison under the same 15 feature masks.</td></tr>
+<tr><td>Compositions</td><td>4 singles · 6 pairs · 4 triples · 1 four-way</td><td>Estimate retention and interactions, not only one final four-way number.</td></tr>
+<tr><td>Judge</td><td>Expected 1-5 trait score from logprobs + separate answer quality</td><td>A continuous primary endpoint; hard all≥4 remains secondary.</td></tr>
+</table>
+<p class="callout"><b>Primary analysis:</b> per-prompt minimum expected trait score, each feature's baseline-adjusted gain,
+and composed-minus-single retention, all with paired bootstrap 95% intervals. Also report hard all≥4/5 and answer quality as guardrails.</p>
+<p class="note">This is 61 generation conditions (11,712 answers) and about 25,344 feature judgments plus 11,712 quality judgments.
+At the current GPT-4o mini list price and the observed ~690-token Judge input, budget roughly $3.5-$4.5. Stop before $5.</p>`;
+
 document.querySelector("#notes").innerHTML=`<h2>Reading rules and current limits</h2>
 <div class="grid"><div class="third"><h3>Primary endpoint</h3><p class="note">Each active trait is judged independently on an anchored 1–5 scale. Joint success means every active trait scored at least 4 on the same answer.</p></div>
 <div class="third"><h3>Uncertainty</h3><p class="note">Rates show Wilson 95% intervals. Method differences in the SVD table use paired prompt bootstrap intervals.</p></div>
-<div class="third"><h3>Not measured yet</h3><p class="note">Answer quality, inactive-trait leakage, and human agreement are not part of this dashboard. Activation sweep winners require held-out confirmation.</p></div></div>`;
+<div class="third"><h3>Distribution caveat</h3><p class="note">The held-out prompts still come from Candor/Sycophancy stories. Baseline Candor is already 4.32/5, so this is prompt holdout, not a neutral cross-concept benchmark.</p></div></div>
+<p class="callout warn"><b>Do not overclaim:</b> the experiment supports simultaneous expression and approximate retention of several features.
+It does not prove that the directions are independent, that activation steering preserves answer quality, or that rank 1 is universally sufficient for arbitrary concepts.
+Answer quality, inactive-trait leakage, human agreement, and probability-weighted scores remain unmeasured here.</p>`;
 </script>
 </body></html>"""
 

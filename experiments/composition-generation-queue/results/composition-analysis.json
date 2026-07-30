@@ -1,0 +1,489 @@
+{
+  "schema_version": "1.0",
+  "holdout": {
+    "methods": {
+      "baseline": {
+        "n": 96,
+        "joint_ge4": {
+          "successes": 8,
+          "n": 96,
+          "rate": 0.0833,
+          "ci95_low": 0.0428,
+          "ci95_high": 0.1559
+        },
+        "minimum": {
+          "n": 96,
+          "mean": 1.9896,
+          "ci95_low": 1.8267,
+          "ci95_high": 2.1525
+        },
+        "feature_means": {
+          "principled_candor": 4.3229,
+          "concrete_language": 4.0938,
+          "casualness": 2.0417,
+          "optimism": 3.5833
+        }
+      },
+      "gdn_rank1": {
+        "n": 96,
+        "joint_ge4": {
+          "successes": 33,
+          "n": 96,
+          "rate": 0.3438,
+          "ci95_low": 0.2564,
+          "ci95_high": 0.4431
+        },
+        "minimum": {
+          "n": 96,
+          "mean": 2.6979,
+          "ci95_low": 2.4904,
+          "ci95_high": 2.9054
+        },
+        "feature_means": {
+          "principled_candor": 4.2604,
+          "concrete_language": 4.4479,
+          "casualness": 2.7292,
+          "optimism": 3.8021
+        }
+      },
+      "gdn_rank4": {
+        "n": 96,
+        "joint_ge4": {
+          "successes": 33,
+          "n": 96,
+          "rate": 0.3438,
+          "ci95_low": 0.2564,
+          "ci95_high": 0.4431
+        },
+        "minimum": {
+          "n": 96,
+          "mean": 2.8021,
+          "ci95_low": 2.6126,
+          "ci95_high": 2.9916
+        },
+        "feature_means": {
+          "principled_candor": 4.0833,
+          "concrete_language": 4.6146,
+          "casualness": 2.8542,
+          "optimism": 3.9167
+        }
+      },
+      "gdn_norm": {
+        "n": 96,
+        "joint_ge4": {
+          "successes": 48,
+          "n": 96,
+          "rate": 0.5,
+          "ci95_low": 0.4019,
+          "ci95_high": 0.5981
+        },
+        "minimum": {
+          "n": 96,
+          "mean": 3.0312,
+          "ci95_low": 2.8251,
+          "ci95_high": 3.2374
+        },
+        "feature_means": {
+          "principled_candor": 4.0938,
+          "concrete_language": 4.4792,
+          "casualness": 3.125,
+          "optimism": 3.8021
+        }
+      },
+      "activation_l10_a4": {
+        "n": 96,
+        "joint_ge4": {
+          "successes": 56,
+          "n": 96,
+          "rate": 0.5833,
+          "ci95_low": 0.4834,
+          "ci95_high": 0.6769
+        },
+        "minimum": {
+          "n": 96,
+          "mean": 3.0729,
+          "ci95_low": 2.8314,
+          "ci95_high": 3.3144
+        },
+        "feature_means": {
+          "principled_candor": 3.8854,
+          "concrete_language": 4.1667,
+          "casualness": 3.9167,
+          "optimism": 3.5104
+        }
+      },
+      "activation_l20_a1": {
+        "n": 96,
+        "joint_ge4": {
+          "successes": 48,
+          "n": 96,
+          "rate": 0.5,
+          "ci95_low": 0.4019,
+          "ci95_high": 0.5981
+        },
+        "minimum": {
+          "n": 96,
+          "mean": 2.9062,
+          "ci95_low": 2.6598,
+          "ci95_high": 3.1527
+        },
+        "feature_means": {
+          "principled_candor": 3.5833,
+          "concrete_language": 4.2396,
+          "casualness": 4.4271,
+          "optimism": 3.6146
+        }
+      }
+    },
+    "comparisons": {
+      "gdn_rank4_minus_gdn_rank1": {
+        "joint_ge4": {
+          "n": 96,
+          "difference": 0.0,
+          "ci95_low": -0.1042,
+          "ci95_high": 0.1042
+        },
+        "minimum": {
+          "n": 96,
+          "difference": 0.1042,
+          "ci95_low": -0.0938,
+          "ci95_high": 0.3125
+        }
+      },
+      "gdn_norm_minus_gdn_rank1": {
+        "joint_ge4": {
+          "n": 96,
+          "difference": 0.1562,
+          "ci95_low": 0.0417,
+          "ci95_high": 0.2708
+        },
+        "minimum": {
+          "n": 96,
+          "difference": 0.3333,
+          "ci95_low": 0.1146,
+          "ci95_high": 0.5417
+        }
+      },
+      "activation_l10_a4_minus_gdn_rank1": {
+        "joint_ge4": {
+          "n": 96,
+          "difference": 0.2396,
+          "ci95_low": 0.1146,
+          "ci95_high": 0.3646
+        },
+        "minimum": {
+          "n": 96,
+          "difference": 0.375,
+          "ci95_low": 0.0729,
+          "ci95_high": 0.6771
+        }
+      },
+      "activation_l20_a1_minus_gdn_rank1": {
+        "joint_ge4": {
+          "n": 96,
+          "difference": 0.1562,
+          "ci95_low": 0.0208,
+          "ci95_high": 0.2812
+        },
+        "minimum": {
+          "n": 96,
+          "difference": 0.2083,
+          "ci95_low": -0.0833,
+          "ci95_high": 0.5
+        }
+      },
+      "activation_l10_a4_minus_gdn_norm": {
+        "joint_ge4": {
+          "n": 96,
+          "difference": 0.0833,
+          "ci95_low": -0.0417,
+          "ci95_high": 0.2083
+        },
+        "minimum": {
+          "n": 96,
+          "difference": 0.0417,
+          "ci95_low": -0.2396,
+          "ci95_high": 0.3229
+        }
+      },
+      "activation_l20_a1_minus_gdn_norm": {
+        "joint_ge4": {
+          "n": 96,
+          "difference": 0.0,
+          "ci95_low": -0.125,
+          "ci95_high": 0.125
+        },
+        "minimum": {
+          "n": 96,
+          "difference": -0.125,
+          "ci95_low": -0.4271,
+          "ci95_high": 0.1771
+        }
+      }
+    }
+  },
+  "rank1_composition": {
+    "conditions": [
+      {
+        "condition": "per_r1_0001",
+        "active_features": [
+          "principled_candor"
+        ],
+        "n": 128,
+        "joint_ge4": 0.9766,
+        "marginal_ge4": {
+          "principled_candor": 0.9766
+        },
+        "independence_product": 0.9766,
+        "mean_minimum": 4.3984
+      },
+      {
+        "condition": "per_r1_0010",
+        "active_features": [
+          "concrete_language"
+        ],
+        "n": 128,
+        "joint_ge4": 0.9922,
+        "marginal_ge4": {
+          "concrete_language": 0.9922
+        },
+        "independence_product": 0.9922,
+        "mean_minimum": 4.2969
+      },
+      {
+        "condition": "per_r1_0011",
+        "active_features": [
+          "principled_candor",
+          "concrete_language"
+        ],
+        "n": 128,
+        "joint_ge4": 0.9609,
+        "marginal_ge4": {
+          "principled_candor": 0.9609,
+          "concrete_language": 1.0
+        },
+        "independence_product": 0.9609,
+        "mean_minimum": 4.1328
+      },
+      {
+        "condition": "per_r1_0100",
+        "active_features": [
+          "casualness"
+        ],
+        "n": 128,
+        "joint_ge4": 0.1484,
+        "marginal_ge4": {
+          "casualness": 0.1484
+        },
+        "independence_product": 0.1484,
+        "mean_minimum": 2.2891
+      },
+      {
+        "condition": "per_r1_0101",
+        "active_features": [
+          "principled_candor",
+          "casualness"
+        ],
+        "n": 128,
+        "joint_ge4": 0.1172,
+        "marginal_ge4": {
+          "principled_candor": 0.9688,
+          "casualness": 0.125
+        },
+        "independence_product": 0.1211,
+        "mean_minimum": 2.2188
+      },
+      {
+        "condition": "per_r1_0110",
+        "active_features": [
+          "concrete_language",
+          "casualness"
+        ],
+        "n": 128,
+        "joint_ge4": 0.2891,
+        "marginal_ge4": {
+          "concrete_language": 0.9766,
+          "casualness": 0.2891
+        },
+        "independence_product": 0.2823,
+        "mean_minimum": 2.6875
+      },
+      {
+        "condition": "per_r1_0111",
+        "active_features": [
+          "principled_candor",
+          "concrete_language",
+          "casualness"
+        ],
+        "n": 128,
+        "joint_ge4": 0.25,
+        "marginal_ge4": {
+          "principled_candor": 0.9688,
+          "concrete_language": 0.9922,
+          "casualness": 0.2578
+        },
+        "independence_product": 0.2478,
+        "mean_minimum": 2.5156
+      },
+      {
+        "condition": "per_r1_1000",
+        "active_features": [
+          "optimism"
+        ],
+        "n": 128,
+        "joint_ge4": 0.875,
+        "marginal_ge4": {
+          "optimism": 0.875
+        },
+        "independence_product": 0.875,
+        "mean_minimum": 3.7969
+      },
+      {
+        "condition": "per_r1_1001",
+        "active_features": [
+          "principled_candor",
+          "optimism"
+        ],
+        "n": 128,
+        "joint_ge4": 0.8203,
+        "marginal_ge4": {
+          "principled_candor": 0.9531,
+          "optimism": 0.8516
+        },
+        "independence_product": 0.8116,
+        "mean_minimum": 3.7188
+      },
+      {
+        "condition": "per_r1_1010",
+        "active_features": [
+          "concrete_language",
+          "optimism"
+        ],
+        "n": 128,
+        "joint_ge4": 0.7969,
+        "marginal_ge4": {
+          "concrete_language": 0.9766,
+          "optimism": 0.8047
+        },
+        "independence_product": 0.7858,
+        "mean_minimum": 3.6641
+      },
+      {
+        "condition": "per_r1_1011",
+        "active_features": [
+          "principled_candor",
+          "concrete_language",
+          "optimism"
+        ],
+        "n": 128,
+        "joint_ge4": 0.7891,
+        "marginal_ge4": {
+          "principled_candor": 0.9453,
+          "concrete_language": 0.9922,
+          "optimism": 0.8438
+        },
+        "independence_product": 0.7914,
+        "mean_minimum": 3.6328
+      },
+      {
+        "condition": "per_r1_1100",
+        "active_features": [
+          "casualness",
+          "optimism"
+        ],
+        "n": 128,
+        "joint_ge4": 0.1562,
+        "marginal_ge4": {
+          "casualness": 0.1562,
+          "optimism": 0.9062
+        },
+        "independence_product": 0.1416,
+        "mean_minimum": 2.3984
+      },
+      {
+        "condition": "per_r1_1101",
+        "active_features": [
+          "principled_candor",
+          "casualness",
+          "optimism"
+        ],
+        "n": 128,
+        "joint_ge4": 0.2266,
+        "marginal_ge4": {
+          "principled_candor": 0.9453,
+          "casualness": 0.25,
+          "optimism": 0.9062
+        },
+        "independence_product": 0.2142,
+        "mean_minimum": 2.4609
+      },
+      {
+        "condition": "per_r1_1110",
+        "active_features": [
+          "concrete_language",
+          "casualness",
+          "optimism"
+        ],
+        "n": 128,
+        "joint_ge4": 0.3281,
+        "marginal_ge4": {
+          "concrete_language": 0.9609,
+          "casualness": 0.3516,
+          "optimism": 0.8359
+        },
+        "independence_product": 0.2824,
+        "mean_minimum": 2.7734
+      },
+      {
+        "condition": "per_r1_1111",
+        "active_features": [
+          "principled_candor",
+          "concrete_language",
+          "casualness",
+          "optimism"
+        ],
+        "n": 128,
+        "joint_ge4": 0.3125,
+        "marginal_ge4": {
+          "principled_candor": 0.9375,
+          "concrete_language": 0.9922,
+          "casualness": 0.3438,
+          "optimism": 0.8906
+        },
+        "independence_product": 0.2848,
+        "mean_minimum": 2.6562
+      }
+    ]
+  },
+  "rank1_four_way_retention": {
+    "principled_candor": {
+      "n": 128,
+      "difference": -0.1484,
+      "ci95_low": -0.2422,
+      "ci95_high": -0.0469
+    },
+    "concrete_language": {
+      "n": 128,
+      "difference": 0.1484,
+      "ci95_low": 0.0469,
+      "ci95_high": 0.25
+    },
+    "casualness": {
+      "n": 128,
+      "difference": 0.3984,
+      "ci95_low": 0.2344,
+      "ci95_high": 0.5703
+    },
+    "optimism": {
+      "n": 128,
+      "difference": 0.0156,
+      "ci95_low": -0.0703,
+      "ci95_high": 0.1094
+    }
+  },
+  "notes": [
+    "All holdout comparisons are paired on the same 96 prompts.",
+    "Bootstrap intervals resample prompts with a fixed seed.",
+    "Scores are discrete Judge ratings; probability-weighted scores were not saved."
+  ]
+}
