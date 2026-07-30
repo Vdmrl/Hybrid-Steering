@@ -42,7 +42,10 @@ DIRECTION = load_module(
 
 def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("phase", choices=("smoke", "svd", "activation", "joy", "norm"))
+    parser.add_argument(
+        "phase",
+        choices=("smoke", "svd", "activation", "activation-confirm", "joy", "norm"),
+    )
     parser.add_argument("--base-directions-dir", type=Path, required=True)
     parser.add_argument("--optimism-direction", type=Path, required=True)
     parser.add_argument("--candor-pairs", type=Path, required=True)
@@ -414,6 +417,52 @@ def activation_phase(args: argparse.Namespace) -> None:
                 torch.cuda.empty_cache()
 
 
+def activation_confirm_phase(args: argparse.Namespace) -> None:
+    tokenizer, model = BASE.load_model(args.model)
+    directions = build_residual_directions(args, model, tokenizer)
+    rows = test_rows(args)[args.activation_test :]
+    path = args.output_dir / "activation-confirm.jsonl"
+    done = {row["task_id"] for row in BASE.jsonl(path)} if path.exists() else set()
+    candidates = ((10, 4.0), (20, 1.0))
+
+    for index, row in enumerate(rows, 1):
+        prompt = BASE.row_prompt(row)
+        task_id = f"activation-confirm:{row['id']}"
+        if task_id in done:
+            continue
+        outputs = {
+            "baseline": activation_generate(
+                model, tokenizer, prompt, None, None, 0.0, args.max_new_tokens
+            )
+        }
+        for layer, alpha in candidates:
+            direction = sum(
+                (directions[name][layer] for name in FEATURES[1:]),
+                directions[FEATURES[0]][layer].clone(),
+            )
+            outputs[f"l{layer}_a{alpha:g}_all4"] = activation_generate(
+                model,
+                tokenizer,
+                prompt,
+                layer,
+                direction,
+                alpha,
+                args.max_new_tokens,
+            )
+        BASE.append_jsonl(
+            path,
+            {
+                "task_id": task_id,
+                "source_id": row["id"],
+                "scenario": prompt,
+                **outputs,
+            },
+        )
+        print(f"activation-confirm: prompt {index}/{len(rows)}", flush=True)
+        gc.collect()
+        torch.cuda.empty_cache()
+
+
 def joy_phase(args: argparse.Namespace) -> None:
     rows = BASE.jsonl(args.joy_pairs)
     if len(rows) < 64:
@@ -534,6 +583,7 @@ def main() -> None:
         "smoke": smoke_phase,
         "svd": svd_phase,
         "activation": activation_phase,
+        "activation-confirm": activation_confirm_phase,
         "joy": joy_phase,
         "norm": norm_phase,
     }[args.phase](args)
