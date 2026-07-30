@@ -56,9 +56,11 @@ def arguments() -> argparse.Namespace:
             "gdn",
             "activation",
             "prepare-main-judge",
+            "check-quality",
             "summarize",
         ),
     )
+    parser.add_argument("--split", choices=("dev", "main"))
     parser.add_argument("--base-directions-dir", type=Path)
     parser.add_argument("--optimism-direction", type=Path)
     parser.add_argument("--joy-direction", type=Path)
@@ -361,6 +363,40 @@ def result_rows(path: Path) -> list[dict]:
     return BASE.jsonl(path)
 
 
+def check_quality_coverage(args: argparse.Namespace) -> None:
+    if not args.split:
+        raise ValueError("--split is required")
+    root = args.output_dir / "judge" / args.split
+    expected = {
+        (row["prompt_id"], answer["answer_id"])
+        for row in BASE.jsonl(root / "inputs" / "quality.jsonl")
+        for answer in row["answers"]
+    }
+    observed = {
+        (row["prompt_id"], row["answer_id"])
+        for row in result_rows(root / "results" / "quality.jsonl")
+    }
+    expected_by_answer = defaultdict(int)
+    observed_by_answer = defaultdict(int)
+    for _, answer_id in expected:
+        expected_by_answer[answer_id] += 1
+    for pair in expected & observed:
+        observed_by_answer[pair[1]] += 1
+    report = {
+        "completed": len(expected & observed),
+        "expected": len(expected),
+        "overall": len(expected & observed) / len(expected),
+        "minimum_per_condition": min(
+            observed_by_answer[name] / count
+            for name, count in expected_by_answer.items()
+        ),
+    }
+    BASE.atomic_json(root / "quality-coverage.json", report)
+    print(json.dumps(report, indent=2))
+    if report["overall"] < 0.9 or report["minimum_per_condition"] < 0.8:
+        raise RuntimeError("quality coverage is below the experiment threshold")
+
+
 def select_phase(args: argparse.Namespace) -> None:
     root = args.output_dir / "judge" / "dev" / "results"
     trait = {}
@@ -633,7 +669,14 @@ def summarize_phase(args: argparse.Namespace) -> None:
     ) / 1_000_000
     BASE.atomic_json(
         args.output_dir / "summary.json",
-        {"conditions": conditions, "contrasts": contrasts, "judge_usage": costs},
+        {
+            "conditions": conditions,
+            "contrasts": contrasts,
+            "judge_usage": costs,
+            "quality_coverage": json.loads(
+                (root.parent / "quality-coverage.json").read_text()
+            ),
+        },
     )
     print(f"conditions={len(conditions)} estimated_cost=${costs['estimated_usd']:.3f}")
 
@@ -661,6 +704,7 @@ def main() -> None:
         "gdn": gdn_phase,
         "activation": activation_phase,
         "prepare-main-judge": lambda value: prepare_judge(value, "main"),
+        "check-quality": check_quality_coverage,
         "summarize": summarize_phase,
     }[args.phase](args)
 

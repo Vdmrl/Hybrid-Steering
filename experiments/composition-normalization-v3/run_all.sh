@@ -64,11 +64,14 @@ judge_split() {
       "$OUTPUT/judge/$split/results/$feature.jsonl" \
       --mode trait --feature "$feature" --workers 8 --config-root "$ROOT/judge"
   done
-  retry "judge-$split-quality" \
-    "$PYTHON" -m hybrid_judge.cli \
-    "$OUTPUT/judge/$split/inputs/quality.jsonl" \
-    "$OUTPUT/judge/$split/results/quality.jsonl" \
-    --mode scalar --feature concrete_language --workers 8 --config-root "$ROOT/judge"
+  if ! "$PYTHON" -m hybrid_judge.cli \
+      "$OUTPUT/judge/$split/inputs/quality.jsonl" \
+      "$OUTPUT/judge/$split/results/quality.jsonl" \
+      --mode scalar --feature concrete_language --workers 8 \
+      --config-root "$ROOT/judge"; then
+    "$PYTHON" "$RUNNER" check-quality "${common[@]}" --split "$split"
+  fi
+  touch "$OUTPUT/judge-$split-quality.DONE"
 }
 
 direct "$PYTHON" "$PREPARE" --output-dir "$OUTPUT/data" --dev 32 --test 128

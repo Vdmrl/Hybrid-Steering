@@ -31,6 +31,9 @@ direction.
 - The test prompts exclude the four target feature families.
 - The Judge receives anonymous answers and scores every answer on all four
   traits. Quality is evaluated once on a 32-prompt subset.
+- Trait endpoints require complete coverage. The secondary quality guard may
+  proceed after legacy scalar-schema failures only with at least 90% overall
+  coverage and 80% coverage for every condition; actual coverage is reported.
 - Final summaries include deterministic 95% paired-bootstrap intervals and
   prompt-paired contrasts for normalization, rank, and steering method.
 
