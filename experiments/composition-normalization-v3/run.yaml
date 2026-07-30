@@ -1,0 +1,21 @@
+experiment: composition-normalization-v3
+model: Qwen/Qwen3.5-9B
+features: [joy, concrete, optimism, candor]
+dev_prompts: 32
+test_prompts: 128
+max_new_tokens: 256
+activation_layer: 10
+alpha_grid: [0.5, 1, 2, 4, 8]
+methods:
+  - gdn_rank1_raw
+  - gdn_rank1_rss
+  - gdn_rank4_rss
+  - activation_raw
+  - activation_rss
+judge:
+  model: openai/gpt-4o-mini
+  mode: trait
+  probability_weighted: true
+  quality_sample: 32
+statistics:
+  paired_prompt_bootstrap_samples: 10000
