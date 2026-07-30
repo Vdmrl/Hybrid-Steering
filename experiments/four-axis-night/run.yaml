@@ -1,0 +1,27 @@
+experiment: four-axis-night
+model: Qwen/Qwen3.5-9B
+max_new_tokens: 256
+features: [candor, calm, concrete, casual]
+donors_per_direction: 64
+tuning_prompts_per_feature: 40
+test_prompts: 128
+alpha_grid: [-8, -4, -2, -1, 0, 1, 2, 4, 8]
+stages:
+  - signed_alpha_sweep
+  - factorial_2x2x2x2
+  - negative_singles
+  - norm_controlled_pairs_and_full
+  - composition_beta_0.5_1.5
+  - last_six_layers
+judge:
+  model: openai/gpt-4o-mini
+  reasoning: none
+  max_output_tokens: 256
+  both_orders: true
+  deferred_stages:
+    - negative_singles
+    - norm_controlled_pairs_and_full
+    - composition_beta_0.5_1.5
+    - last_six_layers
+statistics:
+  cluster_bootstrap_samples: 10000

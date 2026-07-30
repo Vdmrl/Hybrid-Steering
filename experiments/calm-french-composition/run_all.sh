@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+experiment="$root/experiments/calm-french-composition"
+output="$root/outputs/calm-french-composition"
+python_bin="${PYTHON_BIN:-python}"
+donors="${CALM_FRENCH_DONORS:-64}"
+
+if [[ -f "$root/.env" ]]; then
+  set -a
+  source "$root/.env"
+  set +a
+fi
+
+mkdir -p "$output"
+exec 8>"$output/queue.lock"
+flock -n 8 || { echo "calm/French queue is already running"; exit 0; }
+
+language_pairs="$experiment/data/language_pairs.jsonl"
+available="$(grep -cve '^[[:space:]]*$' "$language_pairs" 2>/dev/null || true)"
+if (( available < donors )); then
+  parquet="${FEATURE_STORIES_PARQUET:?set FEATURE_STORIES_PARQUET}"
+  "$python_bin" "$experiment/prepare.py" \
+    --parquet "$parquet" \
+    --output "$language_pairs"
+fi
+
+CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-3}" \
+  "$python_bin" "$experiment/run.py" \
+  --language-pairs "$language_pairs" \
+  --calm-pairs "$root/experiments/composition-data/calm/accepted.jsonl" \
+  --prompts "$root/experiments/composition-data/test/accepted.jsonl" \
+  --output-dir "$output" \
+  --donors "$donors" \
+  --max-new-tokens 256
+
+mkdir -p "$output/judge"
+for comparison in calm_single calm_with_french; do
+  "$python_bin" -m hybrid_judge.cli \
+    "$output/judge-inputs/$comparison.jsonl" \
+    "$output/judge/$comparison.raw.jsonl" \
+    --config-root "$root/judge" \
+    --mode pairwise \
+    --feature calm_composure \
+    --workers 8
+done
+for comparison in french_single french_with_calm; do
+  "$python_bin" -m hybrid_judge.cli \
+    "$output/judge-inputs/$comparison.jsonl" \
+    "$output/judge/$comparison.raw.jsonl" \
+    --config-root "$root/judge" \
+    --mode pairwise \
+    --feature french_language \
+    --workers 8
+done
+
+"$python_bin" "$experiment/summarize.py" --output-dir "$output"

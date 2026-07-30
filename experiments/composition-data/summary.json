@@ -1,0 +1,25 @@
+{
+  "dataset": "AntonKorznikov/feature_stories",
+  "model": "deepseek/deepseek-v4-flash",
+  "features": {
+    "calm": {
+      "accepted": 108,
+      "donors": 64,
+      "validation": 40
+    },
+    "concrete": {
+      "accepted": 110,
+      "donors": 64,
+      "validation": 40
+    },
+    "casual": {
+      "accepted": 106,
+      "donors": 64,
+      "validation": 40
+    }
+  },
+  "test_prompts": 128,
+  "input_tokens": 440377,
+  "output_tokens": 517628,
+  "estimated_cost_usd": 0.132807
+}

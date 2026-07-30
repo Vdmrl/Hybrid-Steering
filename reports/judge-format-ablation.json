@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "date": "2026-07-30",
+  "judge_model": "openai/gpt-4o-mini",
+  "temperature": 0,
+  "evaluation": {
+    "design": "35 newly authored balanced cases not used in prompt tuning",
+    "features": [
+      "principled_candor",
+      "calm_composure",
+      "concrete_language",
+      "casualness",
+      "optimism",
+      "joy",
+      "french_language"
+    ]
+  },
+  "formats": {
+    "audited_json": {
+      "exact": 25,
+      "n": 35,
+      "mae": 0.3143
+    },
+    "compact_one_digit": {
+      "exact": 24,
+      "n": 35,
+      "mae": 0.4,
+      "first_pass_format_valid": 35
+    }
+  },
+  "paired_agreement": {
+    "same_score": 28,
+    "n": 35,
+    "json_closer_to_label": 4,
+    "compact_closer_to_label": 3
+  },
+  "decision": "Use audited JSON when evidence is required; use compact one-digit scoring to fill missing large-run evaluations without repeating completed calls."
+}

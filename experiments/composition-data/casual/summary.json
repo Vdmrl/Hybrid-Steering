@@ -1,0 +1,12 @@
+{
+  "feature": "casual",
+  "class_name": "Communication Style Spectrum",
+  "leaf": [
+    "formality",
+    "casualness"
+  ],
+  "judged": 127,
+  "accepted": 106,
+  "donors": 64,
+  "validation": 40
+}

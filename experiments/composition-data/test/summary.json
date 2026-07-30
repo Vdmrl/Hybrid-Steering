@@ -1,0 +1,10 @@
+{
+  "judged": 264,
+  "accepted": 128,
+  "target": 128,
+  "claim_status_counts": {
+    "reasonable_or_correct": 122,
+    "ambiguous": 5,
+    "incorrect_or_unsupported": 1
+  }
+}
