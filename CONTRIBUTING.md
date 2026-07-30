@@ -19,7 +19,7 @@ chore/<короткое-имя>
 ```text
 exp/optimism-layer-ablation
 exp/optimism-svd-rank
-feat/pairwise-judge
+feat/judge-provider
 fix/resume-duplicate-rows
 docs/optimism-rubric
 ```
@@ -46,9 +46,9 @@ docs/optimism-rubric
 Пример разделения:
 
 ```text
-feat/pairwise-judge           # переиспользуемая возможность
+feat/judge-provider           # переиспользуемая возможность
 exp/optimism-layer-ablation   # конкретный эксперимент
-fix/pairwise-order-bias       # исправление найденной ошибки
+fix/judge-resume              # исправление найденной ошибки
 ```
 
 ## Коммиты
@@ -86,7 +86,7 @@ fix/pairwise-order-bias       # исправление найденной оши
 Примеры:
 
 ```text
-feat(judge): add blind pairwise evaluation
+feat(judge): add provider metadata
 feat(rubric): add optimism versus pessimism scale
 fix(runner): resume partially judged prompts
 docs(prompt): explain anchored score meanings
@@ -99,7 +99,7 @@ test(schema): cover malformed answer ids
 Если изменение несовместимо со старым форматом:
 
 ```text
-feat(schema)!: split scalar and pairwise results
+feat(schema)!: change the Judge result contract
 ```
 
 Причину и важные решения следует добавить в тело коммита:

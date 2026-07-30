@@ -6,16 +6,12 @@ import os
 from pathlib import Path
 from typing import Any
 
-from .aggregate import aggregate_pairwise_file
 from .config import load_configs
 from .provider import openrouter_client
 from .runner import (
-    compact_trait_task_v4,
-    pairwise_task_v2,
-    pairwise_tasks,
+    judge_task_v3,
     read_jsonl,
     run_tasks,
-    scalar_trait_task_v3,
     trait_tasks,
 )
 
@@ -26,16 +22,6 @@ def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Blind shared LLM-as-a-Judge")
     parser.add_argument("input", type=Path)
     parser.add_argument("output", type=Path)
-    parser.add_argument(
-        "--mode",
-        choices=("trait", "trait-audit", "pairwise"),
-        default="trait",
-        help=(
-            "trait: compact independent 1-5 score (default); "
-            "trait-audit: 1-5 score with exact evidence; "
-            "pairwise: optional A/B check"
-        ),
-    )
     parser.add_argument("--feature")
     parser.add_argument("--workers", type=int)
     parser.add_argument("--seed", type=int, default=20260728)
@@ -64,11 +50,7 @@ def main() -> None:
     workers = args.workers or config.generation.workers
     client = openrouter_client(config, api_key)
     rows = read_jsonl(args.input)
-    prompt_name = {
-        "trait": config.evaluation.trait_prompt,
-        "trait-audit": config.evaluation.trait_audit_prompt,
-        "pairwise": config.evaluation.pairwise_prompt,
-    }[args.mode]
+    prompt_name = config.evaluation.prompt
     prompt_path = args.config_root / "prompts" / prompt_name
     config_path = args.config_root / "config" / "judge.yaml"
     common: dict[str, Any] = {
@@ -89,47 +71,20 @@ def main() -> None:
         "seed": args.seed,
     }
 
-    if args.mode in {"trait", "trait-audit"}:
-        tasks = trait_tasks(rows)
+    tasks = trait_tasks(rows)
 
-        def worker(task: Any, dry_run: bool = False) -> Any:
-            row, answer = task
-            if dry_run:
-                version = {
-                    "trait": "trait-compact-v1",
-                    "trait-audit": "scalar-v3",
-                }[args.mode]
-                return (
-                    f"{version}:{features.rubric_version}:{feature_name}:"
-                    f"{row.prompt_id}:{answer.answer_id}"
-                )
-            if args.mode == "trait":
-                return compact_trait_task_v4(
-                    task,
-                    top_logprobs=config.generation.top_logprobs,
-                    **common,
-                )
-            if args.mode == "trait-audit":
-                return scalar_trait_task_v3(task, **common)
-            raise AssertionError(f"unexpected mode: {args.mode}")
-
-    else:
-        tasks = pairwise_tasks(
-            rows,
-            feature_name=feature_name,
-            both_orders=True,
-            seed=args.seed,
+    def worker(task: Any, dry_run: bool = False) -> Any:
+        row, answer = task
+        if dry_run:
+            return (
+                f"judge-v3:{features.rubric_version}:{feature_name}:"
+                f"{row.prompt_id}:{answer.answer_id}"
+            )
+        return judge_task_v3(
+            task,
+            top_logprobs=config.generation.top_logprobs,
+            **common,
         )
-
-        def worker(task: Any, dry_run: bool = False) -> Any:
-            row, left, right, orientation = task
-            if dry_run:
-                pair_key = ":".join(sorted([left.answer_id, right.answer_id]))
-                return (
-                    f"pairwise-v2:{features.rubric_version}:{feature_name}:"
-                    f"{row.prompt_id}:{pair_key}:{orientation}"
-                )
-            return pairwise_task_v2(task, **common)
 
     completed, failed = run_tasks(
         tasks,
@@ -149,10 +104,6 @@ def main() -> None:
         },
     )
     print(f"complete={completed} failed={failed}", flush=True)
-    if args.mode == "pairwise":
-        aggregate_path = args.output.with_name(f"{args.output.stem}.aggregated.jsonl")
-        count = aggregate_pairwise_file(args.output, aggregate_path)
-        print(f"aggregated={count} output={aggregate_path}", flush=True)
     if failed:
         raise SystemExit(1)
 

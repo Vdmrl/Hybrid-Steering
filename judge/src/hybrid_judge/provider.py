@@ -5,10 +5,10 @@ import os
 import httpx
 from openai import OpenAI
 
-from .models import JudgeConfigV2
+from .models import JudgeConfig
 
 
-def openrouter_client(config: JudgeConfigV2, api_key: str) -> OpenAI:
+def openrouter_client(config: JudgeConfig, api_key: str) -> OpenAI:
     proxy = os.environ.get("OPENROUTER_PROXY", "").strip() or None
     return OpenAI(
         api_key=api_key,

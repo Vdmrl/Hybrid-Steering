@@ -1,10 +1,7 @@
 from __future__ import annotations
 
-import hashlib
-import itertools
 import json
 import math
-import random
 from collections.abc import Callable, Iterable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import UTC, datetime
@@ -16,14 +13,11 @@ from pydantic import BaseModel, ValidationError
 
 from .models import (
     Answer,
-    CompactTraitResponseV4,
-    FeatureV2,
+    Feature,
     JudgeInput,
-    PairwiseResponseV2,
-    PairwiseResultV2,
-    ProvenanceV2,
-    ScalarTraitResponseV3,
-    ScalarTraitResultV3,
+    JudgeResponseV3,
+    JudgeResultV3,
+    Provenance,
     TraitScoreDistribution,
     Usage,
 )
@@ -49,12 +43,7 @@ def read_jsonl(path: Path) -> list[JudgeInput]:
     return rows
 
 
-def stable_random(seed: int, *parts: str) -> random.Random:
-    digest = hashlib.sha256(":".join([str(seed), *parts]).encode()).digest()
-    return random.Random(int.from_bytes(digest[:8]))
-
-
-def render_prompt(template: str, feature: FeatureV2, scale: dict[int, str]) -> str:
+def render_prompt(template: str, feature: Feature, scale: dict[int, str]) -> str:
     anchors = "\n".join(f"{score}: {text}" for score, text in sorted(scale.items()))
     exclusions = "\n".join(f"- {item}" for item in feature.exclusions) or "- None"
     return template.format(
@@ -172,36 +161,11 @@ def validated_completion(
     raise SchemaFailure(len(raw_responses), raw_responses)
 
 
-def pairwise_tasks(
-    rows: Iterable[JudgeInput],
-    *,
-    feature_name: str,
-    both_orders: bool,
-    seed: int,
-) -> list[tuple[JudgeInput, Answer, Answer, str]]:
-    tasks = []
-    for row in rows:
-        for first, second in itertools.combinations(row.answers, 2):
-            pair = [first, second]
-            stable_random(
-                seed,
-                "pairwise",
-                feature_name,
-                row.prompt_id,
-                first.answer_id,
-                second.answer_id,
-            ).shuffle(pair)
-            tasks.append((row, pair[0], pair[1], "one"))
-            if both_orders:
-                tasks.append((row, pair[1], pair[0], "reverse"))
-    return tasks
-
-
 def trait_tasks(rows: Iterable[JudgeInput]) -> list[tuple[JudgeInput, Answer]]:
     return [(row, answer) for row in rows for answer in row.answers]
 
 
-def provenance_v2(
+def provenance(
     *,
     model: str,
     provider: str,
@@ -218,8 +182,8 @@ def provenance_v2(
     usage: Usage,
     logprobs: bool = False,
     top_logprobs: int | None = None,
-) -> ProvenanceV2:
-    return ProvenanceV2(
+) -> Provenance:
+    return Provenance(
         judge_model=model,
         provider=provider,
         provider_response_ids=response_ids,
@@ -240,88 +204,11 @@ def provenance_v2(
     )
 
 
-def scalar_trait_task_v3(
+def judge_task_v3(
     task: tuple[JudgeInput, Answer],
     *,
     feature_name: str,
-    feature: FeatureV2,
-    template: str,
-    client: OpenAI,
-    model: str,
-    provider: str,
-    temperature: float,
-    max_tokens: int,
-    schema_retries: int,
-    rubric_version: str,
-    prompt_version: str,
-    prompt_sha256: str,
-    config_version: str,
-    config_sha256: str,
-    seed: int,
-) -> ScalarTraitResultV3:
-    row, answer = task
-
-    def validate(parsed: ScalarTraitResponseV3) -> None:
-        if parsed.answer_id != "answer_0":
-            raise ValueError("judge returned an unexpected answer_id")
-        if parsed.evidence and not parsed.evidence.strip():
-            raise ValueError("use an empty string instead of whitespace evidence")
-        if parsed.evidence and parsed.evidence not in answer.text:
-            raise ValueError("judge evidence is not an exact answer excerpt")
-        if parsed.trait_score != 3 and not parsed.evidence:
-            raise ValueError("non-neutral trait scores require exact evidence")
-        if len(parsed.reason.split()) > 30:
-            raise ValueError("judge reason exceeds 30 words")
-
-    parsed, raw, usage, response_ids, _ = validated_completion(
-        client,
-        response_model=ScalarTraitResponseV3,
-        validate=validate,
-        schema_retries=schema_retries,
-        model=model,
-        system=render_prompt(template, feature, feature.anchors),
-        payload={
-            "scenario": row.scenario,
-            "answer": {"answer_id": "answer_0", "text": answer.text},
-        },
-        temperature=temperature,
-        max_tokens=max_tokens,
-    )
-    return ScalarTraitResultV3(
-        task_id=(
-            f"scalar-v3:{rubric_version}:{feature_name}:"
-            f"{row.prompt_id}:{answer.answer_id}"
-        ),
-        prompt_id=row.prompt_id,
-        answer_id=answer.answer_id,
-        feature=feature_name,
-        trait_score=parsed.trait_score,
-        centered_trait_score=parsed.trait_score - 3,
-        evidence=parsed.evidence,
-        reason=parsed.reason,
-        provenance=provenance_v2(
-            model=model,
-            provider=provider,
-            response_ids=response_ids,
-            prompt_version=prompt_version,
-            prompt_sha256=prompt_sha256,
-            rubric_version=rubric_version,
-            config_version=config_version,
-            config_sha256=config_sha256,
-            answer_order=[answer.answer_id],
-            seed=seed,
-            temperature=temperature,
-            raw_responses=raw,
-            usage=usage,
-        ),
-    )
-
-
-def compact_trait_task_v4(
-    task: tuple[JudgeInput, Answer],
-    *,
-    feature_name: str,
-    feature: FeatureV2,
+    feature: Feature,
     template: str,
     client: OpenAI,
     model: str,
@@ -336,11 +223,11 @@ def compact_trait_task_v4(
     config_version: str,
     config_sha256: str,
     seed: int,
-) -> ScalarTraitResultV3:
+) -> JudgeResultV3:
     row, answer = task
     parsed, raw, usage, response_ids, token_logprobs = validated_completion(
         client,
-        response_model=CompactTraitResponseV4,
+        response_model=JudgeResponseV3,
         validate=lambda _: None,
         schema_retries=schema_retries,
         retry_instruction=(
@@ -361,9 +248,9 @@ def compact_trait_task_v4(
     )
     score = parsed.root
     distribution = score_distribution(score, token_logprobs or [])
-    return ScalarTraitResultV3(
+    return JudgeResultV3(
         task_id=(
-            f"trait-compact-v1:{rubric_version}:{feature_name}:"
+            f"judge-v3:{rubric_version}:{feature_name}:"
             f"{row.prompt_id}:{answer.answer_id}"
         ),
         prompt_id=row.prompt_id,
@@ -371,10 +258,8 @@ def compact_trait_task_v4(
         feature=feature_name,
         trait_score=score,
         centered_trait_score=score - 3,
-        evidence="",
-        reason="",
         score_distribution=distribution,
-        provenance=provenance_v2(
+        provenance=provenance(
             model=model,
             provider=provider,
             response_ids=response_ids,
@@ -419,92 +304,6 @@ def score_distribution(
             6,
         ),
         valid_token_mass=round(min(valid_mass, 1.0), 8),
-    )
-
-
-def pairwise_task_v2(
-    task: tuple[JudgeInput, Answer, Answer, str],
-    *,
-    feature_name: str,
-    feature: FeatureV2,
-    template: str,
-    client: OpenAI,
-    model: str,
-    provider: str,
-    temperature: float,
-    max_tokens: int,
-    schema_retries: int,
-    rubric_version: str,
-    prompt_version: str,
-    prompt_sha256: str,
-    config_version: str,
-    config_sha256: str,
-    seed: int,
-) -> PairwiseResultV2:
-    row, left, right, orientation = task
-
-    def validate(parsed: PairwiseResponseV2) -> None:
-        if parsed.evidence_A and parsed.evidence_A not in left.text:
-            raise ValueError("evidence_A is not an exact answer excerpt")
-        if parsed.evidence_B and parsed.evidence_B not in right.text:
-            raise ValueError("evidence_B is not an exact answer excerpt")
-        if parsed.trait_winner == "A" and not parsed.evidence_A:
-            raise ValueError("trait winner A requires exact evidence_A")
-        if parsed.trait_winner == "B" and not parsed.evidence_B:
-            raise ValueError("trait winner B requires exact evidence_B")
-        if len(parsed.reason.split()) > 30:
-            raise ValueError("judge reason exceeds 30 words")
-
-    parsed, raw, usage, response_ids, _ = validated_completion(
-        client,
-        response_model=PairwiseResponseV2,
-        validate=validate,
-        schema_retries=schema_retries,
-        model=model,
-        system=render_prompt(template, feature, feature.anchors),
-        payload={
-            "scenario": row.scenario,
-            "answer_A": left.text,
-            "answer_B": right.text,
-        },
-        temperature=temperature,
-        max_tokens=max_tokens,
-    )
-
-    def map_winner(value: str) -> str:
-        return {"A": "left", "B": "right", "tie": "tie"}[value]
-
-    pair_key = ":".join(sorted([left.answer_id, right.answer_id]))
-    return PairwiseResultV2(
-        task_id=(
-            f"pairwise-v2:{rubric_version}:{feature_name}:"
-            f"{row.prompt_id}:{pair_key}:{orientation}"
-        ),
-        prompt_id=row.prompt_id,
-        feature=feature_name,
-        orientation=orientation,
-        left_answer_id=left.answer_id,
-        right_answer_id=right.answer_id,
-        trait_winner=map_winner(parsed.trait_winner),
-        quality_winner=map_winner(parsed.quality_winner),
-        evidence_left=parsed.evidence_A,
-        evidence_right=parsed.evidence_B,
-        reason=parsed.reason,
-        provenance=provenance_v2(
-            model=model,
-            provider=provider,
-            response_ids=response_ids,
-            prompt_version=prompt_version,
-            prompt_sha256=prompt_sha256,
-            rubric_version=rubric_version,
-            config_version=config_version,
-            config_sha256=config_sha256,
-            answer_order=[left.answer_id, right.answer_id],
-            seed=seed,
-            temperature=temperature,
-            raw_responses=raw,
-            usage=usage,
-        ),
     )
 
 

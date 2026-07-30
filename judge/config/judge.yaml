@@ -1,4 +1,4 @@
-config_version: "3.0.0"
+config_version: "4.0.0"
 
 provider: "openrouter"
 model: "openai/gpt-4o-mini"
@@ -15,9 +15,7 @@ generation:
 
 evaluation:
   default_feature: "optimism"
-  trait_prompt: "trait_compact_v1.txt"
-  trait_audit_prompt: "scalar_v3.txt"
-  pairwise_prompt: "pairwise_v2.txt"
+  prompt: "judge_v3.txt"
 
 scale:
   minimum: 1
@@ -32,5 +30,3 @@ scale:
 quality_metrics:
   - "task_fulfillment"
   - "coherence"
-
-require_both_orders: true
