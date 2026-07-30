@@ -55,6 +55,7 @@ class FeatureConfigV2(StrictModel):
 class GenerationConfig(StrictModel):
     temperature: float = 0
     max_output_tokens: int = Field(default=4096, gt=0)
+    top_logprobs: int = Field(default=20, ge=5, le=20)
     timeout_seconds: float = Field(default=240, gt=0)
     max_retries: int = Field(default=4, ge=0)
     schema_retries: int = Field(default=2, ge=0)
@@ -124,6 +125,22 @@ class Usage(StrictModel):
     reasoning_tokens: int = 0
 
 
+class TraitScoreDistribution(StrictModel):
+    probabilities: dict[int, float]
+    expected_score: float = Field(ge=1, le=5)
+    chosen_score_probability: float = Field(ge=0, le=1)
+    entropy: float = Field(ge=0)
+    valid_token_mass: float = Field(gt=0, le=1)
+
+    @model_validator(mode="after")
+    def complete_scale(self) -> TraitScoreDistribution:
+        if set(self.probabilities) != {1, 2, 3, 4, 5}:
+            raise ValueError("score probabilities must define scores 1 through 5")
+        if abs(sum(self.probabilities.values()) - 1) > 1e-5:
+            raise ValueError("score probabilities must sum to one")
+        return self
+
+
 class ProvenanceV2(StrictModel):
     judge_model: str
     provider: str
@@ -136,6 +153,8 @@ class ProvenanceV2(StrictModel):
     answer_order: list[str]
     seed: int
     temperature: float
+    logprobs: bool = False
+    top_logprobs: int | None = None
     schema_attempts: int
     timestamp_utc: str
     usage: Usage
@@ -165,6 +184,7 @@ class ScalarTraitResultV3(StrictModel):
     centered_trait_score: int = Field(ge=-2, le=2)
     evidence: str
     reason: str
+    score_distribution: TraitScoreDistribution | None = None
     provenance: ProvenanceV2
 
 

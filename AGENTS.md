@@ -72,6 +72,9 @@ for agents.
   endpoint: independently score each answer and each active feature on the
   anchored 1–5 scale. For compositions, report every feature score and joint
   metrics such as all active scores being at least 4.
+- Keep the integer `trait_score` and the full `score_distribution`. Treat the
+  probability-weighted `expected_score` as a more sensitive secondary endpoint
+  until it has separate human calibration.
 - Treat `pairwise` as an optional causal robustness check, never as the sole
   composition metric. Treat `scalar` as a legacy v2 compatibility mode.
 - Evaluate answer quality separately once per answer; do not repeat or combine

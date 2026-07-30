@@ -107,7 +107,11 @@ def main() -> None:
                     f"{row.prompt_id}:{answer.answer_id}"
                 )
             if args.mode == "trait":
-                return compact_trait_task_v4(task, **common)
+                return compact_trait_task_v4(
+                    task,
+                    top_logprobs=config.generation.top_logprobs,
+                    **common,
+                )
             if args.mode == "trait-audit":
                 return scalar_trait_task_v3(task, **common)
             return scalar_task_v2(task, **common)

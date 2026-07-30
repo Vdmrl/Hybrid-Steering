@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import itertools
 import json
+import math
 import random
 from collections.abc import Callable, Iterable
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -25,6 +26,7 @@ from .models import (
     ScalarResultV2,
     ScalarTraitResponseV3,
     ScalarTraitResultV3,
+    TraitScoreDistribution,
     Usage,
 )
 
@@ -87,26 +89,52 @@ def completion(
     temperature: float,
     max_tokens: int,
     extract_json_object: bool = True,
-) -> tuple[str, Usage, str]:
-    response = client.chat.completions.create(
-        model=model,
-        temperature=temperature,
-        max_tokens=max_tokens,
-        messages=[
+    logprobs: bool = False,
+    top_logprobs: int | None = None,
+) -> tuple[str, Usage, str, list[tuple[str, float]] | None]:
+    request = {
+        "model": model,
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+        "messages": [
             {"role": "system", "content": system},
             {"role": "user", "content": json.dumps(payload, ensure_ascii=False)},
         ],
-    )
+    }
+    if logprobs:
+        request.update(logprobs=True, top_logprobs=top_logprobs)
+    response = client.chat.completions.create(**request)
     content = response.choices[0].message.content
     if not content:
         raise ValueError("judge returned empty content")
     content = content.strip().removeprefix("```json").removesuffix("```").strip()
+    token_logprobs = None
+    if logprobs:
+        positions = getattr(
+            getattr(response.choices[0], "logprobs", None), "content", []
+        )
+        position = next(
+            (
+                item
+                for item in positions or []
+                if item.token.strip() in {"1", "2", "3", "4", "5"}
+            ),
+            None,
+        )
+        if position is None:
+            raise ValueError("judge returned no score-token logprobs")
+        token_logprobs = [(item.token, item.logprob) for item in position.top_logprobs]
     if not extract_json_object:
-        return content, usage_from(response), response.id
+        return content, usage_from(response), response.id, token_logprobs
     start, end = content.find("{"), content.rfind("}")
     if start < 0 or end < start:
         raise ValueError("judge returned no JSON object")
-    return content[start : end + 1], usage_from(response), response.id
+    return (
+        content[start : end + 1],
+        usage_from(response),
+        response.id,
+        token_logprobs,
+    )
 
 
 def add_usage(total: Usage, item: Usage) -> Usage:
@@ -125,7 +153,7 @@ def validated_completion(
     schema_retries: int,
     retry_instruction: str | None = None,
     **kwargs: Any,
-) -> tuple[ResponseT, list[str], Usage, list[str]]:
+) -> tuple[ResponseT, list[str], Usage, list[str], list[tuple[str, float]] | None]:
     raw_responses: list[str] = []
     response_ids: list[str] = []
     total_usage = Usage()
@@ -133,14 +161,14 @@ def validated_completion(
     for attempt in range(schema_retries + 1):
         if attempt and retry_instruction:
             kwargs["system"] = f"{base_system}\n\n{retry_instruction}"
-        content, usage, response_id = completion(client, **kwargs)
+        content, usage, response_id, token_logprobs = completion(client, **kwargs)
         raw_responses.append(content)
         response_ids.append(response_id)
         total_usage = add_usage(total_usage, usage)
         try:
             parsed = response_model.model_validate_json(content)
             validate(parsed)
-            return parsed, raw_responses, total_usage, response_ids
+            return parsed, raw_responses, total_usage, response_ids, token_logprobs
         except (ValidationError, ValueError):
             continue
     raise SchemaFailure(len(raw_responses), raw_responses)
@@ -190,6 +218,8 @@ def provenance_v2(
     temperature: float,
     raw_responses: list[str],
     usage: Usage,
+    logprobs: bool = False,
+    top_logprobs: int | None = None,
 ) -> ProvenanceV2:
     return ProvenanceV2(
         judge_model=model,
@@ -203,6 +233,8 @@ def provenance_v2(
         answer_order=answer_order,
         seed=seed,
         temperature=temperature,
+        logprobs=logprobs,
+        top_logprobs=top_logprobs,
         schema_attempts=len(raw_responses),
         timestamp_utc=datetime.now(UTC).isoformat(),
         usage=usage,
@@ -243,7 +275,7 @@ def scalar_task_v2(
         if len(parsed.reason.split()) > 30:
             raise ValueError("judge reason exceeds 30 words")
 
-    parsed, raw, usage, response_ids = validated_completion(
+    parsed, raw, usage, response_ids, _ = validated_completion(
         client,
         response_model=ScalarResponseV2,
         validate=validate,
@@ -322,7 +354,7 @@ def scalar_trait_task_v3(
         if len(parsed.reason.split()) > 30:
             raise ValueError("judge reason exceeds 30 words")
 
-    parsed, raw, usage, response_ids = validated_completion(
+    parsed, raw, usage, response_ids, _ = validated_completion(
         client,
         response_model=ScalarTraitResponseV3,
         validate=validate,
@@ -377,6 +409,7 @@ def compact_trait_task_v4(
     provider: str,
     temperature: float,
     max_tokens: int,
+    top_logprobs: int,
     schema_retries: int,
     rubric_version: str,
     prompt_version: str,
@@ -386,7 +419,7 @@ def compact_trait_task_v4(
     seed: int,
 ) -> ScalarTraitResultV3:
     row, answer = task
-    parsed, raw, usage, response_ids = validated_completion(
+    parsed, raw, usage, response_ids, token_logprobs = validated_completion(
         client,
         response_model=CompactTraitResponseV4,
         validate=lambda _: None,
@@ -404,8 +437,11 @@ def compact_trait_task_v4(
         temperature=temperature,
         max_tokens=min(max_tokens, 4),
         extract_json_object=False,
+        logprobs=True,
+        top_logprobs=top_logprobs,
     )
     score = parsed.root
+    distribution = score_distribution(score, token_logprobs or [])
     return ScalarTraitResultV3(
         task_id=(
             f"trait-compact-v1:{rubric_version}:{feature_name}:"
@@ -418,6 +454,7 @@ def compact_trait_task_v4(
         centered_trait_score=score - 3,
         evidence="",
         reason="",
+        score_distribution=distribution,
         provenance=provenance_v2(
             model=model,
             provider=provider,
@@ -432,7 +469,37 @@ def compact_trait_task_v4(
             temperature=temperature,
             raw_responses=raw,
             usage=usage,
+            logprobs=True,
+            top_logprobs=top_logprobs,
         ),
+    )
+
+
+def score_distribution(
+    chosen_score: int, token_logprobs: list[tuple[str, float]]
+) -> TraitScoreDistribution:
+    raw = {score: 0.0 for score in range(1, 6)}
+    for token, logprob in token_logprobs:
+        token = token.strip()
+        if token in {"1", "2", "3", "4", "5"}:
+            raw[int(token)] += math.exp(logprob)
+    valid_mass = sum(raw.values())
+    if not valid_mass:
+        raise ValueError("judge returned no probabilities for scores 1 through 5")
+    probabilities = {score: value / valid_mass for score, value in raw.items()}
+    return TraitScoreDistribution(
+        probabilities={
+            score: round(value, 8) for score, value in probabilities.items()
+        },
+        expected_score=round(
+            sum(score * value for score, value in probabilities.items()), 6
+        ),
+        chosen_score_probability=round(probabilities[chosen_score], 8),
+        entropy=round(
+            -sum(value * math.log(value) for value in probabilities.values() if value),
+            6,
+        ),
+        valid_token_mass=round(min(valid_mass, 1.0), 8),
     )
 
 
@@ -469,7 +536,7 @@ def pairwise_task_v2(
         if len(parsed.reason.split()) > 30:
             raise ValueError("judge reason exceeds 30 words")
 
-    parsed, raw, usage, response_ids = validated_completion(
+    parsed, raw, usage, response_ids, _ = validated_completion(
         client,
         response_model=PairwiseResponseV2,
         validate=validate,

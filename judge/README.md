@@ -6,9 +6,11 @@ anonymous answers: never GDN/residual/SVD, layer, alpha, or method names.
 ## Recommended evaluation
 
 Use **trait** mode for new experiments. It is the CLI default and independently
-scores every answer on the anchored 1–5 scale. The provider returns one digit;
-the runner attaches IDs and full provenance. This is the inexpensive default
-for large ablations and supports both effect intensity and joint composition.
+scores every answer on the anchored 1–5 scale. The provider returns one digit
+and token log-probabilities; the runner attaches IDs, full provenance, and a
+conditional probability distribution over scores 1–5. This is the inexpensive
+default for large ablations and supports both effect intensity and joint
+composition.
 
 ```bash
 hybrid-judge judge/examples/input.example.jsonl runs/trait.jsonl \
@@ -17,6 +19,10 @@ hybrid-judge judge/examples/input.example.jsonl runs/trait.jsonl \
 
 `--mode trait` may be written explicitly but is not required. Trait score 3
 means neutral, mixed, absent, or unclear; `centered_trait_score = score - 3`.
+`score_distribution.expected_score` is the probability-weighted soft score;
+`chosen_score_probability` and `entropy` describe uncertainty. Probabilities
+are renormalized over the five valid score tokens, while `valid_token_mass`
+records how much of the returned probability mass they covered.
 
 Use `--mode trait-audit` when exact supporting evidence and a short reason are
 needed. The audited format costs more and can fail strict quote validation, so

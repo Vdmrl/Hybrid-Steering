@@ -1,4 +1,4 @@
-config_version: "2.4.0"
+config_version: "2.5.0"
 
 provider: "openrouter"
 model: "openai/gpt-4o-mini"
@@ -7,6 +7,7 @@ base_url: "https://openrouter.ai/api/v1"
 generation:
   temperature: 0
   max_output_tokens: 256
+  top_logprobs: 20
   timeout_seconds: 240
   max_retries: 4
   schema_retries: 2

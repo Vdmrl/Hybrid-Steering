@@ -1,4 +1,5 @@
 import json
+import math
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -133,10 +134,22 @@ def test_compact_trait_accepts_one_digit_and_caps_output_tokens() -> None:
 
     def create(**kwargs):
         calls.append(kwargs)
+        probabilities = {1: 0.02, 2: 0.03, 3: 0.20, 4: 0.60, 5: 0.15}
+        top_logprobs = [
+            SimpleNamespace(token=str(score), logprob=math.log(probability))
+            for score, probability in probabilities.items()
+        ]
         return SimpleNamespace(
             id="response",
             usage=None,
-            choices=[SimpleNamespace(message=SimpleNamespace(content="4"))],
+            choices=[
+                SimpleNamespace(
+                    message=SimpleNamespace(content="4"),
+                    logprobs=SimpleNamespace(
+                        content=[SimpleNamespace(token="4", top_logprobs=top_logprobs)]
+                    ),
+                )
+            ],
         )
 
     client = SimpleNamespace(
@@ -161,6 +174,7 @@ def test_compact_trait_accepts_one_digit_and_caps_output_tokens() -> None:
         provider="test",
         temperature=0,
         max_tokens=256,
+        top_logprobs=20,
         schema_retries=0,
         rubric_version="1",
         prompt_version="trait_compact_v1.txt",
@@ -172,8 +186,13 @@ def test_compact_trait_accepts_one_digit_and_caps_output_tokens() -> None:
 
     assert result.trait_score == 4
     assert result.centered_trait_score == 1
+    assert result.score_distribution is not None
+    assert result.score_distribution.probabilities[4] == pytest.approx(0.6)
+    assert result.score_distribution.expected_score == pytest.approx(3.83)
     assert result.evidence == result.reason == ""
     assert calls[0]["max_tokens"] == 4
+    assert calls[0]["logprobs"] is True
+    assert calls[0]["top_logprobs"] == 20
 
 
 def test_v3_rejects_non_neutral_score_without_exact_evidence() -> None:
@@ -274,7 +293,7 @@ def test_schema_failure_is_retried_and_recorded() -> None:
             completions=SimpleNamespace(create=lambda **_: next(responses))
         )
     )
-    parsed, raw, _, response_ids = validated_completion(
+    parsed, raw, _, response_ids, _ = validated_completion(
         client,
         response_model=ScalarResponseV2,
         validate=lambda _: None,
