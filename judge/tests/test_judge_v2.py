@@ -8,15 +8,20 @@ from pydantic import ValidationError
 from hybrid_judge.aggregate import aggregate_pairwise_v2
 from hybrid_judge.config import load_configs
 from hybrid_judge.models import (
+    Answer,
+    FeatureV2,
+    JudgeInput,
     PairwiseResultV2,
     ScalarResponseV2,
     ScalarTraitResponseV3,
 )
 from hybrid_judge.runner import (
+    SchemaFailure,
     pairwise_tasks,
     read_jsonl,
     render_prompt,
     run_tasks,
+    scalar_trait_task_v3,
     scalar_v2_tasks,
     validated_completion,
 )
@@ -121,6 +126,53 @@ def test_v3_trait_only_contract() -> None:
     assert config.evaluation.trait_prompt == "scalar_v3.txt"
 
 
+def test_v3_rejects_non_neutral_score_without_exact_evidence() -> None:
+    raw = json.dumps(
+        {
+            "answer_id": "answer_0",
+            "trait_score": 5,
+            "evidence": "invented quote",
+            "reason": "Strong target evidence.",
+        }
+    )
+    response = SimpleNamespace(
+        id="response",
+        usage=None,
+        choices=[SimpleNamespace(message=SimpleNamespace(content=raw))],
+    )
+    client = SimpleNamespace(
+        chat=SimpleNamespace(completions=SimpleNamespace(create=lambda **_: response))
+    )
+    answer = Answer(answer_id="candidate", text="A neutral answer.")
+    row = JudgeInput(prompt_id="scenario", scenario="Scenario", answers=[answer])
+    feature = FeatureV2(
+        target="target",
+        opposite="opposite",
+        definition="definition",
+        anchors={score: str(score) for score in range(1, 6)},
+    )
+
+    with pytest.raises(SchemaFailure):
+        scalar_trait_task_v3(
+            (row, answer),
+            feature_name="feature",
+            feature=feature,
+            template="{target}\n{opposite}\n{definition}\n{exclusions}\n{scale}",
+            client=client,
+            model="test",
+            provider="test",
+            temperature=0,
+            max_tokens=10,
+            schema_retries=0,
+            rubric_version="1",
+            prompt_version="prompt",
+            prompt_sha256="prompt-hash",
+            config_version="1",
+            config_sha256="config-hash",
+            seed=1,
+        )
+
+
 def test_pairwise_orders_are_one_experimental_unit() -> None:
     rows = [
         result("one", "baseline", "steered", "right"),
@@ -201,3 +253,29 @@ def test_queue_persists_failures(tmp_path: Path) -> None:
         (tmp_path / "scores.failures.jsonl").read_text(encoding="utf-8")
     )
     assert failure["task_id"] == "task-1"
+
+
+def test_resume_rejects_incompatible_provenance(tmp_path: Path) -> None:
+    output = tmp_path / "scores.jsonl"
+    output.write_text(
+        json.dumps(
+            {
+                "task_id": "task-1",
+                "provenance": {"judge_model": "old-model"},
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    def worker(task: str, dry_run: bool = False) -> str:
+        return task
+
+    with pytest.raises(ValueError, match="incompatible provenance"):
+        run_tasks(
+            ["task-1"],
+            worker,
+            output=output,
+            workers=1,
+            resume_provenance={"judge_model": "new-model"},
+        )
