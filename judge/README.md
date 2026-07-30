@@ -6,8 +6,9 @@ anonymous answers: never GDN/residual/SVD, layer, alpha, or method names.
 ## Recommended evaluation
 
 Use **trait** mode for new experiments. It is the CLI default and independently
-scores every answer on the anchored 1–5 scale. This supports both effect
-intensity and the question “are all composed traits present in this answer?”
+scores every answer on the anchored 1–5 scale. The provider returns one digit;
+the runner attaches IDs and full provenance. This is the inexpensive default
+for large ablations and supports both effect intensity and joint composition.
 
 ```bash
 hybrid-judge judge/examples/input.example.jsonl runs/trait.jsonl \
@@ -17,8 +18,9 @@ hybrid-judge judge/examples/input.example.jsonl runs/trait.jsonl \
 `--mode trait` may be written explicitly but is not required. Trait score 3
 means neutral, mixed, absent, or unclear; `centered_trait_score = score - 3`.
 
-Every judgment must cite exact answer excerpts. Invalid JSON, unexpected IDs,
-or invented excerpts are retried and then written to a failures sidecar.
+Use `--mode trait-audit` when exact supporting evidence and a short reason are
+needed. The audited format costs more and can fail strict quote validation, so
+run it on a representative audit sample instead of duplicating a large run.
 
 ## Install
 
@@ -59,6 +61,13 @@ One JSON object per scenario:
 
 ## Optional and legacy modes
 
+Audited trait evaluation:
+
+```bash
+hybrid-judge judge/examples/input.example.jsonl runs/trait-audit.jsonl \
+  --mode trait-audit --feature optimism
+```
+
 Pairwise A/B evaluation is a complementary causal robustness check. It should
 not replace the 1–5 trait scores in new composition experiments. Both answer
 orders are mandatory:
@@ -94,6 +103,7 @@ set once in `judge/config/judge.yaml`.
 ```text
 concepts/features.yaml
 judge/config/judge.yaml
+judge/prompts/trait_compact_v1.txt
 judge/prompts/scalar_v3.txt
 judge/prompts/scalar_v2.txt
 judge/prompts/pairwise_v2.txt

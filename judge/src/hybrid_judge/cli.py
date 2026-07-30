@@ -10,6 +10,7 @@ from .aggregate import aggregate_pairwise_file
 from .config import load_configs
 from .provider import openrouter_client
 from .runner import (
+    compact_trait_task_v4,
     pairwise_task_v2,
     pairwise_tasks,
     read_jsonl,
@@ -28,10 +29,11 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("output", type=Path)
     parser.add_argument(
         "--mode",
-        choices=("trait", "scalar", "pairwise"),
+        choices=("trait", "trait-audit", "scalar", "pairwise"),
         default="trait",
         help=(
-            "trait: primary independent 1-5 score (default); "
+            "trait: compact independent 1-5 score (default); "
+            "trait-audit: 1-5 score with exact evidence; "
             "pairwise: optional A/B check; scalar: legacy v2"
         ),
     )
@@ -65,6 +67,7 @@ def main() -> None:
     rows = read_jsonl(args.input)
     prompt_name = {
         "trait": config.evaluation.trait_prompt,
+        "trait-audit": config.evaluation.trait_audit_prompt,
         "scalar": config.evaluation.scalar_prompt,
         "pairwise": config.evaluation.pairwise_prompt,
     }[args.mode]
@@ -88,18 +91,24 @@ def main() -> None:
         "seed": args.seed,
     }
 
-    if args.mode in {"trait", "scalar"}:
+    if args.mode in {"trait", "trait-audit", "scalar"}:
         tasks = scalar_v2_tasks(rows)
 
         def worker(task: Any, dry_run: bool = False) -> Any:
             row, answer = task
             if dry_run:
-                version = "scalar-v3" if args.mode == "trait" else "scalar-v2"
+                version = {
+                    "trait": "trait-compact-v1",
+                    "trait-audit": "scalar-v3",
+                    "scalar": "scalar-v2",
+                }[args.mode]
                 return (
                     f"{version}:{features.rubric_version}:{feature_name}:"
                     f"{row.prompt_id}:{answer.answer_id}"
                 )
             if args.mode == "trait":
+                return compact_trait_task_v4(task, **common)
+            if args.mode == "trait-audit":
                 return scalar_trait_task_v3(task, **common)
             return scalar_task_v2(task, **common)
 

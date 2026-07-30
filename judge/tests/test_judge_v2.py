@@ -17,6 +17,7 @@ from hybrid_judge.models import (
 )
 from hybrid_judge.runner import (
     SchemaFailure,
+    compact_trait_task_v4,
     pairwise_tasks,
     read_jsonl,
     render_prompt,
@@ -123,7 +124,56 @@ def test_v3_trait_only_contract() -> None:
     )
     assert parsed.trait_score == 3
     assert "task_fulfillment" not in parsed.model_fields_set
-    assert config.evaluation.trait_prompt == "scalar_v3.txt"
+    assert config.evaluation.trait_prompt == "trait_compact_v1.txt"
+    assert config.evaluation.trait_audit_prompt == "scalar_v3.txt"
+
+
+def test_compact_trait_accepts_one_digit_and_caps_output_tokens() -> None:
+    calls = []
+
+    def create(**kwargs):
+        calls.append(kwargs)
+        return SimpleNamespace(
+            id="response",
+            usage=None,
+            choices=[SimpleNamespace(message=SimpleNamespace(content="4"))],
+        )
+
+    client = SimpleNamespace(
+        chat=SimpleNamespace(completions=SimpleNamespace(create=create))
+    )
+    answer = Answer(answer_id="candidate", text="A clearly targeted answer.")
+    row = JudgeInput(prompt_id="scenario", scenario="Scenario", answers=[answer])
+    feature = FeatureV2(
+        target="target",
+        opposite="opposite",
+        definition="definition",
+        anchors={score: str(score) for score in range(1, 6)},
+    )
+
+    result = compact_trait_task_v4(
+        (row, answer),
+        feature_name="feature",
+        feature=feature,
+        template="{target}\n{opposite}\n{definition}\n{exclusions}\n{scale}",
+        client=client,
+        model="test",
+        provider="test",
+        temperature=0,
+        max_tokens=256,
+        schema_retries=0,
+        rubric_version="1",
+        prompt_version="trait_compact_v1.txt",
+        prompt_sha256="prompt-hash",
+        config_version="1",
+        config_sha256="config-hash",
+        seed=1,
+    )
+
+    assert result.trait_score == 4
+    assert result.centered_trait_score == 1
+    assert result.evidence == result.reason == ""
+    assert calls[0]["max_tokens"] == 4
 
 
 def test_v3_rejects_non_neutral_score_without_exact_evidence() -> None:

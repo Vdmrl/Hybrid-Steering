@@ -15,6 +15,7 @@ from pydantic import BaseModel, ValidationError
 
 from .models import (
     Answer,
+    CompactTraitResponseV4,
     FeatureV2,
     JudgeInput,
     PairwiseResponseV2,
@@ -85,6 +86,7 @@ def completion(
     payload: dict[str, Any],
     temperature: float,
     max_tokens: int,
+    extract_json_object: bool = True,
 ) -> tuple[str, Usage, str]:
     response = client.chat.completions.create(
         model=model,
@@ -99,6 +101,8 @@ def completion(
     if not content:
         raise ValueError("judge returned empty content")
     content = content.strip().removeprefix("```json").removesuffix("```").strip()
+    if not extract_json_object:
+        return content, usage_from(response), response.id
     start, end = content.find("{"), content.rfind("}")
     if start < 0 or end < start:
         raise ValueError("judge returned no JSON object")
@@ -119,12 +123,16 @@ def validated_completion(
     response_model: type[ResponseT],
     validate: Callable[[ResponseT], None],
     schema_retries: int,
+    retry_instruction: str | None = None,
     **kwargs: Any,
 ) -> tuple[ResponseT, list[str], Usage, list[str]]:
     raw_responses: list[str] = []
     response_ids: list[str] = []
     total_usage = Usage()
-    for _ in range(schema_retries + 1):
+    base_system = kwargs["system"]
+    for attempt in range(schema_retries + 1):
+        if attempt and retry_instruction:
+            kwargs["system"] = f"{base_system}\n\n{retry_instruction}"
         content, usage, response_id = completion(client, **kwargs)
         raw_responses.append(content)
         response_ids.append(response_id)
@@ -340,6 +348,76 @@ def scalar_trait_task_v3(
         centered_trait_score=parsed.trait_score - 3,
         evidence=parsed.evidence,
         reason=parsed.reason,
+        provenance=provenance_v2(
+            model=model,
+            provider=provider,
+            response_ids=response_ids,
+            prompt_version=prompt_version,
+            prompt_sha256=prompt_sha256,
+            rubric_version=rubric_version,
+            config_version=config_version,
+            config_sha256=config_sha256,
+            answer_order=[answer.answer_id],
+            seed=seed,
+            temperature=temperature,
+            raw_responses=raw,
+            usage=usage,
+        ),
+    )
+
+
+def compact_trait_task_v4(
+    task: tuple[JudgeInput, Answer],
+    *,
+    feature_name: str,
+    feature: FeatureV2,
+    template: str,
+    client: OpenAI,
+    model: str,
+    provider: str,
+    temperature: float,
+    max_tokens: int,
+    schema_retries: int,
+    rubric_version: str,
+    prompt_version: str,
+    prompt_sha256: str,
+    config_version: str,
+    config_sha256: str,
+    seed: int,
+) -> ScalarTraitResultV3:
+    row, answer = task
+    parsed, raw, usage, response_ids = validated_completion(
+        client,
+        response_model=CompactTraitResponseV4,
+        validate=lambda _: None,
+        schema_retries=schema_retries,
+        retry_instruction=(
+            "VALIDATION RETRY: Return exactly one ASCII digit from 1 to 5. "
+            "Do not return JSON, analysis, or punctuation."
+        ),
+        model=model,
+        system=render_prompt(template, feature, feature.anchors),
+        payload={
+            "scenario": row.scenario,
+            "answer": {"answer_id": "answer_0", "text": answer.text},
+        },
+        temperature=temperature,
+        max_tokens=min(max_tokens, 4),
+        extract_json_object=False,
+    )
+    score = parsed.root
+    return ScalarTraitResultV3(
+        task_id=(
+            f"trait-compact-v1:{rubric_version}:{feature_name}:"
+            f"{row.prompt_id}:{answer.answer_id}"
+        ),
+        prompt_id=row.prompt_id,
+        answer_id=answer.answer_id,
+        feature=feature_name,
+        trait_score=score,
+        centered_trait_score=score - 3,
+        evidence="",
+        reason="",
         provenance=provenance_v2(
             model=model,
             provider=provider,

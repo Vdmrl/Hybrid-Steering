@@ -1,6 +1,6 @@
 # Judge calibration
 
-The Judge is not publication-ready merely because it returns valid JSON.
+The Judge is not publication-ready merely because it returns a valid score.
 Calibrate each feature before using its scores in an ablation table.
 
 ## Human set
@@ -13,8 +13,8 @@ Create 15–20 blind answers per feature. Include:
 - answers with a quality/trait trade-off;
 - prompt-injection text inside an answer.
 
-Two people independently assign anchored 1–5 trait scores using
-`scalar_v3.txt` and the matching entry in `concepts/features.yaml`. Resolve
+Two people independently assign anchored 1–5 trait scores using the matching
+entry in `concepts/features.yaml`. Resolve
 disagreements only after recording both original labels. Do not use steering
 method names or alpha/layer metadata while labeling.
 
@@ -36,6 +36,10 @@ If pairwise robustness checks are reported, additionally require:
 
 If a gate fails, revise the feature anchors or prompt under a new version and
 recalibrate. Never tune the rubric against the steering test split.
+
+`trait_compact_v1_summary.json` records the initial output-format ablation.
+Compact scoring is the inexpensive default; `--mode trait-audit` remains
+available for evidence-bearing audit samples.
 
 ## Reporting an ablation
 

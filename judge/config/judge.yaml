@@ -1,4 +1,4 @@
-config_version: "2.3.0"
+config_version: "2.4.0"
 
 provider: "openrouter"
 model: "openai/gpt-4o-mini"
@@ -15,7 +15,8 @@ generation:
 evaluation:
   default_feature: "optimism"
   scalar_prompt: "scalar_v2.txt"
-  trait_prompt: "scalar_v3.txt"
+  trait_prompt: "trait_compact_v1.txt"
+  trait_audit_prompt: "scalar_v3.txt"
   pairwise_prompt: "pairwise_v2.txt"
 
 scale:

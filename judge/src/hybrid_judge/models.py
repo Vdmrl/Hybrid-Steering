@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, RootModel, model_validator
 
 ScoreV2 = Annotated[int, Field(ge=1, le=5)]
 
@@ -65,6 +65,7 @@ class EvaluationConfig(StrictModel):
     default_feature: str
     scalar_prompt: str
     trait_prompt: str
+    trait_audit_prompt: str
     pairwise_prompt: str
 
 
@@ -103,6 +104,10 @@ class ScalarTraitResponseV3(StrictModel):
     trait_score: ScoreV2
     evidence: str = Field(max_length=300)
     reason: str = Field(max_length=400)
+
+
+class CompactTraitResponseV4(RootModel[ScoreV2]):
+    pass
 
 
 class PairwiseResponseV2(StrictModel):
