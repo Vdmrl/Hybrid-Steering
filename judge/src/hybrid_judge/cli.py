@@ -15,9 +15,8 @@ from .runner import (
     pairwise_tasks,
     read_jsonl,
     run_tasks,
-    scalar_task_v2,
     scalar_trait_task_v3,
-    scalar_v2_tasks,
+    trait_tasks,
 )
 
 ROOT = Path(__file__).parents[2]
@@ -29,12 +28,12 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("output", type=Path)
     parser.add_argument(
         "--mode",
-        choices=("trait", "trait-audit", "scalar", "pairwise"),
+        choices=("trait", "trait-audit", "pairwise"),
         default="trait",
         help=(
             "trait: compact independent 1-5 score (default); "
             "trait-audit: 1-5 score with exact evidence; "
-            "pairwise: optional A/B check; scalar: legacy v2"
+            "pairwise: optional A/B check"
         ),
     )
     parser.add_argument("--feature")
@@ -68,7 +67,6 @@ def main() -> None:
     prompt_name = {
         "trait": config.evaluation.trait_prompt,
         "trait-audit": config.evaluation.trait_audit_prompt,
-        "scalar": config.evaluation.scalar_prompt,
         "pairwise": config.evaluation.pairwise_prompt,
     }[args.mode]
     prompt_path = args.config_root / "prompts" / prompt_name
@@ -91,8 +89,8 @@ def main() -> None:
         "seed": args.seed,
     }
 
-    if args.mode in {"trait", "trait-audit", "scalar"}:
-        tasks = scalar_v2_tasks(rows)
+    if args.mode in {"trait", "trait-audit"}:
+        tasks = trait_tasks(rows)
 
         def worker(task: Any, dry_run: bool = False) -> Any:
             row, answer = task
@@ -100,7 +98,6 @@ def main() -> None:
                 version = {
                     "trait": "trait-compact-v1",
                     "trait-audit": "scalar-v3",
-                    "scalar": "scalar-v2",
                 }[args.mode]
                 return (
                     f"{version}:{features.rubric_version}:{feature_name}:"
@@ -114,7 +111,7 @@ def main() -> None:
                 )
             if args.mode == "trait-audit":
                 return scalar_trait_task_v3(task, **common)
-            return scalar_task_v2(task, **common)
+            raise AssertionError(f"unexpected mode: {args.mode}")
 
     else:
         tasks = pairwise_tasks(

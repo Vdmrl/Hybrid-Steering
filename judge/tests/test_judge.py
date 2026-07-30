@@ -1,19 +1,19 @@
 import json
 import math
+import sys
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
-from pydantic import ValidationError
 
 from hybrid_judge.aggregate import aggregate_pairwise_v2
+from hybrid_judge.cli import arguments
 from hybrid_judge.config import load_configs
 from hybrid_judge.models import (
     Answer,
     FeatureV2,
     JudgeInput,
     PairwiseResultV2,
-    ScalarResponseV2,
     ScalarTraitResponseV3,
 )
 from hybrid_judge.runner import (
@@ -24,11 +24,24 @@ from hybrid_judge.runner import (
     render_prompt,
     run_tasks,
     scalar_trait_task_v3,
-    scalar_v2_tasks,
+    trait_tasks,
     validated_completion,
 )
 
 ROOT = Path(__file__).parents[1]
+
+
+def test_cli_defaults_to_v3_and_rejects_legacy_scalar(monkeypatch) -> None:
+    monkeypatch.setattr(sys, "argv", ["hybrid-judge", "input.jsonl", "output.jsonl"])
+    assert arguments().mode == "trait"
+
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["hybrid-judge", "input.jsonl", "output.jsonl", "--mode", "scalar"],
+    )
+    with pytest.raises(SystemExit):
+        arguments()
 
 
 def result(
@@ -71,46 +84,23 @@ def result(
     )
 
 
-def test_v2_contracts_and_one_answer_scalar_tasks() -> None:
+def test_contracts_and_one_answer_trait_tasks() -> None:
     features, config = load_configs(ROOT)
     assert set(features.features["french_language"].anchors) == {1, 2, 3, 4, 5}
     feature = features.features["optimism"]
     prompt = render_prompt(
-        (ROOT / "prompts" / config.evaluation.scalar_prompt).read_text(
-            encoding="utf-8"
-        ),
+        (ROOT / "prompts" / config.evaluation.trait_prompt).read_text(encoding="utf-8"),
         feature,
         feature.anchors,
     )
     rows = read_jsonl(ROOT / "examples" / "input.example.jsonl")
 
     assert "1:" in prompt and "5:" in prompt
-    assert len(scalar_v2_tasks(rows)) == 2
+    assert len(trait_tasks(rows)) == 2
     assert (
         len(pairwise_tasks(rows, feature_name="optimism", both_orders=True, seed=1))
         == 2
     )
-    ScalarResponseV2.model_validate(
-        {
-            "answer_id": "answer_0",
-            "trait_score": 3,
-            "task_fulfillment": 5,
-            "coherence": 5,
-            "evidence": [],
-            "reason": "Trait is absent.",
-        }
-    )
-    with pytest.raises(ValidationError):
-        ScalarResponseV2.model_validate(
-            {
-                "answer_id": "answer_0",
-                "trait_score": 0,
-                "task_fulfillment": 5,
-                "coherence": 5,
-                "evidence": [],
-                "reason": "Invalid trait score.",
-            }
-        )
 
 
 def test_v3_trait_only_contract() -> None:
@@ -268,9 +258,7 @@ def test_schema_failure_is_retried_and_recorded() -> None:
         {
             "answer_id": "answer_0",
             "trait_score": 3,
-            "task_fulfillment": 5,
-            "coherence": 5,
-            "evidence": [],
+            "evidence": "",
             "reason": "Trait is absent.",
         }
     )
@@ -295,7 +283,7 @@ def test_schema_failure_is_retried_and_recorded() -> None:
     )
     parsed, raw, _, response_ids, _ = validated_completion(
         client,
-        response_model=ScalarResponseV2,
+        response_model=ScalarTraitResponseV3,
         validate=lambda _: None,
         schema_retries=1,
         model="test",

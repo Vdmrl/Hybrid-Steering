@@ -76,7 +76,7 @@ for agents.
   probability-weighted `expected_score` as a more sensitive secondary endpoint
   until it has separate human calibration.
 - Treat `pairwise` as an optional causal robustness check, never as the sole
-  composition metric. Treat `scalar` as a legacy v2 compatibility mode.
+  composition metric.
 - Evaluate answer quality separately once per answer; do not repeat or combine
   quality judgments with every feature score.
 - Shuffle answer order deterministically and save the seed or permutation.

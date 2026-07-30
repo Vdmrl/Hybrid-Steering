@@ -5,17 +5,9 @@
   "development_cases": 20,
   "holdout_cases": 10,
   "metrics": {
-    "scalar_v2_development": {
-      "exact_accuracy": 0.6,
-      "mean_absolute_error": 0.55
-    },
     "scalar_v3_development": {
       "exact_accuracy": 0.8,
       "mean_absolute_error": 0.2
-    },
-    "scalar_v2_holdout": {
-      "exact_accuracy": 0.6,
-      "mean_absolute_error": 0.4
     },
     "scalar_v3_holdout": {
       "exact_accuracy": 0.8,

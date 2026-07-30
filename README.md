@@ -52,7 +52,7 @@ checks.
 
 ## Judge
 
-Judge v2 evaluates anonymous answers without seeing the steering method,
+Judge v3 evaluates anonymous answers without seeing the steering method,
 layer selection, alpha, or condition name.
 
 - Trait evaluation is the primary endpoint for absolute expression and

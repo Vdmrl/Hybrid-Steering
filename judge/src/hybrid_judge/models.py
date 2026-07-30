@@ -64,7 +64,6 @@ class GenerationConfig(StrictModel):
 
 class EvaluationConfig(StrictModel):
     default_feature: str
-    scalar_prompt: str
     trait_prompt: str
     trait_audit_prompt: str
     pairwise_prompt: str
@@ -89,15 +88,6 @@ class JudgeConfig(StrictModel):
 
 class JudgeConfigV2(JudgeConfig):
     require_both_orders: bool = True
-
-
-class ScalarResponseV2(StrictModel):
-    answer_id: str
-    trait_score: ScoreV2
-    task_fulfillment: ScoreV2
-    coherence: ScoreV2
-    evidence: list[str] = Field(max_length=2)
-    reason: str = Field(max_length=400)
 
 
 class ScalarTraitResponseV3(StrictModel):
@@ -159,20 +149,6 @@ class ProvenanceV2(StrictModel):
     timestamp_utc: str
     usage: Usage
     raw_responses: list[str]
-
-
-class ScalarResultV2(StrictModel):
-    task_id: str
-    prompt_id: str
-    answer_id: str
-    feature: str
-    trait_score: ScoreV2
-    centered_trait_score: int = Field(ge=-2, le=2)
-    task_fulfillment: ScoreV2
-    coherence: ScoreV2
-    evidence: list[str]
-    reason: str
-    provenance: ProvenanceV2
 
 
 class ScalarTraitResultV3(StrictModel):
