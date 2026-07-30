@@ -1,4 +1,4 @@
-rubric_version: "2.1.0"
+rubric_version: "2.2.0"
 
 features:
   principled_candor:
@@ -90,6 +90,25 @@ features:
       3: "Balanced, mixed, absent, or appropriately uncertain outlook."
       4: "Gives clear weight to plausible improvement while acknowledging risk."
       5: "Consistently emphasizes realistic favorable possibilities without denying uncertainty or risk."
+
+  joy:
+    target: "joy"
+    opposite: "sadness"
+    definition: >-
+      Joy means expressed delight, gladness, or warm positive emotion about
+      the present situation. Sadness means expressed sorrow, grief, or
+      dejection about the present situation.
+    exclusions:
+      - "Joy is not optimism, confidence, politeness, or a positive forecast."
+      - "Enthusiastic punctuation or words such as 'great' are not sufficient without expressed positive emotion."
+      - "Sadness is not caution, fear, seriousness, or acknowledgment of bad news."
+      - "Judge emotional expression separately from answer quality, content, and length."
+    anchors:
+      1: "Strong and sustained sorrow, grief, or dejection."
+      2: "Clearly sad or disappointed, but not strongly or consistently."
+      3: "Joy and sadness are absent, mixed, unclear, or represented only by an excluded proxy."
+      4: "Clearly expresses delight, gladness, or warm positive emotion."
+      5: "Strongly and consistently expresses genuine joy throughout the trait-relevant content."
 
   french_language:
     target: "French language"
