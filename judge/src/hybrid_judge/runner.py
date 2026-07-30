@@ -22,8 +22,6 @@ from .models import (
     PairwiseResponseV2,
     PairwiseResultV2,
     ProvenanceV2,
-    ScalarResponseV2,
-    ScalarResultV2,
     ScalarTraitResponseV3,
     ScalarTraitResultV3,
     TraitScoreDistribution,
@@ -199,7 +197,7 @@ def pairwise_tasks(
     return tasks
 
 
-def scalar_v2_tasks(rows: Iterable[JudgeInput]) -> list[tuple[JudgeInput, Answer]]:
+def trait_tasks(rows: Iterable[JudgeInput]) -> list[tuple[JudgeInput, Answer]]:
     return [(row, answer) for row in rows for answer in row.answers]
 
 
@@ -239,85 +237,6 @@ def provenance_v2(
         timestamp_utc=datetime.now(UTC).isoformat(),
         usage=usage,
         raw_responses=raw_responses,
-    )
-
-
-def scalar_task_v2(
-    task: tuple[JudgeInput, Answer],
-    *,
-    feature_name: str,
-    feature: FeatureV2,
-    template: str,
-    client: OpenAI,
-    model: str,
-    provider: str,
-    temperature: float,
-    max_tokens: int,
-    schema_retries: int,
-    rubric_version: str,
-    prompt_version: str,
-    prompt_sha256: str,
-    config_version: str,
-    config_sha256: str,
-    seed: int,
-) -> ScalarResultV2:
-    row, answer = task
-
-    def validate(parsed: ScalarResponseV2) -> None:
-        if parsed.answer_id != "answer_0":
-            raise ValueError("judge returned an unexpected answer_id")
-        if any(not quote.strip() for quote in parsed.evidence):
-            raise ValueError("use an empty evidence list instead of empty excerpts")
-        if any(quote and quote not in answer.text for quote in parsed.evidence):
-            raise ValueError("judge evidence is not an exact answer excerpt")
-        if parsed.trait_score != 3 and not parsed.evidence:
-            raise ValueError("non-neutral trait scores require exact evidence")
-        if len(parsed.reason.split()) > 30:
-            raise ValueError("judge reason exceeds 30 words")
-
-    parsed, raw, usage, response_ids, _ = validated_completion(
-        client,
-        response_model=ScalarResponseV2,
-        validate=validate,
-        schema_retries=schema_retries,
-        model=model,
-        system=render_prompt(template, feature, feature.anchors),
-        payload={
-            "scenario": row.scenario,
-            "answer": {"answer_id": "answer_0", "text": answer.text},
-        },
-        temperature=temperature,
-        max_tokens=max_tokens,
-    )
-    return ScalarResultV2(
-        task_id=(
-            f"scalar-v2:{rubric_version}:{feature_name}:"
-            f"{row.prompt_id}:{answer.answer_id}"
-        ),
-        prompt_id=row.prompt_id,
-        answer_id=answer.answer_id,
-        feature=feature_name,
-        trait_score=parsed.trait_score,
-        centered_trait_score=parsed.trait_score - 3,
-        task_fulfillment=parsed.task_fulfillment,
-        coherence=parsed.coherence,
-        evidence=parsed.evidence,
-        reason=parsed.reason,
-        provenance=provenance_v2(
-            model=model,
-            provider=provider,
-            response_ids=response_ids,
-            prompt_version=prompt_version,
-            prompt_sha256=prompt_sha256,
-            rubric_version=rubric_version,
-            config_version=config_version,
-            config_sha256=config_sha256,
-            answer_order=[answer.answer_id],
-            seed=seed,
-            temperature=temperature,
-            raw_responses=raw,
-            usage=usage,
-        ),
     )
 
 

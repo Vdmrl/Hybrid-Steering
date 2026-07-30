@@ -5,20 +5,20 @@ anonymous answers: never GDN/residual/SVD, layer, alpha, or method names.
 
 ## Recommended evaluation
 
-Use **trait** mode for new experiments. It is the CLI default and independently
-scores every answer on the anchored 1–5 scale. The provider returns one digit
-and token log-probabilities; the runner attaches IDs, full provenance, and a
-conditional probability distribution over scores 1–5. This is the inexpensive
-default for large ablations and supports both effect intensity and joint
-composition.
+Run Hybrid Judge normally for new experiments; no `--mode` flag is required.
+It independently scores every answer on the anchored 1–5 scale. The provider
+returns one digit and token log-probabilities; the runner attaches IDs, full
+provenance, and a conditional probability distribution over scores 1–5. This
+is the inexpensive standard for large ablations and supports both effect
+intensity and joint composition.
 
 ```bash
 hybrid-judge judge/examples/input.example.jsonl runs/trait.jsonl \
   --feature optimism
 ```
 
-`--mode trait` may be written explicitly but is not required. Trait score 3
-means neutral, mixed, absent, or unclear; `centered_trait_score = score - 3`.
+Trait score 3 means neutral, mixed, absent, or unclear;
+`centered_trait_score = score - 3`.
 `score_distribution.expected_score` is the probability-weighted soft score;
 `chosen_score_probability` and `entropy` describe uncertainty. Probabilities
 are renormalized over the five valid score tokens, while `valid_token_mass`
@@ -65,7 +65,7 @@ One JSON object per scenario:
 `answer_id` is used only to join results. The provider sees anonymous
 `answer_0` or `A`/`B` labels.
 
-## Optional and legacy modes
+## Optional modes
 
 Audited trait evaluation:
 
@@ -89,9 +89,9 @@ This writes:
 - `pairwise.aggregated.jsonl`: one conservative result per prompt/pair;
 - `pairwise.failures.jsonl`: append-only failed tasks, if any.
 
-Legacy `--mode scalar` preserves the v2 combined
-trait/task-fulfillment/coherence contract. Evaluate answer quality separately
-once per answer instead of repeating it for every trait.
+For answer-quality checks, use the same default command with
+`--feature answer_quality`. This keeps all large evaluations on the same
+one-token probabilistic contract.
 
 Useful options:
 
@@ -111,7 +111,6 @@ concepts/features.yaml
 judge/config/judge.yaml
 judge/prompts/trait_compact_v1.txt
 judge/prompts/scalar_v3.txt
-judge/prompts/scalar_v2.txt
 judge/prompts/pairwise_v2.txt
 ```
 

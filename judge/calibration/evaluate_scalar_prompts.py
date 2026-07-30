@@ -12,7 +12,7 @@ from pathlib import Path
 from hybrid_judge.config import load_configs
 from hybrid_judge.models import Answer, JudgeInput
 from hybrid_judge.provider import openrouter_client
-from hybrid_judge.runner import scalar_task_v2, scalar_trait_task_v3
+from hybrid_judge.runner import scalar_trait_task_v3
 
 
 def arguments() -> argparse.Namespace:
@@ -23,9 +23,7 @@ def arguments() -> argparse.Namespace:
         type=Path,
         default=Path(__file__).with_name("scalar_hard_cases.jsonl"),
     )
-    parser.add_argument(
-        "--prompts", nargs="+", default=["scalar_v2.txt", "scalar_v3.txt"]
-    )
+    parser.add_argument("--prompts", nargs="+", default=["scalar_v3.txt"])
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--workers", type=int, default=8)
     return parser.parse_args()
@@ -65,46 +63,25 @@ def main() -> None:
             scenario=case["scenario"],
             answers=[answer],
         )
-        if prompt_name == "scalar_v3.txt":
-            result = scalar_trait_task_v3(
-                (row, answer),
-                feature_name=case["feature"],
-                feature=features.features[case["feature"]],
-                template=prompt_path.read_text(encoding="utf-8"),
-                client=client,
-                model=config.model,
-                provider=config.provider,
-                temperature=config.generation.temperature,
-                max_tokens=config.generation.max_output_tokens,
-                schema_retries=config.generation.schema_retries,
-                rubric_version=features.rubric_version,
-                prompt_version=prompt_name,
-                prompt_sha256=sha256(prompt_path),
-                config_version=config.config_version,
-                config_sha256=sha256(config_path),
-                seed=20260729,
-            )
-            result_data = result.model_dump(mode="json")
-        else:
-            result = scalar_task_v2(
-                (row, answer),
-                feature_name=case["feature"],
-                feature=features.features[case["feature"]],
-                template=prompt_path.read_text(encoding="utf-8"),
-                client=client,
-                model=config.model,
-                provider=config.provider,
-                temperature=config.generation.temperature,
-                max_tokens=config.generation.max_output_tokens,
-                schema_retries=config.generation.schema_retries,
-                rubric_version=features.rubric_version,
-                prompt_version=prompt_name,
-                prompt_sha256=sha256(prompt_path),
-                config_version=config.config_version,
-                config_sha256=sha256(config_path),
-                seed=20260729,
-            )
-            result_data = result.model_dump(mode="json")
+        result = scalar_trait_task_v3(
+            (row, answer),
+            feature_name=case["feature"],
+            feature=features.features[case["feature"]],
+            template=prompt_path.read_text(encoding="utf-8"),
+            client=client,
+            model=config.model,
+            provider=config.provider,
+            temperature=config.generation.temperature,
+            max_tokens=config.generation.max_output_tokens,
+            schema_retries=config.generation.schema_retries,
+            rubric_version=features.rubric_version,
+            prompt_version=prompt_name,
+            prompt_sha256=sha256(prompt_path),
+            config_version=config.config_version,
+            config_sha256=sha256(config_path),
+            seed=20260729,
+        )
+        result_data = result.model_dump(mode="json")
         return {
             "prompt_version": prompt_name,
             "prompt_id": case["prompt_id"],
