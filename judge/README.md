@@ -3,19 +3,30 @@
 Blind LLM-as-a-Judge for steering ablations. It receives only a scenario and
 anonymous answers: never GDN/residual/SVD, layer, alpha, or method names.
 
-## Judge v2
+## Recommended evaluation
 
-Two complementary modes are intentionally separate:
+Use **trait** mode for new experiments. It is the CLI default and independently
+scores every answer on the anchored 1–5 scale. The provider returns one digit
+and token log-probabilities; the runner attaches IDs, full provenance, and a
+conditional probability distribution over scores 1–5. This is the inexpensive
+default for large ablations and supports both effect intensity and joint
+composition.
 
-- **pairwise (primary):** compares A and B in both answer orders. The two calls
-  are aggregated into one prompt-level result. An order disagreement becomes a
-  conservative tie and is marked inconsistent;
-- **scalar (secondary):** scores exactly one answer per call on an anchored
-  1–5 trait scale, task fulfillment, and coherence. Trait score 3 means
-  neutral, mixed, absent, or unclear; `centered_trait_score = score - 3`.
+```bash
+hybrid-judge judge/examples/input.example.jsonl runs/trait.jsonl \
+  --feature optimism
+```
 
-Every judgment must cite exact answer excerpts. Invalid JSON, unexpected IDs,
-or invented excerpts are retried and then written to a failures sidecar.
+`--mode trait` may be written explicitly but is not required. Trait score 3
+means neutral, mixed, absent, or unclear; `centered_trait_score = score - 3`.
+`score_distribution.expected_score` is the probability-weighted soft score;
+`chosen_score_probability` and `entropy` describe uncertainty. Probabilities
+are renormalized over the five valid score tokens, while `valid_token_mass`
+records how much of the returned probability mass they covered.
+
+Use `--mode trait-audit` when exact supporting evidence and a short reason are
+needed. The audited format costs more and can fail strict quote validation, so
+run it on a representative audit sample instead of duplicating a large run.
 
 ## Install
 
@@ -54,9 +65,18 @@ One JSON object per scenario:
 `answer_id` is used only to join results. The provider sees anonymous
 `answer_0` or `A`/`B` labels.
 
-## Run
+## Optional and legacy modes
 
-Primary pairwise evaluation (both orders are mandatory):
+Audited trait evaluation:
+
+```bash
+hybrid-judge judge/examples/input.example.jsonl runs/trait-audit.jsonl \
+  --mode trait-audit --feature optimism
+```
+
+Pairwise A/B evaluation is a complementary causal robustness check. It should
+not replace the 1–5 trait scores in new composition experiments. Both answer
+orders are mandatory:
 
 ```bash
 hybrid-judge judge/examples/input.example.jsonl runs/pairwise.jsonl \
@@ -69,12 +89,9 @@ This writes:
 - `pairwise.aggregated.jsonl`: one conservative result per prompt/pair;
 - `pairwise.failures.jsonl`: append-only failed tasks, if any.
 
-Secondary scalar evaluation:
-
-```bash
-hybrid-judge judge/examples/input.example.jsonl runs/scalar.jsonl \
-  --feature optimism
-```
+Legacy `--mode scalar` preserves the v2 combined
+trait/task-fulfillment/coherence contract. Evaluate answer quality separately
+once per answer instead of repeating it for every trait.
 
 Useful options:
 
@@ -92,6 +109,8 @@ set once in `judge/config/judge.yaml`.
 ```text
 concepts/features.yaml
 judge/config/judge.yaml
+judge/prompts/trait_compact_v1.txt
+judge/prompts/scalar_v3.txt
 judge/prompts/scalar_v2.txt
 judge/prompts/pairwise_v2.txt
 ```
@@ -104,4 +123,5 @@ responses, response IDs, and UTC timestamp.
 
 Read [calibration/README.md](calibration/README.md). A valid API run is only
 exploratory until every feature passes the human calibration and order-bias
-gates. Pairwise is the primary endpoint; scalar scores are diagnostic.
+gates. Trait scores are the primary endpoint for absolute expression and
+composition; pairwise comparisons remain a causal robustness check.

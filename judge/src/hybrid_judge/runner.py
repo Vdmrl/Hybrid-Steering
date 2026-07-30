@@ -3,9 +3,8 @@ from __future__ import annotations
 import hashlib
 import itertools
 import json
+import math
 import random
-import re
-import unicodedata
 from collections.abc import Callable, Iterable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import UTC, datetime
@@ -17,6 +16,7 @@ from pydantic import BaseModel, ValidationError
 
 from .models import (
     Answer,
+    CompactTraitResponseV4,
     FeatureV2,
     JudgeInput,
     PairwiseResponseV2,
@@ -24,6 +24,9 @@ from .models import (
     ProvenanceV2,
     ScalarResponseV2,
     ScalarResultV2,
+    ScalarTraitResponseV3,
+    ScalarTraitResultV3,
+    TraitScoreDistribution,
     Usage,
 )
 
@@ -34,22 +37,6 @@ class SchemaFailure(ValueError):
     def __init__(self, attempts: int, raw_responses: list[str]) -> None:
         super().__init__(f"judge schema validation failed after {attempts} attempts")
         self.raw_responses = raw_responses
-
-
-def evidence_is_excerpt(evidence: str, answer: str) -> bool:
-    """Match contiguous words while ignoring presentation-only differences."""
-
-    def words(text: str) -> str:
-        normalized = unicodedata.normalize("NFKC", text).casefold()
-        return " ".join(re.findall(r"[^\W_]+", normalized))
-
-    excerpt = words(evidence)
-    return bool(excerpt) and f" {excerpt} " in f" {words(answer)} "
-
-
-def exact_evidence(evidence: Iterable[str], answer: str) -> list[str]:
-    """Keep audit excerpts that can be traced to the answer text."""
-    return [quote for quote in evidence if evidence_is_excerpt(quote, answer)]
 
 
 def read_jsonl(path: Path) -> list[JudgeInput]:
@@ -101,9 +88,11 @@ def completion(
     payload: dict[str, Any],
     temperature: float,
     max_tokens: int,
-    reasoning_effort: str | None = None,
-) -> tuple[str, Usage, str]:
-    request: dict[str, Any] = {
+    extract_json_object: bool = True,
+    logprobs: bool = False,
+    top_logprobs: int | None = None,
+) -> tuple[str, Usage, str, list[tuple[str, float]] | None]:
+    request = {
         "model": model,
         "temperature": temperature,
         "max_tokens": max_tokens,
@@ -111,21 +100,41 @@ def completion(
             {"role": "system", "content": system},
             {"role": "user", "content": json.dumps(payload, ensure_ascii=False)},
         ],
-        "response_format": {"type": "json_object"},
     }
-    if reasoning_effort and reasoning_effort != "none":
-        request["extra_body"] = {
-            "reasoning": {"effort": reasoning_effort, "exclude": True}
-        }
+    if logprobs:
+        request.update(logprobs=True, top_logprobs=top_logprobs)
     response = client.chat.completions.create(**request)
     content = response.choices[0].message.content
     if not content:
         raise ValueError("judge returned empty content")
     content = content.strip().removeprefix("```json").removesuffix("```").strip()
+    token_logprobs = None
+    if logprobs:
+        positions = getattr(
+            getattr(response.choices[0], "logprobs", None), "content", []
+        )
+        position = next(
+            (
+                item
+                for item in positions or []
+                if item.token.strip() in {"1", "2", "3", "4", "5"}
+            ),
+            None,
+        )
+        if position is None:
+            raise ValueError("judge returned no score-token logprobs")
+        token_logprobs = [(item.token, item.logprob) for item in position.top_logprobs]
+    if not extract_json_object:
+        return content, usage_from(response), response.id, token_logprobs
     start, end = content.find("{"), content.rfind("}")
     if start < 0 or end < start:
         raise ValueError("judge returned no JSON object")
-    return content[start : end + 1], usage_from(response), response.id
+    return (
+        content[start : end + 1],
+        usage_from(response),
+        response.id,
+        token_logprobs,
+    )
 
 
 def add_usage(total: Usage, item: Usage) -> Usage:
@@ -142,20 +151,24 @@ def validated_completion(
     response_model: type[ResponseT],
     validate: Callable[[ResponseT], None],
     schema_retries: int,
+    retry_instruction: str | None = None,
     **kwargs: Any,
-) -> tuple[ResponseT, list[str], Usage, list[str]]:
+) -> tuple[ResponseT, list[str], Usage, list[str], list[tuple[str, float]] | None]:
     raw_responses: list[str] = []
     response_ids: list[str] = []
     total_usage = Usage()
-    for _ in range(schema_retries + 1):
-        content, usage, response_id = completion(client, **kwargs)
+    base_system = kwargs["system"]
+    for attempt in range(schema_retries + 1):
+        if attempt and retry_instruction:
+            kwargs["system"] = f"{base_system}\n\n{retry_instruction}"
+        content, usage, response_id, token_logprobs = completion(client, **kwargs)
         raw_responses.append(content)
         response_ids.append(response_id)
         total_usage = add_usage(total_usage, usage)
         try:
             parsed = response_model.model_validate_json(content)
             validate(parsed)
-            return parsed, raw_responses, total_usage, response_ids
+            return parsed, raw_responses, total_usage, response_ids, token_logprobs
         except (ValidationError, ValueError):
             continue
     raise SchemaFailure(len(raw_responses), raw_responses)
@@ -205,6 +218,8 @@ def provenance_v2(
     temperature: float,
     raw_responses: list[str],
     usage: Usage,
+    logprobs: bool = False,
+    top_logprobs: int | None = None,
 ) -> ProvenanceV2:
     return ProvenanceV2(
         judge_model=model,
@@ -218,6 +233,8 @@ def provenance_v2(
         answer_order=answer_order,
         seed=seed,
         temperature=temperature,
+        logprobs=logprobs,
+        top_logprobs=top_logprobs,
         schema_attempts=len(raw_responses),
         timestamp_utc=datetime.now(UTC).isoformat(),
         usage=usage,
@@ -243,7 +260,6 @@ def scalar_task_v2(
     config_version: str,
     config_sha256: str,
     seed: int,
-    reasoning_effort: str | None = None,
 ) -> ScalarResultV2:
     row, answer = task
 
@@ -252,11 +268,14 @@ def scalar_task_v2(
             raise ValueError("judge returned an unexpected answer_id")
         if any(not quote.strip() for quote in parsed.evidence):
             raise ValueError("use an empty evidence list instead of empty excerpts")
-        parsed.evidence = exact_evidence(parsed.evidence, answer.text)
+        if any(quote and quote not in answer.text for quote in parsed.evidence):
+            raise ValueError("judge evidence is not an exact answer excerpt")
+        if parsed.trait_score != 3 and not parsed.evidence:
+            raise ValueError("non-neutral trait scores require exact evidence")
         if len(parsed.reason.split()) > 30:
             raise ValueError("judge reason exceeds 30 words")
 
-    parsed, raw, usage, response_ids = validated_completion(
+    parsed, raw, usage, response_ids, _ = validated_completion(
         client,
         response_model=ScalarResponseV2,
         validate=validate,
@@ -269,7 +288,6 @@ def scalar_task_v2(
         },
         temperature=temperature,
         max_tokens=max_tokens,
-        reasoning_effort=reasoning_effort,
     )
     return ScalarResultV2(
         task_id=(
@@ -303,6 +321,188 @@ def scalar_task_v2(
     )
 
 
+def scalar_trait_task_v3(
+    task: tuple[JudgeInput, Answer],
+    *,
+    feature_name: str,
+    feature: FeatureV2,
+    template: str,
+    client: OpenAI,
+    model: str,
+    provider: str,
+    temperature: float,
+    max_tokens: int,
+    schema_retries: int,
+    rubric_version: str,
+    prompt_version: str,
+    prompt_sha256: str,
+    config_version: str,
+    config_sha256: str,
+    seed: int,
+) -> ScalarTraitResultV3:
+    row, answer = task
+
+    def validate(parsed: ScalarTraitResponseV3) -> None:
+        if parsed.answer_id != "answer_0":
+            raise ValueError("judge returned an unexpected answer_id")
+        if parsed.evidence and not parsed.evidence.strip():
+            raise ValueError("use an empty string instead of whitespace evidence")
+        if parsed.evidence and parsed.evidence not in answer.text:
+            raise ValueError("judge evidence is not an exact answer excerpt")
+        if parsed.trait_score != 3 and not parsed.evidence:
+            raise ValueError("non-neutral trait scores require exact evidence")
+        if len(parsed.reason.split()) > 30:
+            raise ValueError("judge reason exceeds 30 words")
+
+    parsed, raw, usage, response_ids, _ = validated_completion(
+        client,
+        response_model=ScalarTraitResponseV3,
+        validate=validate,
+        schema_retries=schema_retries,
+        model=model,
+        system=render_prompt(template, feature, feature.anchors),
+        payload={
+            "scenario": row.scenario,
+            "answer": {"answer_id": "answer_0", "text": answer.text},
+        },
+        temperature=temperature,
+        max_tokens=max_tokens,
+    )
+    return ScalarTraitResultV3(
+        task_id=(
+            f"scalar-v3:{rubric_version}:{feature_name}:"
+            f"{row.prompt_id}:{answer.answer_id}"
+        ),
+        prompt_id=row.prompt_id,
+        answer_id=answer.answer_id,
+        feature=feature_name,
+        trait_score=parsed.trait_score,
+        centered_trait_score=parsed.trait_score - 3,
+        evidence=parsed.evidence,
+        reason=parsed.reason,
+        provenance=provenance_v2(
+            model=model,
+            provider=provider,
+            response_ids=response_ids,
+            prompt_version=prompt_version,
+            prompt_sha256=prompt_sha256,
+            rubric_version=rubric_version,
+            config_version=config_version,
+            config_sha256=config_sha256,
+            answer_order=[answer.answer_id],
+            seed=seed,
+            temperature=temperature,
+            raw_responses=raw,
+            usage=usage,
+        ),
+    )
+
+
+def compact_trait_task_v4(
+    task: tuple[JudgeInput, Answer],
+    *,
+    feature_name: str,
+    feature: FeatureV2,
+    template: str,
+    client: OpenAI,
+    model: str,
+    provider: str,
+    temperature: float,
+    max_tokens: int,
+    top_logprobs: int,
+    schema_retries: int,
+    rubric_version: str,
+    prompt_version: str,
+    prompt_sha256: str,
+    config_version: str,
+    config_sha256: str,
+    seed: int,
+) -> ScalarTraitResultV3:
+    row, answer = task
+    parsed, raw, usage, response_ids, token_logprobs = validated_completion(
+        client,
+        response_model=CompactTraitResponseV4,
+        validate=lambda _: None,
+        schema_retries=schema_retries,
+        retry_instruction=(
+            "VALIDATION RETRY: Return exactly one ASCII digit from 1 to 5. "
+            "Do not return JSON, analysis, or punctuation."
+        ),
+        model=model,
+        system=render_prompt(template, feature, feature.anchors),
+        payload={
+            "scenario": row.scenario,
+            "answer": {"answer_id": "answer_0", "text": answer.text},
+        },
+        temperature=temperature,
+        max_tokens=min(max_tokens, 4),
+        extract_json_object=False,
+        logprobs=True,
+        top_logprobs=top_logprobs,
+    )
+    score = parsed.root
+    distribution = score_distribution(score, token_logprobs or [])
+    return ScalarTraitResultV3(
+        task_id=(
+            f"trait-compact-v1:{rubric_version}:{feature_name}:"
+            f"{row.prompt_id}:{answer.answer_id}"
+        ),
+        prompt_id=row.prompt_id,
+        answer_id=answer.answer_id,
+        feature=feature_name,
+        trait_score=score,
+        centered_trait_score=score - 3,
+        evidence="",
+        reason="",
+        score_distribution=distribution,
+        provenance=provenance_v2(
+            model=model,
+            provider=provider,
+            response_ids=response_ids,
+            prompt_version=prompt_version,
+            prompt_sha256=prompt_sha256,
+            rubric_version=rubric_version,
+            config_version=config_version,
+            config_sha256=config_sha256,
+            answer_order=[answer.answer_id],
+            seed=seed,
+            temperature=temperature,
+            raw_responses=raw,
+            usage=usage,
+            logprobs=True,
+            top_logprobs=top_logprobs,
+        ),
+    )
+
+
+def score_distribution(
+    chosen_score: int, token_logprobs: list[tuple[str, float]]
+) -> TraitScoreDistribution:
+    raw = {score: 0.0 for score in range(1, 6)}
+    for token, logprob in token_logprobs:
+        token = token.strip()
+        if token in {"1", "2", "3", "4", "5"}:
+            raw[int(token)] += math.exp(logprob)
+    valid_mass = sum(raw.values())
+    if not valid_mass:
+        raise ValueError("judge returned no probabilities for scores 1 through 5")
+    probabilities = {score: value / valid_mass for score, value in raw.items()}
+    return TraitScoreDistribution(
+        probabilities={
+            score: round(value, 8) for score, value in probabilities.items()
+        },
+        expected_score=round(
+            sum(score * value for score, value in probabilities.items()), 6
+        ),
+        chosen_score_probability=round(probabilities[chosen_score], 8),
+        entropy=round(
+            -sum(value * math.log(value) for value in probabilities.values() if value),
+            6,
+        ),
+        valid_token_mass=round(min(valid_mass, 1.0), 8),
+    )
+
+
 def pairwise_task_v2(
     task: tuple[JudgeInput, Answer, Answer, str],
     *,
@@ -321,19 +521,22 @@ def pairwise_task_v2(
     config_version: str,
     config_sha256: str,
     seed: int,
-    reasoning_effort: str | None = None,
 ) -> PairwiseResultV2:
     row, left, right, orientation = task
 
     def validate(parsed: PairwiseResponseV2) -> None:
-        if not evidence_is_excerpt(parsed.evidence_A, left.text):
-            parsed.evidence_A = ""
-        if not evidence_is_excerpt(parsed.evidence_B, right.text):
-            parsed.evidence_B = ""
+        if parsed.evidence_A and parsed.evidence_A not in left.text:
+            raise ValueError("evidence_A is not an exact answer excerpt")
+        if parsed.evidence_B and parsed.evidence_B not in right.text:
+            raise ValueError("evidence_B is not an exact answer excerpt")
+        if parsed.trait_winner == "A" and not parsed.evidence_A:
+            raise ValueError("trait winner A requires exact evidence_A")
+        if parsed.trait_winner == "B" and not parsed.evidence_B:
+            raise ValueError("trait winner B requires exact evidence_B")
         if len(parsed.reason.split()) > 30:
             raise ValueError("judge reason exceeds 30 words")
 
-    parsed, raw, usage, response_ids = validated_completion(
+    parsed, raw, usage, response_ids, _ = validated_completion(
         client,
         response_model=PairwiseResponseV2,
         validate=validate,
@@ -347,7 +550,6 @@ def pairwise_task_v2(
         },
         temperature=temperature,
         max_tokens=max_tokens,
-        reasoning_effort=reasoning_effort,
     )
 
     def map_winner(value: str) -> str:
@@ -394,15 +596,31 @@ def run_tasks(
     output: Path,
     workers: int,
     failures_output: Path | None = None,
+    resume_provenance: dict[str, Any] | None = None,
 ) -> tuple[int, int]:
     output.parent.mkdir(parents=True, exist_ok=True)
-    done = set()
+    existing = []
     if output.exists():
-        done = {
-            json.loads(line)["task_id"]
+        existing = [
+            json.loads(line)
             for line in output.read_text(encoding="utf-8").splitlines()
             if line.strip()
-        }
+        ]
+    if resume_provenance:
+        for row in existing:
+            provenance = row.get("provenance", {})
+            mismatches = [
+                key
+                for key, expected in resume_provenance.items()
+                if provenance.get(key) != expected
+            ]
+            if mismatches:
+                fields = ", ".join(mismatches)
+                raise ValueError(
+                    f"cannot resume {output}: incompatible provenance fields "
+                    f"({fields}); use a new output file"
+                )
+    done = {row["task_id"] for row in existing}
     pending = [task for task in tasks if worker(task, dry_run=True) not in done]
     failures = 0
     failures_output = failures_output or output.with_name(

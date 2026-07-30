@@ -55,11 +55,11 @@ checks.
 Judge v2 evaluates anonymous answers without seeing the steering method,
 layer selection, alpha, or condition name.
 
-- Pairwise evaluation is the primary endpoint. Every comparison runs in both
-  A/B orders and the two decisions are aggregated into one prompt-level result.
-- Scalar evaluation scores one answer per call on an anchored 1–5 trait scale,
-  task fulfillment, and coherence.
-- Exact answer excerpts are required as evidence.
+- Trait evaluation is the primary endpoint for absolute expression and
+  composition. Pairwise A/B evaluation remains a causal robustness check.
+- Trait evaluation scores one answer per call on an anchored 1–5 scale and
+  stores both the chosen score and its token-probability distribution.
+- Exact answer excerpts are required only in the optional audit mode.
 - Invalid schemas or invented excerpts are retried and persisted as failures.
 - Results include prompt/config hashes, answer order, decoding settings, token
   usage, raw responses, and provider response IDs.
@@ -72,13 +72,14 @@ export OPENROUTER_API_KEY="..."
 # Optional when direct OpenRouter access is unavailable:
 # export OPENROUTER_PROXY="http://user:password@host:port"
 
-hybrid-judge judge/examples/input.example.jsonl runs/pairwise.jsonl \
-  --mode pairwise \
+hybrid-judge judge/examples/input.example.jsonl runs/trait.jsonl \
   --feature optimism
 ```
 
-See [`judge/README.md`](judge/README.md) for input/output schemas, scalar mode,
-calibration, and resume behavior.
+This default command independently scores every answer on the anchored 1–5
+trait scale. Pairwise A/B evaluation is optional secondary evidence, not the
+primary composition metric. See [`judge/README.md`](judge/README.md) for
+input/output schemas, calibration, and resume behavior.
 
 ## Development
 

@@ -42,6 +42,23 @@ Do not duplicate a feature definition inside Python code. Do not silently edit
 an existing prompt version after it has produced reported results; add a new
 version instead.
 
+## Adding a feature
+
+Before using a feature, check whether it exists in `concepts/features.yaml`.
+If it does not:
+
+1. Add one YAML entry with `target`, `opposite`, `definition`, `exclusions`,
+   and distinct anchors for every score from 1 through 5.
+2. Keep the definition behavioral and judgeable from the answer text. Explicitly
+   exclude likely proxies such as verbosity, politeness, or answer quality.
+3. Increment `rubric_version`; never reuse old scores under the new version.
+4. Add blind calibration cases following `judge/calibration/README.md`.
+5. Submit the rubric and calibration fixtures in a dedicated branch and pull
+   request. Do not embed a private feature definition in experiment code.
+
+Until the feature passes its calibration gates, label its Judge results
+exploratory rather than article-ready.
+
 Treat every existing rubric and prompt version as immutable once results have
 been shared. Shared Judge changes must
 be reviewed through a pull request; direct commits to `main` are not allowed
@@ -51,6 +68,17 @@ for agents.
 
 - Evaluation must be blind: the judge must not see intervention or method
   names.
+- For every new experiment, use the default `trait` mode as the primary
+  endpoint: independently score each answer and each active feature on the
+  anchored 1–5 scale. For compositions, report every feature score and joint
+  metrics such as all active scores being at least 4.
+- Keep the integer `trait_score` and the full `score_distribution`. Treat the
+  probability-weighted `expected_score` as a more sensitive secondary endpoint
+  until it has separate human calibration.
+- Treat `pairwise` as an optional causal robustness check, never as the sole
+  composition metric. Treat `scalar` as a legacy v2 compatibility mode.
+- Evaluate answer quality separately once per answer; do not repeat or combine
+  quality judgments with every feature score.
 - Shuffle answer order deterministically and save the seed or permutation.
 - Save judge model, prompt version, rubric version, decoding parameters, and
   token usage with every run.

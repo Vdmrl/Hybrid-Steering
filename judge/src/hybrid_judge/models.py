@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, RootModel, model_validator
 
 ScoreV2 = Annotated[int, Field(ge=1, le=5)]
 
@@ -55,7 +55,7 @@ class FeatureConfigV2(StrictModel):
 class GenerationConfig(StrictModel):
     temperature: float = 0
     max_output_tokens: int = Field(default=4096, gt=0)
-    reasoning_effort: Literal["none", "high", "xhigh"] = "high"
+    top_logprobs: int = Field(default=20, ge=5, le=20)
     timeout_seconds: float = Field(default=240, gt=0)
     max_retries: int = Field(default=4, ge=0)
     schema_retries: int = Field(default=2, ge=0)
@@ -65,6 +65,8 @@ class GenerationConfig(StrictModel):
 class EvaluationConfig(StrictModel):
     default_feature: str
     scalar_prompt: str
+    trait_prompt: str
+    trait_audit_prompt: str
     pairwise_prompt: str
 
 
@@ -98,6 +100,17 @@ class ScalarResponseV2(StrictModel):
     reason: str = Field(max_length=400)
 
 
+class ScalarTraitResponseV3(StrictModel):
+    answer_id: str
+    trait_score: ScoreV2
+    evidence: str = Field(max_length=300)
+    reason: str = Field(max_length=400)
+
+
+class CompactTraitResponseV4(RootModel[ScoreV2]):
+    pass
+
+
 class PairwiseResponseV2(StrictModel):
     trait_winner: Literal["A", "B", "tie"]
     quality_winner: Literal["A", "B", "tie"]
@@ -112,6 +125,22 @@ class Usage(StrictModel):
     reasoning_tokens: int = 0
 
 
+class TraitScoreDistribution(StrictModel):
+    probabilities: dict[int, float]
+    expected_score: float = Field(ge=1, le=5)
+    chosen_score_probability: float = Field(ge=0, le=1)
+    entropy: float = Field(ge=0)
+    valid_token_mass: float = Field(gt=0, le=1)
+
+    @model_validator(mode="after")
+    def complete_scale(self) -> TraitScoreDistribution:
+        if set(self.probabilities) != {1, 2, 3, 4, 5}:
+            raise ValueError("score probabilities must define scores 1 through 5")
+        if abs(sum(self.probabilities.values()) - 1) > 1e-5:
+            raise ValueError("score probabilities must sum to one")
+        return self
+
+
 class ProvenanceV2(StrictModel):
     judge_model: str
     provider: str
@@ -124,6 +153,8 @@ class ProvenanceV2(StrictModel):
     answer_order: list[str]
     seed: int
     temperature: float
+    logprobs: bool = False
+    top_logprobs: int | None = None
     schema_attempts: int
     timestamp_utc: str
     usage: Usage
@@ -141,6 +172,19 @@ class ScalarResultV2(StrictModel):
     coherence: ScoreV2
     evidence: list[str]
     reason: str
+    provenance: ProvenanceV2
+
+
+class ScalarTraitResultV3(StrictModel):
+    task_id: str
+    prompt_id: str
+    answer_id: str
+    feature: str
+    trait_score: ScoreV2
+    centered_trait_score: int = Field(ge=-2, le=2)
+    evidence: str
+    reason: str
+    score_distribution: TraitScoreDistribution | None = None
     provenance: ProvenanceV2
 
 

@@ -1,4 +1,5 @@
 import json
+import math
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -7,14 +8,22 @@ from pydantic import ValidationError
 
 from hybrid_judge.aggregate import aggregate_pairwise_v2
 from hybrid_judge.config import load_configs
-from hybrid_judge.models import PairwiseResultV2, ScalarResponseV2
+from hybrid_judge.models import (
+    Answer,
+    FeatureV2,
+    JudgeInput,
+    PairwiseResultV2,
+    ScalarResponseV2,
+    ScalarTraitResponseV3,
+)
 from hybrid_judge.runner import (
-    evidence_is_excerpt,
-    exact_evidence,
+    SchemaFailure,
+    compact_trait_task_v4,
     pairwise_tasks,
     read_jsonl,
     render_prompt,
     run_tasks,
+    scalar_trait_task_v3,
     scalar_v2_tasks,
     validated_completion,
 )
@@ -104,16 +113,133 @@ def test_v2_contracts_and_one_answer_scalar_tasks() -> None:
         )
 
 
-def test_evidence_matching_ignores_formatting_but_not_words() -> None:
-    answer = '**Present the test data**: the design fails the "break-free" safety test.'
-    assert evidence_is_excerpt(
-        "present the test data: the design fails the 'break-free' safety test",
-        answer,
+def test_v3_trait_only_contract() -> None:
+    _, config = load_configs(ROOT)
+    parsed = ScalarTraitResponseV3.model_validate(
+        {
+            "answer_id": "answer_0",
+            "trait_score": 3,
+            "evidence": "",
+            "reason": "The trait is absent.",
+        }
     )
-    assert not evidence_is_excerpt("present revised test data", answer)
-    assert exact_evidence(
-        ["present the test data", "present revised test data"], answer
-    ) == ["present the test data"]
+    assert parsed.trait_score == 3
+    assert "task_fulfillment" not in parsed.model_fields_set
+    assert config.evaluation.trait_prompt == "trait_compact_v1.txt"
+    assert config.evaluation.trait_audit_prompt == "scalar_v3.txt"
+
+
+def test_compact_trait_accepts_one_digit_and_caps_output_tokens() -> None:
+    calls = []
+
+    def create(**kwargs):
+        calls.append(kwargs)
+        probabilities = {1: 0.02, 2: 0.03, 3: 0.20, 4: 0.60, 5: 0.15}
+        top_logprobs = [
+            SimpleNamespace(token=str(score), logprob=math.log(probability))
+            for score, probability in probabilities.items()
+        ]
+        return SimpleNamespace(
+            id="response",
+            usage=None,
+            choices=[
+                SimpleNamespace(
+                    message=SimpleNamespace(content="4"),
+                    logprobs=SimpleNamespace(
+                        content=[SimpleNamespace(token="4", top_logprobs=top_logprobs)]
+                    ),
+                )
+            ],
+        )
+
+    client = SimpleNamespace(
+        chat=SimpleNamespace(completions=SimpleNamespace(create=create))
+    )
+    answer = Answer(answer_id="candidate", text="A clearly targeted answer.")
+    row = JudgeInput(prompt_id="scenario", scenario="Scenario", answers=[answer])
+    feature = FeatureV2(
+        target="target",
+        opposite="opposite",
+        definition="definition",
+        anchors={score: str(score) for score in range(1, 6)},
+    )
+
+    result = compact_trait_task_v4(
+        (row, answer),
+        feature_name="feature",
+        feature=feature,
+        template="{target}\n{opposite}\n{definition}\n{exclusions}\n{scale}",
+        client=client,
+        model="test",
+        provider="test",
+        temperature=0,
+        max_tokens=256,
+        top_logprobs=20,
+        schema_retries=0,
+        rubric_version="1",
+        prompt_version="trait_compact_v1.txt",
+        prompt_sha256="prompt-hash",
+        config_version="1",
+        config_sha256="config-hash",
+        seed=1,
+    )
+
+    assert result.trait_score == 4
+    assert result.centered_trait_score == 1
+    assert result.score_distribution is not None
+    assert result.score_distribution.probabilities[4] == pytest.approx(0.6)
+    assert result.score_distribution.expected_score == pytest.approx(3.83)
+    assert result.evidence == result.reason == ""
+    assert calls[0]["max_tokens"] == 4
+    assert calls[0]["logprobs"] is True
+    assert calls[0]["top_logprobs"] == 20
+
+
+def test_v3_rejects_non_neutral_score_without_exact_evidence() -> None:
+    raw = json.dumps(
+        {
+            "answer_id": "answer_0",
+            "trait_score": 5,
+            "evidence": "invented quote",
+            "reason": "Strong target evidence.",
+        }
+    )
+    response = SimpleNamespace(
+        id="response",
+        usage=None,
+        choices=[SimpleNamespace(message=SimpleNamespace(content=raw))],
+    )
+    client = SimpleNamespace(
+        chat=SimpleNamespace(completions=SimpleNamespace(create=lambda **_: response))
+    )
+    answer = Answer(answer_id="candidate", text="A neutral answer.")
+    row = JudgeInput(prompt_id="scenario", scenario="Scenario", answers=[answer])
+    feature = FeatureV2(
+        target="target",
+        opposite="opposite",
+        definition="definition",
+        anchors={score: str(score) for score in range(1, 6)},
+    )
+
+    with pytest.raises(SchemaFailure):
+        scalar_trait_task_v3(
+            (row, answer),
+            feature_name="feature",
+            feature=feature,
+            template="{target}\n{opposite}\n{definition}\n{exclusions}\n{scale}",
+            client=client,
+            model="test",
+            provider="test",
+            temperature=0,
+            max_tokens=10,
+            schema_retries=0,
+            rubric_version="1",
+            prompt_version="prompt",
+            prompt_sha256="prompt-hash",
+            config_version="1",
+            config_sha256="config-hash",
+            seed=1,
+        )
 
 
 def test_pairwise_orders_are_one_experimental_unit() -> None:
@@ -162,16 +288,12 @@ def test_schema_failure_is_retried_and_recorded() -> None:
             ),
         ]
     )
-    requests = []
-
-    def create(**kwargs):
-        requests.append(kwargs)
-        return next(responses)
-
     client = SimpleNamespace(
-        chat=SimpleNamespace(completions=SimpleNamespace(create=create))
+        chat=SimpleNamespace(
+            completions=SimpleNamespace(create=lambda **_: next(responses))
+        )
     )
-    parsed, raw, _, response_ids = validated_completion(
+    parsed, raw, _, response_ids, _ = validated_completion(
         client,
         response_model=ScalarResponseV2,
         validate=lambda _: None,
@@ -181,16 +303,10 @@ def test_schema_failure_is_retried_and_recorded() -> None:
         payload={},
         temperature=0,
         max_tokens=10,
-        reasoning_effort="high",
     )
     assert parsed.trait_score == 3
     assert len(raw) == 2
     assert response_ids == ["bad", "good"]
-    assert requests[0]["extra_body"]["reasoning"] == {
-        "effort": "high",
-        "exclude": True,
-    }
-    assert requests[0]["response_format"] == {"type": "json_object"}
 
 
 def test_queue_persists_failures(tmp_path: Path) -> None:
@@ -206,3 +322,29 @@ def test_queue_persists_failures(tmp_path: Path) -> None:
         (tmp_path / "scores.failures.jsonl").read_text(encoding="utf-8")
     )
     assert failure["task_id"] == "task-1"
+
+
+def test_resume_rejects_incompatible_provenance(tmp_path: Path) -> None:
+    output = tmp_path / "scores.jsonl"
+    output.write_text(
+        json.dumps(
+            {
+                "task_id": "task-1",
+                "provenance": {"judge_model": "old-model"},
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    def worker(task: str, dry_run: bool = False) -> str:
+        return task
+
+    with pytest.raises(ValueError, match="incompatible provenance"):
+        run_tasks(
+            ["task-1"],
+            worker,
+            output=output,
+            workers=1,
+            resume_provenance={"judge_model": "new-model"},
+        )
