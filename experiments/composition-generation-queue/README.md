@@ -17,3 +17,18 @@ under the ignored `outputs/` directory.
 
 `run_all.sh` uses GPU selection from `CUDA_VISIBLE_DEVICES`; it does not call a
 Judge or any paid API.
+
+## Evaluation summary
+
+`summarize_judge.py` combines two compatible 1–5 Judge outputs without paying
+to evaluate the same answer twice. Audited JSON results take precedence;
+compact one-digit results fill missing `(prompt_id, answer_id, feature)` keys.
+It reports every active feature separately and the joint rate at which all
+active features score at least 4.
+
+```bash
+python experiments/composition-generation-queue/summarize_judge.py \
+  --json-results outputs/composition-generation-queue/judge-final/results \
+  --compact-results outputs/composition-generation-queue/judge-compact-v1/results \
+  --output reports/composition-generation-queue-summary.json
+```
