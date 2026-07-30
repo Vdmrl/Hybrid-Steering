@@ -56,11 +56,9 @@ def arguments() -> argparse.Namespace:
             "gdn",
             "activation",
             "prepare-main-judge",
-            "check-quality",
             "summarize",
         ),
     )
-    parser.add_argument("--split", choices=("dev", "main"))
     parser.add_argument("--base-directions-dir", type=Path)
     parser.add_argument("--optimism-direction", type=Path)
     parser.add_argument("--joy-direction", type=Path)
@@ -363,42 +361,8 @@ def result_rows(path: Path) -> list[dict]:
     return BASE.jsonl(path)
 
 
-def check_quality_coverage(args: argparse.Namespace) -> None:
-    if not args.split:
-        raise ValueError("--split is required")
-    root = args.output_dir / "judge" / args.split
-    expected = {
-        (row["prompt_id"], answer["answer_id"])
-        for row in BASE.jsonl(root / "inputs" / "quality.jsonl")
-        for answer in row["answers"]
-    }
-    observed = {
-        (row["prompt_id"], row["answer_id"])
-        for row in result_rows(root / "results" / "quality.jsonl")
-    }
-    expected_by_answer = defaultdict(int)
-    observed_by_answer = defaultdict(int)
-    for _, answer_id in expected:
-        expected_by_answer[answer_id] += 1
-    for pair in expected & observed:
-        observed_by_answer[pair[1]] += 1
-    report = {
-        "completed": len(expected & observed),
-        "expected": len(expected),
-        "overall": len(expected & observed) / len(expected),
-        "minimum_per_condition": min(
-            observed_by_answer[name] / count
-            for name, count in expected_by_answer.items()
-        ),
-    }
-    BASE.atomic_json(root / "quality-coverage.json", report)
-    print(json.dumps(report, indent=2))
-    if report["overall"] < 0.9 or report["minimum_per_condition"] < 0.8:
-        raise RuntimeError("quality coverage is below the experiment threshold")
-
-
 def select_phase(args: argparse.Namespace) -> None:
-    root = args.output_dir / "judge" / "dev" / "results"
+    root = args.output_dir / "judge" / "dev" / "results-compact"
     trait = {}
     for feature in FEATURES:
         grouped = defaultdict(list)
@@ -410,9 +374,9 @@ def select_phase(args: argparse.Namespace) -> None:
             answer: sum(values) / len(values) for answer, values in grouped.items()
         }
     quality_grouped = defaultdict(list)
-    for row in result_rows(root / "quality.jsonl"):
+    for row in result_rows(root / "answer_quality.jsonl"):
         quality_grouped[row["answer_id"]].append(
-            min(row["task_fulfillment"], row["coherence"])
+            row["score_distribution"]["expected_score"]
         )
     quality = {
         answer: sum(values) / len(values) for answer, values in quality_grouped.items()
@@ -567,7 +531,7 @@ def bootstrap_mean(values: list[float], samples: int = 10_000) -> dict[str, floa
 
 
 def summarize_phase(args: argparse.Namespace) -> None:
-    root = args.output_dir / "judge" / "main" / "results"
+    root = args.output_dir / "judge" / "main" / "results-compact"
     scores = defaultdict(dict)
     costs = {"input_tokens": 0, "output_tokens": 0}
     for feature in FEATURES:
@@ -580,10 +544,10 @@ def summarize_phase(args: argparse.Namespace) -> None:
             costs["input_tokens"] += usage["input_tokens"]
             costs["output_tokens"] += usage["output_tokens"]
     quality = defaultdict(dict)
-    for row in result_rows(root / "quality.jsonl"):
-        quality[row["answer_id"]][row["prompt_id"]] = min(
-            row["task_fulfillment"], row["coherence"]
-        )
+    for row in result_rows(root / "answer_quality.jsonl"):
+        quality[row["answer_id"]][row["prompt_id"]] = row["score_distribution"][
+            "expected_score"
+        ]
         usage = row["provenance"]["usage"]
         costs["input_tokens"] += usage["input_tokens"]
         costs["output_tokens"] += usage["output_tokens"]
@@ -673,9 +637,6 @@ def summarize_phase(args: argparse.Namespace) -> None:
             "conditions": conditions,
             "contrasts": contrasts,
             "judge_usage": costs,
-            "quality_coverage": json.loads(
-                (root.parent / "quality-coverage.json").read_text()
-            ),
         },
     )
     print(f"conditions={len(conditions)} estimated_cost=${costs['estimated_usd']:.3f}")
@@ -704,7 +665,6 @@ def main() -> None:
         "gdn": gdn_phase,
         "activation": activation_phase,
         "prepare-main-judge": lambda value: prepare_judge(value, "main"),
-        "check-quality": check_quality_coverage,
         "summarize": summarize_phase,
     }[args.phase](args)
 

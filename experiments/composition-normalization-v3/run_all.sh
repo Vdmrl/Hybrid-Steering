@@ -43,6 +43,10 @@ direct() {
 retry() {
   local name="$1"
   shift
+  if [[ -f "$OUTPUT/$name.DONE" ]]; then
+    echo "[$(date -Is)] phase=$name already complete"
+    return 0
+  fi
   local attempt
   for attempt in 1 2 3; do
     echo "[$(date -Is)] phase=$name attempt=$attempt"
@@ -57,21 +61,15 @@ retry() {
 judge_split() {
   local split="$1"
   local feature
-  for feature in joy concrete_language optimism principled_candor; do
-    retry "judge-$split-$feature" \
+  for feature in joy concrete_language optimism principled_candor answer_quality; do
+    local input="$feature"
+    [[ "$feature" == "answer_quality" ]] && input="quality"
+    retry "judge-compact-$split-$feature" \
       "$PYTHON" -m hybrid_judge.cli \
-      "$OUTPUT/judge/$split/inputs/$feature.jsonl" \
-      "$OUTPUT/judge/$split/results/$feature.jsonl" \
+      "$OUTPUT/judge/$split/inputs/$input.jsonl" \
+      "$OUTPUT/judge/$split/results-compact/$feature.jsonl" \
       --mode trait --feature "$feature" --workers 8 --config-root "$ROOT/judge"
   done
-  if ! "$PYTHON" -m hybrid_judge.cli \
-      "$OUTPUT/judge/$split/inputs/quality.jsonl" \
-      "$OUTPUT/judge/$split/results/quality.jsonl" \
-      --mode scalar --feature concrete_language --workers 8 \
-      --config-root "$ROOT/judge"; then
-    "$PYTHON" "$RUNNER" check-quality "${common[@]}" --split "$split"
-  fi
-  touch "$OUTPUT/judge-$split-quality.DONE"
 }
 
 direct "$PYTHON" "$PREPARE" --output-dir "$OUTPUT/data" --dev 32 --test 128

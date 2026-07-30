@@ -16,6 +16,7 @@ judge:
   model: openai/gpt-4o-mini
   mode: trait
   probability_weighted: true
+  quality_feature: answer_quality
   quality_sample: 32
 statistics:
   paired_prompt_bootstrap_samples: 10000

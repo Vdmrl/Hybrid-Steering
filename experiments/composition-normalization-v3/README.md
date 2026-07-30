@@ -29,11 +29,9 @@ direction.
   candidates whose mean minimum quality falls more than 0.25 below baseline.
 - Activation and GDN use the same newline bridge before decoding.
 - The test prompts exclude the four target feature families.
-- The Judge receives anonymous answers and scores every answer on all four
-  traits. Quality is evaluated once on a 32-prompt subset.
-- Trait endpoints require complete coverage. The secondary quality guard may
-  proceed after legacy scalar-schema failures only with at least 90% overall
-  coverage and 80% coverage for every condition; actual coverage is reported.
+- The compact probabilistic Judge receives anonymous answers and scores every
+  answer on all four traits. The same one-token Judge scores `answer_quality`
+  once on a 32-prompt subset; legacy scalar/JSON evaluation is not used.
 - Final summaries include deterministic 95% paired-bootstrap intervals and
   prompt-paired contrasts for normalization, rank, and steering method.
 
