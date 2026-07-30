@@ -21,6 +21,7 @@ def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--json-results", type=Path, required=True)
     parser.add_argument("--compact-results", type=Path, required=True)
+    parser.add_argument("--activation-holdout", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     return parser.parse_args()
 
@@ -56,7 +57,11 @@ def proportion_ci(successes: int, total: int) -> dict[str, float | int]:
 
 
 def phase_from(path: Path) -> str:
-    return path.stem.split("-", 1)[0]
+    return (
+        "activation_holdout"
+        if path.stem.startswith("activation-confirm")
+        else path.stem.split("-", 1)[0]
+    )
 
 
 def load_results(roots: tuple[Path, ...]) -> dict[tuple[str, str, str, str], dict]:
@@ -76,6 +81,29 @@ def load_results(roots: tuple[Path, ...]) -> dict[tuple[str, str, str, str], dic
     return merged
 
 
+def split_activation_holdout(
+    rows: dict[tuple[str, str, str, str], dict], source: Path | None
+) -> dict[tuple[str, str, str, str], dict]:
+    if source is None:
+        return rows
+    holdout_ids = {
+        json.loads(line)["source_id"]
+        for line in source.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    }
+    return {
+        (
+            "activation_holdout"
+            if phase == "activation" and prompt_id in holdout_ids
+            else phase,
+            prompt_id,
+            answer_id,
+            feature,
+        ): row
+        for (phase, prompt_id, answer_id, feature), row in rows.items()
+    }
+
+
 def mask_features(answer_id: str) -> tuple[str, ...]:
     bits = answer_id.rsplit("_", 1)[-1]
     mask = int(bits, 2)
@@ -85,7 +113,7 @@ def mask_features(answer_id: str) -> tuple[str, ...]:
 def active_features(phase: str, answer_id: str) -> tuple[str, ...]:
     if phase in {"svd", "norm"}:
         return mask_features(answer_id)
-    if phase == "activation":
+    if phase in {"activation", "activation_holdout"}:
         if answer_id == "baseline":
             return FEATURES
         suffix = answer_id.rsplit("_", 1)[-1]
@@ -165,13 +193,19 @@ def self_test() -> None:
         "casualness",
     )
     assert active_features("joy", "joy_a2_optimism") == ("joy", "optimism")
+    assert phase_from(Path("activation-confirm-principled_candor.jsonl")) == (
+        "activation_holdout"
+    )
     assert proportion_ci(5, 10)["rate"] == 0.5
 
 
 def main() -> None:
     args = arguments()
     self_test()
-    rows = load_results((args.compact_results, args.json_results))
+    rows = split_activation_holdout(
+        load_results((args.compact_results, args.json_results)),
+        args.activation_holdout,
+    )
     summary = summarize(rows)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(

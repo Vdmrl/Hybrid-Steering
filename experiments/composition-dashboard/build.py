@@ -136,18 +136,19 @@ const best=all4.reduce((a,b)=>a.all_active_ge_4.rate>b.all_active_ge_4.rate?a:b)
 const casual=best.feature_scores.casualness.mean;
 const activationRows=conditions.filter(x=>x.phase==="activation"&&x.condition.endsWith("_all4")&&x.condition!=="baseline");
 const activationBest=activationRows.reduce((a,b)=>a.all_active_ge_4.rate>b.all_active_ge_4.rate?a:b);
-const activationConfirmed=activationRows.filter(x=>x.n_joint>=96);
+const activationConfirmed=conditions.filter(x=>x.phase==="activation_holdout");
+const activationWinner=activationConfirmed.filter(x=>x.condition!=="baseline").reduce((a,b)=>a.all_active_ge_4.rate>b.all_active_ge_4.rate?a:b,activationBest);
 const joy8=by("joy","joy_a8_optimism");
 document.querySelector("#overview").innerHTML=`<h2>What do the results say?</h2>
 <div class="cards">
  <div class="card"><span>Best full GDN method</span><strong>${pct(best.all_active_ge_4.rate)}</strong><small>${METHODS[best.condition]} · all 4 ≥ 4/5</small></div>
  <div class="card"><span>Main bottleneck</span><strong class="warn">${casual.toFixed(2)}/5</strong><small>Casualness under ${METHODS[best.condition]}</small></div>
- <div class="card"><span>Best activation sweep</span><strong>${pct(activationBest.all_active_ge_4.rate)}</strong><small>${activationBest.condition.replaceAll("_"," ")} · ${confidenceTag(activationBest.n_joint)}</small></div>
+ <div class="card"><span>${activationConfirmed.length?"Best activation holdout":"Best activation sweep"}</span><strong>${pct(activationWinner.all_active_ge_4.rate)}</strong><small>${activationWinner.condition.replaceAll("_"," ")} · ${confidenceTag(activationWinner.n_joint)}</small></div>
  <div class="card"><span>Joy + optimism, α=8</span><strong>${pct(joy8.all_active_ge_4.rate)}</strong><small>both traits ≥ 4/5 · N=${joy8.n_joint}</small></div>
 </div>
 <p class="callout"><b>Strongest current result:</b> norm control improves four-way GDN joint success by
 14.8 percentage points over per-feature rank 1; paired bootstrap 95% CI [+5.5, +24.2] pp.
-Activation looks stronger, but ${activationConfirmed.length?"the holdout rows below separate confirmatory from sweep results":"its best setting was selected on the same 32 prompts and still needs holdout confirmation"}.</p>`;
+Activation looks stronger, and ${activationConfirmed.length?"the separate 96-prompt holdout below preserves the exploratory/confirmatory boundary":"its best setting was selected on the same 32 prompts and still needs holdout confirmation"}.</p>`;
 
 document.querySelector("#method-bars").innerHTML=`<h2>Which GDN composition method works best?</h2>
 <p class="note">Strict joint endpoint: all four independently scored traits are at least 4/5 on the same answer.</p>
@@ -170,7 +171,7 @@ let act=`<h2>Classical activation steering: layer × α</h2><p class="note">Cell
 <table class="heat"><tr><th>Layer ↓ / α →</th>${alphas.map(a=>`<th>${a}</th>`).join("")}</tr>`;
 layers.forEach(l=>{act+=`<tr><th>${l}</th>`;alphas.forEach(a=>{const x=by("activation",`l${l}_a${a}_all4`);act+=`<td style="background:${heat(x.all_active_ge_4.rate)}">${pct(x.all_active_ge_4.rate)}<br><small>N=${x.n_joint}</small></td>`});act+="</tr>"});
 act+="</table>";
-if(activationConfirmed.length){act+=`<h3 style="margin-top:18px">Held-out confirmation</h3>${activationConfirmed.map(x=>bar(x.condition.replaceAll("_"," "),x.all_active_ge_4.rate,x.all_active_ge_4.ci95_low,x.all_active_ge_4.ci95_high)).join("")}`}
+if(activationConfirmed.length){act+=`<h3 style="margin-top:18px">Held-out confirmation</h3><p class="note">The untouched 96 prompts only; not pooled with the 32-prompt sweep.</p>${activationConfirmed.map(x=>bar(x.condition.replaceAll("_"," "),x.all_active_ge_4.rate,x.all_active_ge_4.ci95_low,x.all_active_ge_4.ci95_high)).join("")}`}
 else act+=`<p class="callout warn">Holdout is pending for layer 10 / α=4 and layer 20 / α=1. Do not present 62.5% as confirmatory yet.</p>`;
 document.querySelector("#activation").innerHTML=act;
 
@@ -182,7 +183,7 @@ function depth(rows,size){const xs=rows.filter(x=>x.active_features.length===siz
 const depths=[2,3,4];
 let comp=`<h2>Does performance decay with more traits?</h2><p class="note">Mean joint success across all available combinations of each size.</p>
 <table><tr><th>Method</th>${depths.map(x=>`<th>${x} traits</th>`).join("")}</tr>`;
-[[METHODS.per_r1_1111,rank1],[METHODS.norm_1111,norm]].forEach(([label,rows])=>{comp+=`<tr><td>${label}</td>${depths.map(n=>`<td style="background:${heat(depth(rows,n))}">${pct(depth(rows,n))}</td>`).join("")}</tr>`});
+[[METHODS.per_r1_1111,rank1],[METHODS.norm_1111,norm]].forEach(([label,rows])=>{comp+=`<tr><td>${label}</td>${depths.map(n=>{const value=depth(rows,n);return value===null?'<td>—</td>':`<td style="background:${heat(value)}">${pct(value)}</td>`}).join("")}</tr>`});
 document.querySelector("#composition").innerHTML=comp+`</table><p class="callout">Composition is not uniformly hard: combinations containing Casualness dominate failures. Use the ranked table below before attributing decay only to the number of traits.</p>`;
 
 const joys=[1,2,4,8].map(a=>({a,single:by("joy",`joy_a${a}`),pair:by("joy",`joy_a${a}_optimism`)}));

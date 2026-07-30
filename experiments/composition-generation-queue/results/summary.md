@@ -65,6 +65,9 @@ Audited JSON scores are preferred where available; compact one-digit scores fill
 | activation | `l30_a4_casual` | casualness | 32 | 3.1% [0.5%, 15.7%] | 1.12 |
 | activation | `l30_a4_concrete` | concrete_language | 32 | 100.0% [89.3%, 100.0%] | 4.19 |
 | activation | `l30_a4_optimism` | optimism | 32 | 78.1% [61.2%, 89.0%] | 3.53 |
+| activation_holdout | `baseline` | principled_candor, concrete_language, casualness, optimism | 96 | 8.3% [4.3%, 15.6%] | 1.99 |
+| activation_holdout | `l10_a4_all4` | principled_candor, concrete_language, casualness, optimism | 96 | 58.3% [48.3%, 67.7%] | 3.07 |
+| activation_holdout | `l20_a1_all4` | principled_candor, concrete_language, casualness, optimism | 96 | 50.0% [40.2%, 59.8%] | 2.91 |
 | joy | `joy_a1` | joy | 128 | 8.6% [4.9%, 14.7%] | 3.05 |
 | joy | `joy_a1_optimism` | joy, optimism | 128 | 25.0% [18.3%, 33.2%] | 3.24 |
 | joy | `joy_a2` | joy | 128 | 16.4% [11.0%, 23.8%] | 3.16 |
