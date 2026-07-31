@@ -1,0 +1,130 @@
+{
+  "source": "outputs/meeting-dashboard/dashboard.html and reports/four-axis-night-analysis.md",
+  "metric": "strict two-order A/B signed effect",
+  "n_prompts": 128,
+  "comparisons_per_feature": 1024,
+  "main_effects": [
+    {
+      "feature": "principled_candor",
+      "label": "Principled candor",
+      "effect": 0.366,
+      "ci_low": 0.317,
+      "ci_high": 0.417,
+      "verdict": "устойчиво положительный сдвиг"
+    },
+    {
+      "feature": "calm_composure",
+      "label": "Calm composure",
+      "effect": -0.061,
+      "ci_low": -0.085,
+      "ci_high": -0.036,
+      "verdict": "выбранное направление не сработало"
+    },
+    {
+      "feature": "concrete_language",
+      "label": "Concrete language",
+      "effect": 0.157,
+      "ci_low": 0.111,
+      "ci_high": 0.202,
+      "verdict": "положительный, но слабее candor"
+    },
+    {
+      "feature": "casualness",
+      "label": "Casualness",
+      "effect": 0.296,
+      "ci_low": 0.258,
+      "ci_high": 0.334,
+      "verdict": "устойчиво положительный сдвиг"
+    }
+  ],
+  "full_context_effects": [
+    {
+      "feature": "principled_candor",
+      "effect": 0.336,
+      "ci_low": 0.234,
+      "ci_high": 0.438
+    },
+    {
+      "feature": "calm_composure",
+      "effect": -0.031,
+      "ci_low": -0.086,
+      "ci_high": 0.023
+    },
+    {
+      "feature": "concrete_language",
+      "effect": 0.117,
+      "ci_low": 0.008,
+      "ci_high": 0.227
+    },
+    {
+      "feature": "casualness",
+      "effect": 0.266,
+      "ci_low": 0.172,
+      "ci_high": 0.359
+    }
+  ],
+  "interactions": [
+    {
+      "target": "principled_candor",
+      "context": "calm_composure",
+      "effect": 0.096,
+      "ci_low": 0.039,
+      "ci_high": 0.150,
+      "verdict": "положительная зависимость"
+    },
+    {
+      "target": "principled_candor",
+      "context": "concrete_language",
+      "effect": -0.100,
+      "ci_low": -0.164,
+      "ci_high": -0.037,
+      "verdict": "candor немного ослабляется"
+    },
+    {
+      "target": "casualness",
+      "context": "principled_candor",
+      "effect": -0.104,
+      "ci_low": -0.180,
+      "ci_high": -0.025,
+      "verdict": "исследовательский сигнал"
+    },
+    {
+      "target": "concrete_language",
+      "context": "casualness",
+      "effect": -0.084,
+      "ci_low": -0.162,
+      "ci_high": -0.006,
+      "verdict": "исследовательский сигнал"
+    }
+  ],
+  "pair_tests": [
+    {
+      "name": "Calm composure + French",
+      "rows": [
+        {"feature": "calm_composure", "standalone": -0.16, "combined": -0.06, "ci_low": -0.19, "ci_high": 0.06},
+        {"feature": "french_language", "standalone": 0.84, "combined": 0.80, "ci_low": 0.70, "ci_high": 0.89}
+      ],
+      "note": "Французский сохраняется, calm не появляется."
+    },
+    {
+      "name": "Principled candor + French",
+      "rows": [
+        {"feature": "principled_candor", "standalone": 0.34, "combined": 0.42, "ci_low": 0.28, "ci_high": 0.56},
+        {"feature": "french_language", "standalone": 0.84, "combined": 0.69, "ci_low": 0.58, "ci_high": 0.80}
+      ],
+      "note": "Оба направления сохраняются, но французский становится слабее."
+    },
+    {
+      "name": "Optimism + French",
+      "rows": [
+        {"feature": "optimism", "standalone": 0.11, "combined": 0.14, "ci_low": 0.03, "ci_high": 0.25},
+        {"feature": "french_language", "standalone": 0.84, "combined": 0.78, "ci_low": 0.67, "ci_high": 0.88}
+      ],
+      "note": "Наиболее чистая языковая комбинация из старого теста."
+    }
+  ],
+  "notes": [
+    "Dashboard 1 использует строгий consensus двух порядков ответов; это не тот же endpoint, что scalar 1–5 в Exp3.",
+    "После Holm-коррекции только первые две interaction-проверки оставались убедительными; остальные помечены как exploratory."
+  ]
+}
