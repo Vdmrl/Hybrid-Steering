@@ -140,7 +140,7 @@ def interference_tables(exp4: dict) -> str:
     tables = []
     for method in ("gdn_raw_r1", "gdn_raw_r4"):
         rows = []
-        for added in FEATURES:
+        for added, added_label in FEATURES.items():
             cells = []
             for target in FEATURES:
                 if added == target:
@@ -156,7 +156,7 @@ def interference_tables(exp4: dict) -> str:
                 )
                 css_class = "good" if delta > 0 else "bad"
                 cells.append(f'<td class="{css_class}"><b>{signed(delta)}</b></td>')
-            rows.append(f"<tr><th>{FEATURES[added]}</th>{''.join(cells)}</tr>")
+            rows.append(f"<tr><th>{added_label}</th>{''.join(cells)}</tr>")
         tables.append(
             f"<article><h3>{METHODS[method]}</h3><table><tr><th>Добавили ↓ / измеряем →</th>"
             + "".join(f"<th>{label}</th>" for label in FEATURES.values())
