@@ -3,24 +3,33 @@
 from __future__ import annotations
 
 import argparse
+import json
 from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 OUTPUT = ROOT / "outputs/meeting-dashboard-4/index.html"
+SUMMARY = ROOT / "outputs/strong-composition-exp4/summary.json"
 
 
-def build() -> str:
+def build(summary: dict | None = None) -> str:
     generated = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    return HTML.replace("__GENERATED__", generated)
+    data = json.dumps(
+        {"summary": summary}, ensure_ascii=False, separators=(",", ":")
+    ).replace("</", "<\\/")
+    return HTML.replace("__GENERATED__", generated).replace("__DATA__", data)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, default=OUTPUT)
+    parser.add_argument("--summary", type=Path, default=SUMMARY)
     args = parser.parse_args()
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(build(), encoding="utf-8")
+    summary = None
+    if args.summary.exists():
+        summary = json.loads(args.summary.read_text(encoding="utf-8"))
+    args.output.write_text(build(summary), encoding="utf-8")
     print(args.output)
 
 
@@ -46,11 +55,19 @@ HTML = r"""<!doctype html>
 <section class="panel" id="matrix"></section>
 <section class="panel" id="metrics"></section>
 <section class="panel" id="queue"></section>
+<section class="panel" id="results"></section>
 <section class="panel" id="interpret"></section>
 <section class="panel" id="limits"></section>
 </main>
 <script>
 const featureNames={joy:'Joy — радость',concrete:'Concrete language — конкретный язык',optimism:'Optimism — оптимизм',candor:'Principled candor — принципиальная прямота'};
+const DATA=__DATA__, RESULT=DATA.summary;
+const condition=id=>RESULT?.conditions?.find(item=>item.condition===id);
+const num=value=>Number.isFinite(value)?value:null;
+const pct=value=>num(value)===null?'—':`${(value*100).toFixed(1)}%`;
+const score=value=>num(value)===null?'—':value.toFixed(3);
+const ci=value=>value?`[${value.ci95_low.toFixed(3)}, ${value.ci95_high.toFixed(3)}]`:'—';
+const contrastLabel={rss_minus_raw_rank1:'RSS − raw, rank 1',rss_minus_raw_rank4:'RSS − raw, rank 4',rank4_minus_rank1_raw:'raw rank 4 − raw rank 1',rank4_minus_rank1_rss:'RSS rank 4 − RSS rank 1'};
 document.querySelector('#why').innerHTML=`<h2>Зачем нужен Exp4 после Exp3</h2>
 <p>В реальном Exp3 мы уже увидели несколько сигналов, но не закрыли всю матрицу:</p>
 <table><tr><th>Что известно из Exp3</th><th>Чего не хватало</th><th>Что делает Exp4</th></tr>
@@ -93,7 +110,12 @@ document.querySelector('#metrics').innerHTML=`<h2>Какие числа буду
 
 document.querySelector('#queue').innerHTML=`<h2>Порядок автономной очереди</h2><p class="note">Очередь сначала считает короткие проверки, затем наиболее важные блоки. Если процесс остановится, уже готовые блоки не теряются.</p><div class="timeline">
 <div class="step"><b>1. Self-test</b><small>Проверка условий и формул.</small></div><div class="step"><b>2. GPU smoke</b><small>Один prompt, два режима.</small></div><div class="step"><b>3. Dev</b><small>3 λ × all-four на 32 prompts.</small></div><div class="step"><b>4. All-four</b><small>4 метода × 128.</small></div><div class="step"><b>5. Singletons</b><small>rank1/rank4 × 4 признака.</small></div><div class="step"><b>6. Pairs</b><small>6 пар × 4 метода.</small></div><div class="step"><b>7. Judge + summary</b><small>CI, contrasts, report.</small></div></div>
-<p class="callout"><b>Сейчас:</b> очередь Exp4 уже запущена на GPU 3. Dashboard — статический дизайн, он не делает новых вызовов и не заменяет серверный queue.log.</p>`;
+<p class="callout"><b>Сейчас:</b> очередь Exp4 уже запущена на GPU 3. Dashboard сам не делает новых вызовов; он показывает план, а после появления summary — результаты. Он не заменяет серверный queue.log.</p>`;
+
+const resultIds=['baseline','gdn_raw_r1_1111','gdn_rss_r1_1111','gdn_raw_r4_1111','gdn_rss_r4_1111'];
+const resultLabels={baseline:'Baseline (без вмешательства)',gdn_raw_r1_1111:'GDN raw, rank 1',gdn_rss_r1_1111:'GDN RSS, rank 1',gdn_raw_r4_1111:'GDN raw, rank 4',gdn_rss_r4_1111:'GDN RSS, rank 4'};
+const resultRow=id=>{const item=condition(id); if(!item)return `<tr><th>${resultLabels[id]||id}</th><td colspan="4" class="muted">ещё нет в summary</td></tr>`; return `<tr><th>${resultLabels[id]||id}</th><td>${score(item.mean_minimum_expected.mean)}<br><span class="muted">${ci(item.mean_minimum_expected)}</span></td><td>${pct(item.all_active_ge4.mean)}<br><span class="muted">${ci(item.all_active_ge4)}</span></td><td>${score(item.quality?.mean)}<br><span class="muted">${ci(item.quality)}</span></td><td>${item.n??'—'}</td></tr>`};
+document.querySelector('#results').innerHTML=RESULT?`<h2>Вставленные результаты Exp4</h2><p class="note">Эта секция заполняется из <span class="mono">summary.json</span>. Здесь сравниваются одинаковые prompt_id; числа — средние, рядом bootstrap 95% CI.</p><table><tr><th>Условие</th><th>Mean minimum<br><span class="muted">1–5</span></th><th>Все активные ≥4</th><th>Качество ответа<br><span class="muted">1–5</span></th><th>n</th></tr>${resultIds.map(resultRow).join('')}</table><h3 style="margin-top:20px">Контрасты по all-four</h3><table><tr><th>Сравнение</th><th>Δ mean minimum</th><th>Δ joint ≥4</th><th>n</th></tr>${(RESULT.contrasts||[]).filter(item=>item.mask==='1111').map(item=>`<tr><th>${contrastLabel[item.contrast]||item.contrast}</th><td>${score(item.delta_mean_minimum_expected?.mean)}<br><span class="muted">${ci(item.delta_mean_minimum_expected)}</span></td><td>${pct(item.delta_all_active_ge4?.mean)}<br><span class="muted">${ci(item.delta_all_active_ge4)}</span></td><td>${item.n??'—'}</td></tr>`).join('')||'<tr><td colspan="4" class="muted">Контрасты появятся после Judge.</td></tr>'}</table><p class="note">Стоимость Judge: ${RESULT.judge_usage?.estimated_usd===undefined?'—':`$${RESULT.judge_usage.estimated_usd.toFixed(2)}`} · input ${RESULT.judge_usage?.input_tokens??'—'} · output ${RESULT.judge_usage?.output_tokens??'—'}.</p>`:`<h2>Результаты Exp4 ещё не подключены</h2><p>Сейчас здесь отображается план. Когда серверная очередь создаст <span class="mono">summary.json</span>, пересобери страницу:</p><div class="formula">python experiments/meeting-dashboard-4/build.py --summary outputs/strong-composition-exp4/summary.json</div><p class="callout warn">Без этого файла мы ничего не придумываем: пустая секция не означает нулевой эффект, только отсутствие завершённого Judge.</p>`;
 
 document.querySelector('#interpret').innerHTML=`<h2>Как поймём результат</h2><div class="insights">
 <article class="insight"><h3>Если rank4 лучше rank1</h3><p>У rank1 не хватало ёмкости для совместной композиции. Это поддерживает гипотезу «каждый признак требует нескольких компонент».</p></article>

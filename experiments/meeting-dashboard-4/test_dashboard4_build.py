@@ -16,3 +16,6 @@ def test_build_describes_exp4() -> None:
     assert "RSS" in html
     assert "Тройки признаков" in html
     assert "__GENERATED__" not in html
+    assert "__DATA__" not in html
+    rendered = MODULE.build({"conditions": [], "contrasts": [], "judge_usage": {}})
+    assert "Вставленные результаты Exp4" in rendered

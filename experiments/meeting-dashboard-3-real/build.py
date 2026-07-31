@@ -56,6 +56,7 @@ HTML = r"""<!doctype html>
 <p class="muted">Это исправленная версия Dashboard 3: она читает именно завершённый summary эксперимента 3, а не старый factorial-run. Здесь 64 условия, 128 тестовых промптов и Judge с вероятностным expected score. Построено __GENERATED__.</p>
 <p class="callout warn"><b>Важно:</b> это matched-strength эксперимент. Для каждого признака alpha подбиралась на dev, поэтому результат отвечает на вопрос «как ведут себя методы при сопоставимой силе», а не «какой метод можно раскрутить сильнее всего».</p>
 </header><main class="grid">
+<section class="panel" id="presentation"></section>
 <section class="panel" id="overview"></section>
 <section class="panel" id="features"></section>
 <section class="panel" id="allfour"></section>
@@ -88,6 +89,11 @@ function rowName(id){return M[id]||id.replaceAll('_',' ')}
 function scoreCells(x, only=FEATURES){return only.map(f=>`<td>${fmt(x.feature_expected_means[f])}</td>`).join('')}
 
 const base=byId.baseline, full=byId.gdn_rss_r4_1111;
+document.querySelector('#presentation').innerHTML=`<h2>Тезисы для показа</h2><div class="insights">
+<article class="insight"><h3>1. GDN-композиция возможна</h3><p>Для четырёх признаков joint endpoint вырос с ${pct(base.all_active_ge4)} у baseline до ${pct(full.all_active_ge4)} у RSS rank 4. Это частичное, но наблюдаемое совместное сохранение режимов.</p></article>
+<article class="insight"><h3>2. Самый чистый методический сигнал</h3><p>GDN raw rank 1 − activation raw = +0.092 по mean minimum; 95% CI [+0.016, +0.172]. Rank 4 RSS выше rank 1 RSS на +0.106.</p></article>
+<article class="insight warn"><h3>3. Что ещё нельзя утверждать</h3><p>RSS rank 4 — лучший абсолютный результат, но Exp3 не содержал raw rank 4 и не закрывал full-rank control. Это проверяет текущий Exp4.</p></article>
+</div><p class="source">Если Exp4 не завершится к показу, этот Dashboard 3 уже содержит самостоятельный завершённый результат: baseline, GDN/activation, rank, RSS, пары, тройки, all-four и quality.</p>`;
 document.querySelector('#overview').innerHTML=`<h2>Короткий ответ</h2><div class="cards">
 <div class="card"><span>Baseline: все 4 ≥4</span><strong>${pct(base.all_active_ge4)}</strong><small>N=${base.n}; качество ${fmt(base.quality_mean)}/5</small></div>
 <div class="card"><span>GDN raw rank 1</span><strong>${pct(byId.gdn_raw_r1_1111.all_active_ge4)}</strong><small>mean minimum ${fmt(byId.gdn_raw_r1_1111.mean_minimum_expected)}/5</small></div>

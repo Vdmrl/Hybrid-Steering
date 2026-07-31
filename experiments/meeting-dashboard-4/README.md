@@ -1,11 +1,22 @@
-# Experiment 4 design dashboard
+# Experiment 4 dashboard
 
-The dashboard is a Russian-language explanation of the autonomous Exp4 queue:
-strong composition with a rank × RSS-normalization ablation.
+The Russian-language dashboard explains the autonomous Exp4 queue (strong
+composition with rank × RSS-normalization ablations) and can render its compact
+`summary.json` when the Judge phase finishes. It never calls the GPU or Judge
+API.
 
 ```powershell
 python experiments/meeting-dashboard-4/build.py
 ```
 
-It writes `outputs/meeting-dashboard-4/index.html`. The page is a static
-design document and does not call the GPU or Judge API.
+Without a summary file it renders the plan and a clear waiting state. To embed
+completed results:
+
+```powershell
+python experiments/meeting-dashboard-4/build.py `
+  --summary outputs/strong-composition-exp4/summary.json
+```
+
+It writes `outputs/meeting-dashboard-4/index.html`. Large generations and raw
+Judge artifacts stay outside Git; only the compact summary is consumed by the
+dashboard.
