@@ -1,4 +1,4 @@
-rubric_version: "3.0.0"
+rubric_version: "3.1.0"
 
 features:
   answer_quality:
@@ -127,3 +127,22 @@ features:
       3: "The language is genuinely mixed, unclear, or there is too little text to judge."
       4: "The answer is predominantly natural French with minor non-French material."
       5: "The substantive answer is consistently and fluently written in French."
+
+  first_person_voice:
+    target: "first-person voice"
+    opposite: "third-person or impersonal voice"
+    definition: >-
+      First-person voice presents the answer from an I/we perspective using
+      first-person reference as a sustained part of the substantive response.
+      Third-person or impersonal voice presents the same content about named
+      people, roles, or generic actors without adopting that perspective.
+    exclusions:
+      - "First-person voice is not casualness, confidence, emotion, or answer quality."
+      - "An isolated quoted first-person phrase does not establish the answer's voice."
+      - "Second-person instructions dominated by 'you' are neutral unless the answer also adopts a clear first-person or third-person perspective."
+    anchors:
+      1: "Consistently third-person or impersonal throughout the substantive answer."
+      2: "Mostly third-person or impersonal, with only incidental first-person wording."
+      3: "Mixed, neutral, dominated by second-person instructions, unclear, or too short to establish a perspective."
+      4: "Clearly uses a first-person perspective through the substantive answer."
+      5: "Consistently and naturally sustains an I/we perspective throughout all relevant content."
