@@ -136,14 +136,20 @@ def method_rows(exp4: dict) -> str:
 
 
 def retention_rows(exp4: dict) -> str:
+    retention = {
+        (item["method"], item["feature"]): item["full_minus_singleton"]
+        for item in exp4["retention"]
+    }
     rows = []
-    for item in exp4["retention"]:
-        if item["feature"] != "candor":
-            continue
-        metric = item["full_minus_singleton"]
-        rows.append(
-            f"<tr><th>{METHODS[item['method']]}</th><td>{signed(metric['mean'])}</td><td>{ci(metric)}</td></tr>"
-        )
+    for method, method_label in METHODS.items():
+        cells = []
+        for feature in FEATURES:
+            metric = retention[(method, feature)]
+            _, css_class = status(metric)
+            cells.append(
+                f'<td class="{css_class}"><b>{signed(metric["mean"])}</b><small>{ci(metric)}</small></td>'
+            )
+        rows.append(f"<tr><th>{method_label}</th>{''.join(cells)}</tr>")
     return "".join(rows)
 
 
@@ -241,7 +247,7 @@ TEMPLATE = """<!doctype html>
 <tr><th>Rank 4 − rank 1, RSS</th><td>{rss_rank}</td><td>{rss_rank_ci}</td></tr></table>
 <p class="callout"><b>Вывод:</b> RSS полезен как стабилизатор перегруженного rank 4, но не даёт подтверждённого выигрыша при rank 1. Сам rank 4 без RSS заметно хуже rank 1.</p></section>
 
-<section class="panel half"><h2>Сохранение принципиальной прямоты</h2><table><tr><th>Метод</th><th>Full composition − singleton</th><th>95% CI</th></tr>{retention_rows}</table><p class="callout"><b>Вывод:</b> добавление соседних направлений ослабляет candor. Это главный наблюдаемый предел текущей композиции, а не просто шум общей метрики.</p></section>
+<section class="panel half"><h2>Как остальные векторы влияют на каждый признак</h2><table><tr><th>Метод</th><th>Радость</th><th>Конкретность</th><th>Оптимизм</th><th>Прямота</th></tr>{retention_rows}</table><p class="muted">В каждой ячейке: score признака в композиции четырёх минус score того же признака при steering только им одним; ниже — 95% CI. Отрицательное значение означает взаимное ослабление.</p><p class="callout"><b>Вывод:</b> соседние векторы не ухудшают радость, конкретность и оптимизм подтверждённо; систематически страдает только candor: от −0.208 балла для raw rank 1 до −0.924 для raw rank 4. RSS сокращает потерю candor у rank 4 до −0.631.</p></section>
 
 <section class="panel"><h2>Короткие выводы</h2><div class="conclusions">
 <article><h3>GDN работает</h3><p>На matched сравнении GDN raw rank 1 превосходит обычный activation steering на <b>{gdn_activation} балла</b>; 95% CI полностью выше нуля.</p></article>
