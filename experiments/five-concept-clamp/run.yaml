@@ -1,0 +1,26 @@
+experiment: five-concept-clamp
+model: Qwen/Qwen3.5-9B
+features:
+  - french_language
+  - concrete_language
+  - principled_candor
+  - optimism
+  - first_person_voice
+donor_pairs: 64
+dev_prompts: 32
+test_prompts: 128
+max_new_tokens: 256
+rank: 1
+bridge_rank: 4
+ridge: 1.0e-6
+beta_grid: [0.2, 0.5, 1.0]
+quality_floor_delta: -0.25
+primary_blocks:
+  - singleton_sanity
+  - full_five
+  - leave_one_out
+  - flip_one
+extension_blocks:
+  - all_pairs
+  - activation_full_five
+
