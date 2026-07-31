@@ -1,0 +1,27 @@
+experiment: strong-composition-exp4
+model: Qwen/Qwen3.5-9B
+features: [joy, concrete, optimism, candor]
+strong_alphas:
+  joy: 4
+  concrete: 4
+  optimism: 8
+  candor: 8
+global_scale_grid: [0.5, 0.75, 1.0]
+dev_prompts: 32
+test_prompts: 128
+max_new_tokens: 256
+methods:
+  - gdn_rank1_raw
+  - gdn_rank1_rss
+  - gdn_rank4_raw
+  - gdn_rank4_rss
+test_masks:
+  - singletons
+  - all_pairs
+  - all_four
+judge:
+  model: openai/gpt-4o-mini
+  probability_weighted: true
+  quality_sample: 32
+statistics:
+  paired_prompt_bootstrap_samples: 10000
