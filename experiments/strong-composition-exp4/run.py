@@ -48,6 +48,7 @@ def arguments() -> argparse.Namespace:
         "phase",
         choices=(
             "self-test",
+            "smoke",
             "dev",
             "prepare-dev-judge",
             "select",
@@ -148,6 +149,28 @@ def dev_phase(args: argparse.Namespace) -> None:
         conditions,
         "exp4:dev",
     )
+
+
+def smoke_phase(args: argparse.Namespace) -> None:
+    rank1, rank4 = directions(args)
+    strengths = scaled_alphas(0.5)
+    conditions = {}
+    for name, value in compose_conditions(rank1, rank4, strengths, 15).items():
+        if name in {"gdn_raw_r1_1111", "gdn_rss_r4_1111"}:
+            conditions[name] = value
+    tokenizer, model = BASE.load_model(args.model)
+    row = EXP3.prompt_rows(args.dev_prompts)[0]
+    texts, _ = BASE.generate(
+        model,
+        tokenizer,
+        BASE.row_prompt(row),
+        conditions,
+        24,
+    )
+    if set(texts) != set(conditions) or any(not text for text in texts.values()):
+        raise RuntimeError("smoke generation returned incomplete answers")
+    BASE.atomic_json(args.output_dir / "smoke.json", texts)
+    print("Experiment #4 GPU smoke passed")
 
 
 def selected_lambda(args: argparse.Namespace) -> float:
@@ -498,6 +521,7 @@ def main() -> None:
     args.output_dir.mkdir(parents=True, exist_ok=True)
     {
         "self-test": lambda _args: self_test(),
+        "smoke": smoke_phase,
         "dev": dev_phase,
         "prepare-dev-judge": lambda value: prepare_judge(value, "dev"),
         "select": select_phase,

@@ -71,6 +71,7 @@ judge_split() {
 }
 
 retry self-test "$PYTHON" "$RUNNER" self-test --output-dir "$OUTPUT"
+retry smoke direct "$PYTHON" "$RUNNER" smoke "${common[@]}"
 retry dev direct "$PYTHON" "$RUNNER" dev "${common[@]}"
 "$PYTHON" "$RUNNER" prepare-dev-judge "${common[@]}"
 judge_split dev scale
