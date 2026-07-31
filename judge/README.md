@@ -22,6 +22,8 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -e "judge[dev]"
 export OPENROUTER_API_KEY="..."
+# Optional fallback used only after a 402/429 response from the primary key:
+# export OPENROUTER_FALLBACK_API_KEY="..."
 # Optional:
 # export OPENROUTER_PROXY="http://user:password@host:port"
 ```
@@ -30,6 +32,7 @@ PowerShell:
 
 ```powershell
 $env:OPENROUTER_API_KEY="..."
+$env:OPENROUTER_FALLBACK_API_KEY="..." # optional quota fallback
 $env:OPENROUTER_PROXY="http://user:password@host:port" # optional
 ```
 
