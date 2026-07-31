@@ -48,3 +48,6 @@ def test_dashboard3_uses_data_driven_labels_and_visuals() -> None:
     assert "__CONDITION_COUNT__" not in html
     assert "__TEST_N__" not in html
     assert "балла" in html
+    assert "исправленная версия" not in html
+    assert "старый factorial-run" not in html
+    assert "Если Exp4 не завершится" not in html
