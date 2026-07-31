@@ -1,4 +1,4 @@
-config_version: "4.0.0"
+config_version: "4.1.0"
 
 provider: "openrouter"
 model: "openai/gpt-4o-mini"
@@ -15,7 +15,7 @@ generation:
 
 evaluation:
   default_feature: "optimism"
-  prompt: "judge_v3.txt"
+  prompt: "judge_v3_attainable5.txt"
 
 scale:
   minimum: 1

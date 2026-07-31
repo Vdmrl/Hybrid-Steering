@@ -48,7 +48,7 @@ def test_contracts_and_tasks() -> None:
 
     assert "1:" in prompt and "5:" in prompt
     assert len(trait_tasks(rows)) == 2
-    assert config.evaluation.prompt == "judge_v3.txt"
+    assert config.evaluation.prompt == "judge_v3_attainable5.txt"
 
 
 def test_v3_accepts_one_digit_and_records_probabilities() -> None:
