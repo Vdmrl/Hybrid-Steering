@@ -63,6 +63,7 @@ HTML = r"""<!doctype html>
 <section class="panel" id="profiles"></section>
 <section class="panel" id="combinations"></section>
 <section class="panel" id="contrasts"></section>
+<section class="panel" id="triples"></section>
 <section class="panel" id="conclusions"></section>
 </main>
 <script>
@@ -130,6 +131,12 @@ let ct=`<h2>Парные контрасты и доверительные инт
 contrastIds.forEach(key=>{const [n,mask]=key.split('|'),x=contrast(n,mask);if(!x)return;const d=x.paired_difference;const verdict=d.ci95_low>0?'CI выше нуля':d.ci95_high<0?'CI ниже нуля':'CI пересекает ноль';ct+=`<tr><th>${n.replaceAll('_',' ')}</th><td>${labels(maskFeatures(mask))}</td><td class="${cls(d.mean)}">${signed(d.mean)}</td><td>[${signed(d.ci95_low)}, ${signed(d.ci95_high)}]</td><td>${verdict}</td></tr>`});
 ct+=`</table><p class="callout"><b>Что здесь лучше всего видно:</b> GDN raw rank 1 выше activation raw на all-four на ${signed(0.0918334765625)} (CI полностью выше нуля). Для RSS rank 1 преимущество над raw не доказано. Rank 4 RSS выше rank 1 RSS на ${signed(0.10628953125)}.</p>`;
 document.querySelector('#contrasts').innerHTML=ct;
+
+const tripleMasks=['0111','1011','1101','1110'];
+let triples=`<h2>Тройки: сила и сохранение качества</h2><p class="note">Эта таблица добавляет то, чего не хватало в старой сводке: для каждой тройки рядом видны joint endpoint и отдельное качество ответа. Поэтому слабый joy можно отличить от общего падения качества.</p><table><tr><th>Состав</th><th>Raw rank1<br>mean min</th><th>Raw rank1<br>все ≥4</th><th>Raw rank1<br>quality</th><th>RSS rank4<br>mean min</th><th>RSS rank4<br>все ≥4</th><th>RSS rank4<br>quality</th><th>Δ quality</th></tr>`;
+tripleMasks.forEach(mask=>{const raw=byId['gdn_raw_r1_'+mask],rss=byId['gdn_rss_r4_'+mask],dq=rss.quality_mean-raw.quality_mean;triples+=`<tr><th>${labels(maskFeatures(mask))}</th><td>${fmt(raw.mean_minimum_expected)}</td><td><b>${pct(raw.all_active_ge4)}</b></td><td>${fmt(raw.quality_mean)}</td><td>${fmt(rss.mean_minimum_expected)}</td><td><b>${pct(rss.all_active_ge4)}</b></td><td>${fmt(rss.quality_mean)}</td><td class="${cls(dq)}">${signed(dq)}</td></tr>`});
+triples+=`</table><p class="callout"><b>Что видно:</b> тройка concrete + optimism + candor — сильный рабочий случай: raw rank1 даёт ${pct(byId.gdn_raw_r1_1110.all_active_ge4)}, RSS rank4 — ${pct(byId.gdn_rss_r4_1110.all_active_ge4)}, при quality ${fmt(byId.gdn_rss_r4_1110.quality_mean)}/5. Тройки с joy заметно слабее (пример RSS rank4: ${pct(byId.gdn_rss_r4_0111.all_active_ge4)}, ${pct(byId.gdn_rss_r4_1011.all_active_ge4)}, ${pct(byId.gdn_rss_r4_1101.all_active_ge4)}), но их quality остаётся около ${fmt(byId.gdn_rss_r4_0111.quality_mean)}–${fmt(byId.gdn_rss_r4_1101.quality_mean)}. Это похоже на слабую выраженность joy, а не на разрушение ответа.</p>`;
+document.querySelector('#triples').innerHTML=triples;
 
 document.querySelector('#conclusions').innerHTML=`<h2>Выводы и границы вывода</h2><div class="insights">
 <article class="insight"><h3>1. GDN умеет складывать признаки, но не идеально</h3><p>У full-four GDN raw rank1 joint rate ${pct(byId.gdn_raw_r1_1111.all_active_ge4)}, RSS rank4 — ${pct(full.all_active_ge4)}. Это значит, что часть ответов одновременно сохраняет четыре режима, но не все.</p></article>

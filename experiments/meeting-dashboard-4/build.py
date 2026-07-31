@@ -109,6 +109,9 @@ document.querySelector('#limits').innerHTML=`<h2>Что Exp4 пока не пр�
 <tr><th>Заморозка или clamp отдельных компонент</th><td class="warn">Не входит</td><td>Сначала измеряем базовую композицию; иначе не отделим эффект clamp от эффекта rank/normalization.</td></tr>
 <tr><th>Классический activation steering</th><td class="warn">Не входит</td><td>Его лучше сравнить после полной GDN матрицы на тех же парах и с тем же Judge.</td></tr>
 <tr><th>French и новые признаки</th><td class="warn">Не входит</td><td>Exp4 сосредоточен на четырёх уже подготовленных направлениях и качестве композиционного абляционного теста.</td></tr>
+<tr><th>Тройки признаков</th><td class="warn">Не входит</td><td>В Exp4 приоритет — все 6 пар и all-four. Тройки уже были в Exp3; следующий расширенный run может повторить их на выбранных методах.</td></tr>
+<tr><th>256 prompts вместо 128</th><td class="warn">Не входит</td><td>Текущая очередь фиксирована на 128 для сопоставимости с Exp3. Увеличение до 256 разумно после закрытия raw-rank4/RSS и выбора компактного набора условий.</td></tr>
+<tr><th>Full-rank direction без SVD-обрезки</th><td class="warn">Не входит</td><td>RSS можно применять и к full-rank сумме; это отдельная контрольная клетка, которую стоит добавить после текущей rank-абляции.</td></tr>
 </table><p class="callout">Поэтому Exp4 — не финальное доказательство «GDN лучше activation steering». Это аккуратный следующий блок: он сначала закрывает пропущенную rank×normalization матрицу и показывает, где именно ломается композиция.</p><p class="source">Источник дизайна: <span class="mono">experiments/strong-composition-exp4/run.yaml</span> и <span class="mono">run.py</span>. Большие генерации и Judge artifacts остаются на сервере, в Git попадает только код, manifest и этот объясняющий dashboard.</p>`;
 </script></body></html>"""
 
