@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import gc
+import itertools
 import json
 import math
 from pathlib import Path
@@ -45,7 +46,7 @@ def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "phase",
-        choices=("self-test", "direction", "smoke", "dev", "main"),
+        choices=("self-test", "direction", "smoke", "dev", "main", "extension"),
     )
     parser.add_argument("--directions-dir", type=Path)
     parser.add_argument("--first-person-pairs", type=Path)
@@ -518,6 +519,36 @@ def main_phase(args: argparse.Namespace) -> None:
     )
 
 
+def extension_phase(args: argparse.Namespace) -> None:
+    rank1 = load_directions(args, 1)
+    scale, beta = selected(args)
+    strengths = {name: DEFAULT_STRENGTHS[name] * scale for name in FEATURES}
+    plans = {}
+    for size in (2, 3):
+        for names in itertools.combinations(FEATURES, size):
+            coefficients = {name: strengths[name] for name in names}
+            deltas = rss_coefficients(rank1, coefficients)
+            tag = "+".join(names)
+            plans[f"add_{tag}"] = {
+                "kind": "add_coefficients",
+                "directions": rank1,
+                "coefficients": deltas,
+            }
+            plans[f"clamp_{tag}"] = {
+                "kind": "clamp",
+                "directions": rank1,
+                "deltas": deltas,
+                "beta": beta,
+            }
+    run_rows(
+        args,
+        jsonl(args.test_prompts)[: args.test],
+        plans,
+        args.output_dir / "extension-generations.jsonl",
+        "exp5:extension",
+    )
+
+
 def self_test() -> None:
     eye = torch.eye(3)
     state = 2 * eye[0] + 3 * eye[1]
@@ -540,6 +571,7 @@ def main() -> None:
         "smoke": smoke_phase,
         "dev": dev_phase,
         "main": main_phase,
+        "extension": extension_phase,
     }[args.phase](args)
 
 

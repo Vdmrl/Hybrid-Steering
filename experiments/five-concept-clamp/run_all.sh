@@ -40,5 +40,6 @@ if [[ ! -f "$OUTPUT/selection.json" ]]; then
 fi
 
 retry main env CUDA_VISIBLE_DEVICES=3 "$PYTHON" "$RUNNER" main "${COMMON[@]}"
+retry extension env CUDA_VISIBLE_DEVICES=3 "$PYTHON" "$RUNNER" extension "${COMMON[@]}"
 touch "$OUTPUT/ALL.DONE"
 echo "[$(date -Is)] Experiment #5 generation complete"

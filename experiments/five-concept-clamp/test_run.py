@@ -30,3 +30,14 @@ def test_primary_plan_has_expected_conditions() -> None:
     assert sum(name.startswith("singleton_") for name in plans) == 5
     assert sum(name.startswith("loo_clamp_") for name in plans) == 5
     assert sum(name.startswith("flip_") for name in plans) == 5
+
+
+def test_pair_and_triple_count() -> None:
+    assert (
+        sum(
+            1
+            for size in (2, 3)
+            for _ in __import__("itertools").combinations(RUN.FEATURES, size)
+        )
+        == 20
+    )
