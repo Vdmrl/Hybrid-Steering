@@ -5,6 +5,7 @@ ROOT="${ROOT:-/home/student4/Hybrid-Steering-exp5}"
 OUTPUT="${OUTPUT:-/home/student4/Hybrid-Steering-exp5-output}"
 PYTHON="${PYTHON:-/home/student4/hybrid-steering/.venv/bin/python}"
 RUNNER="$ROOT/experiments/five-concept-clamp/run.py"
+export PYTHONPATH="$ROOT/steering/src:$ROOT/judge/src${PYTHONPATH:+:$PYTHONPATH}"
 
 COMMON=(
   --directions-dir "$OUTPUT/source-directions"
