@@ -1,0 +1,239 @@
+{
+  "joy": {
+    "matched_target": 3.15782621875,
+    "gdn": {
+      "selected_alpha": 0.5,
+      "candidates": [
+        {
+          "alpha": 0.5,
+          "trait": 3.13021684375,
+          "quality": 4.77994484375
+        },
+        {
+          "alpha": 1.0,
+          "trait": 3.15852428125,
+          "quality": 4.6808415625
+        },
+        {
+          "alpha": 2.0,
+          "trait": 3.27689890625,
+          "quality": 4.7520095937499995
+        },
+        {
+          "alpha": 4.0,
+          "trait": 3.31121003125,
+          "quality": 4.595462625
+        }
+      ]
+    },
+    "act": {
+      "selected_alpha": 2.0,
+      "candidates": [
+        {
+          "alpha": 0.5,
+          "trait": 3.1033548125,
+          "quality": 4.779649375
+        },
+        {
+          "alpha": 1.0,
+          "trait": 3.07142121875,
+          "quality": 4.79053409375
+        },
+        {
+          "alpha": 2.0,
+          "trait": 3.14217146875,
+          "quality": 4.76418021875
+        },
+        {
+          "alpha": 4.0,
+          "trait": 3.11595975,
+          "quality": 4.7159428125
+        },
+        {
+          "alpha": 8.0,
+          "trait": 3.15782621875,
+          "quality": 4.7034449375
+        }
+      ]
+    }
+  },
+  "concrete": {
+    "matched_target": 3.9872193125,
+    "gdn": {
+      "selected_alpha": 0.5,
+      "candidates": [
+        {
+          "alpha": 0.5,
+          "trait": 3.969673125,
+          "quality": 4.78315059375
+        },
+        {
+          "alpha": 1.0,
+          "trait": 3.9466449375,
+          "quality": 4.7996229687500005
+        },
+        {
+          "alpha": 2.0,
+          "trait": 3.93056803125,
+          "quality": 4.76499475
+        },
+        {
+          "alpha": 4.0,
+          "trait": 3.9872193125,
+          "quality": 4.8195458125
+        }
+      ]
+    },
+    "act": {
+      "selected_alpha": 2.0,
+      "candidates": [
+        {
+          "alpha": 0.5,
+          "trait": 3.89392021875,
+          "quality": 4.7673803125
+        },
+        {
+          "alpha": 1.0,
+          "trait": 3.8871474999999998,
+          "quality": 4.78717353125
+        },
+        {
+          "alpha": 2.0,
+          "trait": 3.9421745,
+          "quality": 4.7879389375
+        },
+        {
+          "alpha": 4.0,
+          "trait": 4.0052775625,
+          "quality": 4.82052675
+        }
+      ]
+    }
+  },
+  "optimism": {
+    "matched_target": 3.792218625,
+    "gdn": {
+      "selected_alpha": 2.0,
+      "candidates": [
+        {
+          "alpha": 0.5,
+          "trait": 3.664994,
+          "quality": 4.70662384375
+        },
+        {
+          "alpha": 1.0,
+          "trait": 3.72945065625,
+          "quality": 4.70195390625
+        },
+        {
+          "alpha": 2.0,
+          "trait": 3.84609925,
+          "quality": 4.7215655312500004
+        },
+        {
+          "alpha": 4.0,
+          "trait": 3.8505378125,
+          "quality": 4.73983221875
+        },
+        {
+          "alpha": 8.0,
+          "trait": 3.87698228125,
+          "quality": 4.63186909375
+        }
+      ]
+    },
+    "act": {
+      "selected_alpha": 0.5,
+      "candidates": [
+        {
+          "alpha": 0.5,
+          "trait": 3.74607675,
+          "quality": 4.74668659375
+        },
+        {
+          "alpha": 1.0,
+          "trait": 3.72250534375,
+          "quality": 4.78356971875
+        },
+        {
+          "alpha": 2.0,
+          "trait": 3.737266,
+          "quality": 4.75325828125
+        },
+        {
+          "alpha": 4.0,
+          "trait": 3.70493428125,
+          "quality": 4.59765659375
+        },
+        {
+          "alpha": 8.0,
+          "trait": 3.792218625,
+          "quality": 4.83152259375
+        }
+      ]
+    }
+  },
+  "candor": {
+    "matched_target": 4.0440545624999995,
+    "gdn": {
+      "selected_alpha": 2.0,
+      "candidates": [
+        {
+          "alpha": 0.5,
+          "trait": 3.97815778125,
+          "quality": 4.79734315625
+        },
+        {
+          "alpha": 1.0,
+          "trait": 3.9685505625,
+          "quality": 4.77855728125
+        },
+        {
+          "alpha": 2.0,
+          "trait": 4.04665328125,
+          "quality": 4.8076816875
+        },
+        {
+          "alpha": 4.0,
+          "trait": 4.058781875,
+          "quality": 4.8373314375
+        },
+        {
+          "alpha": 8.0,
+          "trait": 4.14145703125,
+          "quality": 4.86182096875
+        }
+      ]
+    },
+    "act": {
+      "selected_alpha": 2.0,
+      "candidates": [
+        {
+          "alpha": 0.5,
+          "trait": 3.96082175,
+          "quality": 4.7743793125
+        },
+        {
+          "alpha": 1.0,
+          "trait": 3.95578578125,
+          "quality": 4.74519740625
+        },
+        {
+          "alpha": 2.0,
+          "trait": 4.0264630625,
+          "quality": 4.79599384375
+        },
+        {
+          "alpha": 4.0,
+          "trait": 4.00341765625,
+          "quality": 4.94126309375
+        },
+        {
+          "alpha": 8.0,
+          "trait": 4.0440545624999995,
+          "quality": 4.849110375
+        }
+      ]
+    }
+  }
+}
