@@ -3,10 +3,10 @@ model: Qwen/Qwen3.5-9B
 features:
   - french_language
   - concrete_language
-  - principled_candor
   - optimism
   - first_person_voice
-donor_pairs: 64
+  - bulleted_layout
+donor_pairs: 128
 dev_prompts: 32
 test_prompts: 128
 max_new_tokens: 256

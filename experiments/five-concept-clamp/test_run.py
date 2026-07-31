@@ -26,18 +26,11 @@ def test_primary_plan_has_expected_conditions() -> None:
         for index, name in enumerate(RUN.FEATURES)
     }
     plans = RUN.condition_plan(toy, toy, 0.5, 0.5)
-    assert len(plans) == 26
+    assert len(plans) == 27
     assert sum(name.startswith("singleton_") for name in plans) == 5
     assert sum(name.startswith("loo_clamp_") for name in plans) == 5
     assert sum(name.startswith("flip_") for name in plans) == 5
 
 
-def test_pair_and_triple_count() -> None:
-    assert (
-        sum(
-            1
-            for size in (2, 3)
-            for _ in __import__("itertools").combinations(RUN.FEATURES, size)
-        )
-        == 20
-    )
+def test_pair_count() -> None:
+    assert sum(1 for _ in __import__("itertools").combinations(RUN.FEATURES, 2)) == 10

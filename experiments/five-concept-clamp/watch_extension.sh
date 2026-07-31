@@ -13,6 +13,7 @@ CUDA_VISIBLE_DEVICES=3 "$PYTHON" \
   "$ROOT/experiments/five-concept-clamp/run.py" extension \
   --directions-dir "$OUTPUT/source-directions" \
   --first-person-pairs "$OUTPUT/data/first-person.jsonl" \
+  --bullet-pairs "$OUTPUT/data/bullets.jsonl" \
   --dev-prompts "$OUTPUT/data/dev.jsonl" \
   --test-prompts "$OUTPUT/data/test.jsonl" \
   --output-dir "$OUTPUT"

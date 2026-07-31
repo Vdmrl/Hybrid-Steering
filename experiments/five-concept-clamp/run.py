@@ -23,16 +23,16 @@ from transformers import AutoTokenizer
 FEATURES = (
     "french_language",
     "concrete_language",
-    "principled_candor",
     "optimism",
     "first_person_voice",
+    "bulleted_layout",
 )
 DEFAULT_STRENGTHS = {
     "french_language": 4.0,
     "concrete_language": 4.0,
-    "principled_candor": 8.0,
     "optimism": 8.0,
     "first_person_voice": 4.0,
+    "bulleted_layout": 4.0,
 }
 BETAS = (0.2, 0.5, 1.0)
 TARGET_SYSTEM = "Answer the user's question directly and naturally."
@@ -50,6 +50,7 @@ def arguments() -> argparse.Namespace:
     )
     parser.add_argument("--directions-dir", type=Path)
     parser.add_argument("--first-person-pairs", type=Path)
+    parser.add_argument("--bullet-pairs", type=Path)
     parser.add_argument("--dev-prompts", type=Path)
     parser.add_argument("--test-prompts", type=Path)
     parser.add_argument("--output-dir", type=Path, required=True)
@@ -150,22 +151,27 @@ def load_direction(path: Path) -> dict[int, torch.Tensor]:
 
 
 def direction_phase(args: argparse.Namespace) -> None:
-    path = args.output_dir / "directions" / "first_person_voice.safetensors"
-    if path.exists():
-        print(f"direction already exists: {path}")
-        return
-    rows = jsonl(args.first_person_pairs)
-    if len(rows) != 64:
-        raise RuntimeError(f"need 64 first-person pairs, found {len(rows)}")
     tokenizer, model = load_model(args.model)
-    differences = []
-    for index, row in enumerate(rows, 1):
-        negative = state_for_text(model, tokenizer, row["negative_text"])
-        positive = state_for_text(model, tokenizer, row["positive_text"])
-        differences.append(subtract_states(positive, negative))
-        if index % 8 == 0:
-            print(f"first-person direction: {index}/64", flush=True)
-    save_direction(path, mean_direction(differences))
+    sources = {
+        "first_person_voice": args.first_person_pairs,
+        "bulleted_layout": args.bullet_pairs,
+    }
+    for feature, source in sources.items():
+        path = args.output_dir / "directions" / f"{feature}.safetensors"
+        if path.exists():
+            print(f"direction already exists: {path}")
+            continue
+        rows = jsonl(source)
+        if len(rows) != 128:
+            raise RuntimeError(f"need 128 {feature} pairs, found {len(rows)}")
+        differences = []
+        for index, row in enumerate(rows, 1):
+            negative = state_for_text(model, tokenizer, row["negative_text"])
+            positive = state_for_text(model, tokenizer, row["positive_text"])
+            differences.append(subtract_states(positive, negative))
+            if index % 16 == 0:
+                print(f"{feature} direction: {index}/128", flush=True)
+        save_direction(path, mean_direction(differences))
 
 
 def truncate_tensor(value: torch.Tensor, rank: int) -> torch.Tensor:
@@ -185,8 +191,8 @@ def load_directions(args: argparse.Namespace, rank: int) -> dict[str, dict]:
     result = {}
     for feature in FEATURES:
         source = (
-            args.output_dir / "directions" / "first_person_voice.safetensors"
-            if feature == "first_person_voice"
+            args.output_dir / "directions" / f"{feature}.safetensors"
+            if feature in {"first_person_voice", "bulleted_layout"}
             else args.directions_dir / f"{feature}.safetensors"
         )
         cache = args.output_dir / "directions" / f"{feature}-rank{rank}.safetensors"
@@ -371,6 +377,12 @@ def condition_plan(rank1: dict, rank4: dict, scale: float, beta: float) -> dict:
                 "deltas": rss_coefficients(rank1, full),
                 "beta": beta,
             },
+            "full_clamp_rss_r4": {
+                "kind": "clamp",
+                "directions": rank4,
+                "deltas": rss_coefficients(rank4, full),
+                "beta": beta,
+            },
         }
     )
     for omitted in FEATURES:
@@ -524,22 +536,21 @@ def extension_phase(args: argparse.Namespace) -> None:
     scale, beta = selected(args)
     strengths = {name: DEFAULT_STRENGTHS[name] * scale for name in FEATURES}
     plans = {}
-    for size in (2, 3):
-        for names in itertools.combinations(FEATURES, size):
-            coefficients = {name: strengths[name] for name in names}
-            deltas = rss_coefficients(rank1, coefficients)
-            tag = "+".join(names)
-            plans[f"add_{tag}"] = {
-                "kind": "add_coefficients",
-                "directions": rank1,
-                "coefficients": deltas,
-            }
-            plans[f"clamp_{tag}"] = {
-                "kind": "clamp",
-                "directions": rank1,
-                "deltas": deltas,
-                "beta": beta,
-            }
+    for names in itertools.combinations(FEATURES, 2):
+        coefficients = {name: strengths[name] for name in names}
+        deltas = rss_coefficients(rank1, coefficients)
+        tag = "+".join(names)
+        plans[f"add_{tag}"] = {
+            "kind": "add_coefficients",
+            "directions": rank1,
+            "coefficients": deltas,
+        }
+        plans[f"clamp_{tag}"] = {
+            "kind": "clamp",
+            "directions": rank1,
+            "deltas": deltas,
+            "beta": beta,
+        }
     run_rows(
         args,
         jsonl(args.test_prompts)[: args.test],
@@ -558,7 +569,7 @@ def self_test() -> None:
         name: {0: torch.eye(3).reshape(1, 1, 3, 3) * (index + 1)}
         for index, name in enumerate(FEATURES)
     }
-    assert len(condition_plan(toy, toy, 0.5, 0.5)) == 26
+    assert len(condition_plan(toy, toy, 0.5, 0.5)) == 27
     print("five-concept clamp self-test passed")
 
 

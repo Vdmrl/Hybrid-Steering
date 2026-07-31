@@ -10,6 +10,7 @@ export PYTHONPATH="$ROOT/steering/src:$ROOT/judge/src${PYTHONPATH:+:$PYTHONPATH}
 COMMON=(
   --directions-dir "$OUTPUT/source-directions"
   --first-person-pairs "$OUTPUT/data/first-person.jsonl"
+  --bullet-pairs "$OUTPUT/data/bullets.jsonl"
   --dev-prompts "$OUTPUT/data/dev.jsonl"
   --test-prompts "$OUTPUT/data/test.jsonl"
   --output-dir "$OUTPUT"
@@ -31,6 +32,7 @@ retry() {
 mkdir -p "$OUTPUT/data" "$OUTPUT/source-directions"
 retry self-test "$PYTHON" "$RUNNER" self-test --output-dir "$OUTPUT"
 retry first-person-pairs "$PYTHON" "$ROOT/experiments/five-concept-clamp/prepare_first_person.py" "$OUTPUT/data/first-person.jsonl"
+retry bullet-pairs "$PYTHON" "$ROOT/experiments/five-concept-clamp/prepare_bullets.py" "$OUTPUT/data/first-person.jsonl" "$OUTPUT/data/bullets.jsonl"
 retry direction env CUDA_VISIBLE_DEVICES=3 "$PYTHON" "$RUNNER" direction "${COMMON[@]}"
 retry smoke env CUDA_VISIBLE_DEVICES=3 "$PYTHON" "$RUNNER" smoke "${COMMON[@]}"
 # Judge-based dev selection remains a registered extension. The primary queue

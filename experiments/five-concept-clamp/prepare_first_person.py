@@ -11,7 +11,7 @@ import pyarrow.parquet as pq
 def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("output", type=Path)
-    parser.add_argument("--count", type=int, default=64)
+    parser.add_argument("--count", type=int, default=128)
     parser.add_argument("--shards", default=",".join(map(str, range(16))))
     return parser.parse_args()
 
