@@ -22,5 +22,7 @@ primary_blocks:
   - flip_one
 extension_blocks:
   - all_pairs
+  - all_triples
+future_extensions:
   - activation_full_five
-
+  - 256_prompt_replication
