@@ -39,6 +39,7 @@ def test_contracts_and_tasks() -> None:
     features, config = load_configs(ROOT)
     assert set(features.features["french_language"].anchors) == {1, 2, 3, 4, 5}
     assert set(features.features["first_person_voice"].anchors) == {1, 2, 3, 4, 5}
+    assert set(features.features["bulleted_layout"].anchors) == {1, 2, 3, 4, 5}
     feature = features.features["optimism"]
     prompt = render_prompt(
         (ROOT / "prompts" / config.evaluation.prompt).read_text(encoding="utf-8"),
