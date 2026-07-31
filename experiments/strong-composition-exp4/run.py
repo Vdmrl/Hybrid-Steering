@@ -495,6 +495,7 @@ def summarize_phase(args: argparse.Namespace) -> None:
             "conditions": conditions,
             "contrasts": contrasts,
             "retention": retention,
+            "quality_n": args.quality_test,
             "judge_usage": usage,
         },
     )
