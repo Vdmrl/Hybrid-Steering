@@ -26,6 +26,8 @@ def test_dashboard_uses_completed_summaries() -> None:
     assert "Промежуточные результаты" in page
     assert "GDN против activation steering" in page
     assert "Радость + Оптимизм" in page
+    assert "Как добавление одного признака меняет другой" in page
+    assert "Добавили ↓ / измеряем →" in page
     assert "Короткие выводы" in page
     assert "Эксперимент" not in page
     assert "__DATA__" not in page

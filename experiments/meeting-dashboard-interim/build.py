@@ -135,22 +135,34 @@ def method_rows(exp4: dict) -> str:
     return "".join(rows)
 
 
-def retention_rows(exp4: dict) -> str:
-    retention = {
-        (item["method"], item["feature"]): item["full_minus_singleton"]
-        for item in exp4["retention"]
-    }
-    rows = []
-    for method, method_label in METHODS.items():
-        cells = []
-        for feature in FEATURES:
-            metric = retention[(method, feature)]
-            _, css_class = status(metric)
-            cells.append(
-                f'<td class="{css_class}"><b>{signed(metric["mean"])}</b><small>{ci(metric)}</small></td>'
-            )
-        rows.append(f"<tr><th>{method_label}</th>{''.join(cells)}</tr>")
-    return "".join(rows)
+def interference_tables(exp4: dict) -> str:
+    bits = {"joy": 1, "concrete": 2, "optimism": 4, "candor": 8}
+    tables = []
+    for method in ("gdn_raw_r1", "gdn_raw_r4"):
+        rows = []
+        for added in FEATURES:
+            cells = []
+            for target in FEATURES:
+                if added == target:
+                    cells.append('<td class="muted">—</td>')
+                    continue
+                pair_mask = f"{bits[added] + bits[target]:04b}"
+                singleton_mask = f"{bits[target]:04b}"
+                pair = condition(exp4, f"{method}_{pair_mask}")
+                singleton = condition(exp4, f"{method}_{singleton_mask}")
+                delta = (
+                    pair["features"][target]["expected"]["mean"]
+                    - singleton["features"][target]["expected"]["mean"]
+                )
+                css_class = "good" if delta > 0 else "bad"
+                cells.append(f'<td class="{css_class}"><b>{signed(delta)}</b></td>')
+            rows.append(f"<tr><th>{FEATURES[added]}</th>{''.join(cells)}</tr>")
+        tables.append(
+            f"<article><h3>{METHODS[method]}</h3><table><tr><th>Добавили ↓ / измеряем →</th>"
+            + "".join(f"<th>{label}</th>" for label in FEATURES.values())
+            + f"</tr>{''.join(rows)}</table></article>"
+        )
+    return "".join(tables)
 
 
 def build(exp3: dict, exp4: dict) -> str:
@@ -191,7 +203,7 @@ def build(exp3: dict, exp4: dict) -> str:
         profile_rows=profile_rows(exp4),
         pair_rows=pair_rows(exp4),
         method_headers="".join(f"<th>{label}</th>" for label in METHODS.values()),
-        retention_rows=retention_rows(exp4),
+        interference_tables=interference_tables(exp4),
         rss_r1=signed(rss_r1["mean"]),
         rss_r1_ci=ci(rss_r1),
         raw_rank=signed(raw_rank["mean"]),
@@ -247,7 +259,7 @@ TEMPLATE = """<!doctype html>
 <tr><th>Rank 4 − rank 1, RSS</th><td>{rss_rank}</td><td>{rss_rank_ci}</td></tr></table>
 <p class="callout"><b>Вывод:</b> RSS полезен как стабилизатор перегруженного rank 4, но не даёт подтверждённого выигрыша при rank 1. Сам rank 4 без RSS заметно хуже rank 1.</p></section>
 
-<section class="panel half"><h2>Как остальные векторы влияют на каждый признак</h2><table><tr><th>Метод</th><th>Радость</th><th>Конкретность</th><th>Оптимизм</th><th>Прямота</th></tr>{retention_rows}</table><p class="muted">В каждой ячейке: score признака в композиции четырёх минус score того же признака при steering только им одним; ниже — 95% CI. Отрицательное значение означает взаимное ослабление.</p><p class="callout"><b>Вывод:</b> соседние векторы не ухудшают радость, конкретность и оптимизм подтверждённо; систематически страдает только candor: от −0.208 балла для raw rank 1 до −0.924 для raw rank 4. RSS сокращает потерю candor у rank 4 до −0.631.</p></section>
+<section class="panel"><h2>Как добавление одного признака меняет другой</h2><div class="profiles">{interference_tables}</div><p class="muted">Строка — добавленный вектор; столбец — уже присутствующий признак, изменение его expected score относительно singleton. Например, ячейка «добавили оптимизм → измеряем прямоту» показывает, насколько оптимизм изменил прямоту. Минус означает ухудшение.</p><p class="callout"><b>Важно:</b> это направленные описательные разницы для пар. В summary нет paired CI для этих 24 отдельных сравнений, поэтому таблица показывает размер и направление интерференции, но не статистическую значимость каждой ячейки.</p></section>
 
 <section class="panel"><h2>Короткие выводы</h2><div class="conclusions">
 <article><h3>GDN работает</h3><p>На matched сравнении GDN raw rank 1 превосходит обычный activation steering на <b>{gdn_activation} балла</b>; 95% CI полностью выше нуля.</p></article>
