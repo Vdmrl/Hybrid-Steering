@@ -2,18 +2,17 @@ from __future__ import annotations
 
 import argparse
 import json
-import tempfile
 from pathlib import Path
 
+import fsspec
 import pyarrow.parquet as pq
-import requests
 
 
 def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("output", type=Path)
     parser.add_argument("--count", type=int, default=64)
-    parser.add_argument("--shards", default="10,9,11")
+    parser.add_argument("--shards", default=",".join(map(str, range(16))))
     return parser.parse_args()
 
 
@@ -26,14 +25,9 @@ def main() -> None:
             "feature_stories/resolve/main/data/"
             f"train-{shard:05d}-of-00016.parquet"
         )
-        with tempfile.NamedTemporaryFile(suffix=".parquet") as handle:
-            with requests.get(url, stream=True, timeout=120) as response:
-                response.raise_for_status()
-                for chunk in response.iter_content(1024 * 1024):
-                    handle.write(chunk)
-            handle.flush()
+        with fsspec.open(url, "rb", block_size=8 * 1024 * 1024) as handle:
             table = pq.read_table(
-                handle.name,
+                handle,
                 filters=[
                     ("concept", "=", "uses first-person"),
                     ("antagonist", "=", "uses third-person"),
