@@ -117,6 +117,7 @@
     "persuasive",
     "technical"
   ],
+  "recommendation_note": "The ranking is based on the 12-prompt alpha=2 screen. Persuasive and technical are the most defensible follow-up candidates; narrative is only a third exploratory candidate because the alpha=4 four-prompt check showed a large quality drop.",
   "dangerous_pairs": [
     {
       "pair": [
