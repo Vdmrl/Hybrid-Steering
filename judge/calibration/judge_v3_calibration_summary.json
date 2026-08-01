@@ -1,0 +1,23 @@
+{
+  "date": "2026-07-30",
+  "status": "exploratory",
+  "judge_model": "openai/gpt-4o-mini",
+  "temperature": 0,
+  "cases": 35,
+  "case_policy": "Balanced cases not used to tune the compact output format",
+  "features": [
+    "principled_candor",
+    "calm_composure",
+    "concrete_language",
+    "casualness",
+    "optimism",
+    "joy",
+    "french_language"
+  ],
+  "judge_v3": {
+    "exact": 24,
+    "mae": 0.4,
+    "first_pass_format_valid": 35
+  },
+  "interpretation": "The compact one-digit format was selected as Judge v3. This small calibration does not establish publication-grade agreement or statistical non-inferiority."
+}

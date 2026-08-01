@@ -1,61 +1,41 @@
-# Judge calibration
+# Judge v3 calibration
 
-The Judge is not publication-ready merely because it returns a valid score.
-Calibrate each feature before using its scores in an ablation table.
+Judge v3 is not publication-ready merely because it returns a valid score.
+Calibrate every reported feature before using its scores in an ablation table.
 
 ## Human set
 
-Create 15–20 blind answers per feature. Include:
+Create 15–20 blind answers per feature, including obvious target/opposite
+examples, neutral cases, hard exclusions, quality/trait trade-offs, and prompt
+injection inside an answer. Two people independently label the anchored 1–5
+score without seeing method, alpha, rank, or layer metadata.
 
-- obvious target and obvious opposite examples;
-- genuine ties and cases where the trait is absent;
-- hard boundary cases from the feature exclusions;
-- answers with a quality/trait trade-off;
-- prompt-injection text inside an answer.
+Primary gates per feature:
 
-Two people independently assign anchored 1–5 trait scores using the matching
-entry in `concepts/features.yaml`. Resolve
-disagreements only after recording both original labels. Do not use steering
-method names or alpha/layer metadata while labeling.
+- at least 90% agreement on obvious cases;
+- at least 75% agreement on hard cases;
+- weighted Cohen's kappa of at least 0.60.
 
-`human_labels_v2.example.jsonl` documents the storage shape only. Its row is
-not a gold label and must not be included in calibration statistics.
+If a gate fails, revise the feature anchors or add a new prompt version and
+recalibrate. Never tune on the steering test split.
 
-## Acceptance gates
+`judge_v3_calibration_summary.json` records the initial small output-format
+calibration. It is exploratory, not article-grade human validation.
 
-Run these primary checks separately for every feature:
+The current engineering prompt audit and its limitations are documented in
+`compositional_calibration_v3_ru.md`. It does not replace the two-annotator
+human set required above.
 
-- agreement with obvious human labels: at least 90%;
-- agreement with hard human labels: at least 75%;
-- weighted Cohen's kappa for scalar 1–5 labels: at least 0.60.
+## Reporting
 
-If pairwise robustness checks are reported, additionally require:
-
-- identical-answer tie rate: at least 95%;
-- answer-order consistency: at least 95%.
-
-If a gate fails, revise the feature anchors or prompt under a new version and
-recalibrate. Never tune the rubric against the steering test split.
-
-`trait_compact_v1_summary.json` records the initial output-format ablation.
-Compact scoring is the inexpensive default; `--mode trait-audit` remains
-available for evidence-bearing audit samples.
-
-## Reporting an ablation
-
-Use the prompt/scenario as the statistical unit. The two answer orders are one
-comparison, not two samples.
-
-- Primary endpoint: paired change in centered trait score (`score - 3`).
-- Absolute composition endpoint: predeclared proportion of answers where every
-  active trait scores at least 4.
-- Robustness endpoint: pairwise target-pole win/loss/tie after order aggregation.
-- Quality guardrail: report task-fulfillment and coherence changes separately.
+- Primary endpoint: paired change in centered integer score (`score - 3`).
+- Secondary endpoint: paired change in probability-weighted expected score.
+- Composition endpoint: predeclared proportion of answers where every active
+  feature scores at least 4.
+- Quality guardrail: score `answer_quality` once per answer.
 - Uncertainty: bootstrap a 95% confidence interval over prompts.
 - Hypothesis test: two-sided sign test on non-tied prompt-level comparisons.
-- Multiple concepts or ablations: apply Holm correction to confirmatory tests.
+- Multiple concepts or ablations: use Holm correction for confirmatory tests.
 
-Keep raw judgments, prompt/config hashes, and failed schema attempts. For
-optional pairwise runs, also keep both order-level rows and their aggregate;
-report order inconsistency and missing judgments rather than silently dropping
-them.
+Keep raw judgments, prompt/config hashes, score distributions, token usage, and
+failed attempts. Report missing judgments rather than silently dropping them.

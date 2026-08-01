@@ -1,4 +1,4 @@
-rubric_version: "2.3.0"
+rubric_version: "3.3.0"
 
 features:
   answer_quality:
@@ -146,3 +146,40 @@ features:
       3: "The language is genuinely mixed, unclear, or there is too little text to judge."
       4: "The answer is predominantly natural French with minor non-French material."
       5: "The substantive answer is consistently and fluently written in French."
+
+  first_person_voice:
+    target: "first-person voice"
+    opposite: "third-person or impersonal voice"
+    definition: >-
+      First-person voice presents the answer from an I/we perspective using
+      first-person reference as a sustained part of the substantive response.
+      Third-person or impersonal voice presents the same content about named
+      people, roles, or generic actors without adopting that perspective.
+    exclusions:
+      - "First-person voice is not casualness, confidence, emotion, or answer quality."
+      - "An isolated quoted first-person phrase does not establish the answer's voice."
+      - "Second-person instructions dominated by 'you' are neutral unless the answer also adopts a clear first-person or third-person perspective."
+    anchors:
+      1: "Consistently third-person or impersonal throughout the substantive answer."
+      2: "Mostly third-person or impersonal, with only incidental first-person wording."
+      3: "Mixed, neutral, dominated by second-person instructions, unclear, or too short to establish a perspective."
+      4: "Clearly uses a first-person perspective through the substantive answer."
+      5: "Consistently and naturally sustains an I/we perspective throughout all relevant content."
+
+  bulleted_layout:
+    target: "bulleted list layout"
+    opposite: "continuous paragraph layout"
+    definition: >-
+      Bulleted layout presents the substantive answer as a sustained list of
+      distinct bullet items. Paragraph layout presents the same kind of content
+      as continuous prose without adopting a list structure.
+    exclusions:
+      - "Bulleted layout is not concreteness, brevity, readability, or answer quality."
+      - "A heading, quoted bullet, or isolated list marker does not establish the layout."
+      - "Judge the visible organization, not whether the listed claims are useful or specific."
+    anchors:
+      1: "Consistently continuous prose with no substantive bullet list."
+      2: "Mostly prose, with only an isolated or incidental bullet item."
+      3: "Mixed, unclear, or too little substantive content to establish either layout."
+      4: "Predominantly organized as substantive bullet items, with minor surrounding prose."
+      5: "Consistently presents all substantive content as a clear multi-item bullet list."

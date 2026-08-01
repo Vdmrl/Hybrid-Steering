@@ -4,7 +4,7 @@ from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, RootModel, model_validator
 
-ScoreV2 = Annotated[int, Field(ge=1, le=5)]
+Score = Annotated[int, Field(ge=1, le=5)]
 
 
 class StrictModel(BaseModel):
@@ -35,21 +35,18 @@ class Feature(StrictModel):
     opposite: str
     definition: str
     exclusions: list[str] = Field(default_factory=list)
-
-
-class FeatureV2(Feature):
     anchors: dict[int, str]
 
     @model_validator(mode="after")
-    def complete_scale(self) -> FeatureV2:
+    def complete_scale(self) -> Feature:
         if set(self.anchors) != {1, 2, 3, 4, 5}:
             raise ValueError("feature anchors must define scores 1 through 5")
         return self
 
 
-class FeatureConfigV2(StrictModel):
+class FeatureConfig(StrictModel):
     rubric_version: str
-    features: dict[str, FeatureV2]
+    features: dict[str, Feature]
 
 
 class GenerationConfig(StrictModel):
@@ -64,10 +61,7 @@ class GenerationConfig(StrictModel):
 
 class EvaluationConfig(StrictModel):
     default_feature: str
-    scalar_prompt: str
-    trait_prompt: str
-    trait_audit_prompt: str
-    pairwise_prompt: str
+    prompt: str
 
 
 class ScaleConfig(StrictModel):
@@ -87,36 +81,8 @@ class JudgeConfig(StrictModel):
     quality_metrics: list[str]
 
 
-class JudgeConfigV2(JudgeConfig):
-    require_both_orders: bool = True
-
-
-class ScalarResponseV2(StrictModel):
-    answer_id: str
-    trait_score: ScoreV2
-    task_fulfillment: ScoreV2
-    coherence: ScoreV2
-    evidence: list[str] = Field(max_length=2)
-    reason: str = Field(max_length=400)
-
-
-class ScalarTraitResponseV3(StrictModel):
-    answer_id: str
-    trait_score: ScoreV2
-    evidence: str = Field(max_length=300)
-    reason: str = Field(max_length=400)
-
-
-class CompactTraitResponseV4(RootModel[ScoreV2]):
+class JudgeResponseV3(RootModel[Score]):
     pass
-
-
-class PairwiseResponseV2(StrictModel):
-    trait_winner: Literal["A", "B", "tie"]
-    quality_winner: Literal["A", "B", "tie"]
-    evidence_A: str = Field(max_length=300)
-    evidence_B: str = Field(max_length=300)
-    reason: str = Field(max_length=400)
 
 
 class Usage(StrictModel):
@@ -141,7 +107,7 @@ class TraitScoreDistribution(StrictModel):
         return self
 
 
-class ProvenanceV2(StrictModel):
+class Provenance(StrictModel):
     judge_model: str
     provider: str
     provider_response_ids: list[str]
@@ -161,57 +127,12 @@ class ProvenanceV2(StrictModel):
     raw_responses: list[str]
 
 
-class ScalarResultV2(StrictModel):
+class JudgeResultV3(StrictModel):
     task_id: str
     prompt_id: str
     answer_id: str
     feature: str
-    trait_score: ScoreV2
+    trait_score: Score
     centered_trait_score: int = Field(ge=-2, le=2)
-    task_fulfillment: ScoreV2
-    coherence: ScoreV2
-    evidence: list[str]
-    reason: str
-    provenance: ProvenanceV2
-
-
-class ScalarTraitResultV3(StrictModel):
-    task_id: str
-    prompt_id: str
-    answer_id: str
-    feature: str
-    trait_score: ScoreV2
-    centered_trait_score: int = Field(ge=-2, le=2)
-    evidence: str
-    reason: str
-    score_distribution: TraitScoreDistribution | None = None
-    provenance: ProvenanceV2
-
-
-class PairwiseResultV2(StrictModel):
-    task_id: str
-    prompt_id: str
-    feature: str
-    orientation: Literal["one", "reverse"]
-    left_answer_id: str
-    right_answer_id: str
-    trait_winner: Literal["left", "right", "tie"]
-    quality_winner: Literal["left", "right", "tie"]
-    evidence_left: str
-    evidence_right: str
-    reason: str
-    provenance: ProvenanceV2
-
-
-class PairwiseAggregateV2(StrictModel):
-    aggregate_id: str
-    prompt_id: str
-    feature: str
-    answer_ids: list[str] = Field(min_length=2, max_length=2)
-    orientation_count: int = Field(ge=1, le=2)
-    status: Literal["complete", "incomplete"]
-    trait_order_consistent: bool | None
-    quality_order_consistent: bool | None
-    trait_winner_answer_id: str | Literal["tie"] | None
-    quality_winner_answer_id: str | Literal["tie"] | None
-    task_ids: list[str]
+    score_distribution: TraitScoreDistribution
+    provenance: Provenance

@@ -1,0 +1,29 @@
+{
+  "source": "Exp5 real calibration outputs",
+  "features": [
+    "concrete_language",
+    "optimism",
+    "first_person_voice",
+    "bulleted_layout"
+  ],
+  "sanity_features": {
+    "french_language": [
+      "baseline",
+      "full_add_rss_r1"
+    ]
+  },
+  "development": 100,
+  "validation": 100,
+  "scenario_groups": [
+    "allocation",
+    "campaign",
+    "presentation",
+    "real_source_0",
+    "real_source_1",
+    "real_source_2",
+    "real_source_3",
+    "zoning"
+  ],
+  "coexisting_source_pairs": "Exp5 first-person and bullet positive/negative pairs",
+  "policy": "Split by complete scenario group. V3 corrects deterministic labels for transformed first-person and numbered-list cases; no Judge prediction is used as a label."
+}
