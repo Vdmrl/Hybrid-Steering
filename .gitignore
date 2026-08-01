@@ -20,3 +20,7 @@ judge/runs/
 judge/results/
 judge/*.jsonl
 !judge/examples/*.jsonl
+judge/calibration/run_results/
+judge/calibration/metrics/
+judge/calibration/manual_*_errors.json
+judge/calibration/benchmark/*.jsonl

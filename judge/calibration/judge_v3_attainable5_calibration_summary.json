@@ -1,0 +1,37 @@
+{
+  "date": "2026-07-31",
+  "status": "exploratory",
+  "judge_model": "openai/gpt-4o-mini",
+  "candidate_prompt": "judge_v3_attainable5.txt",
+  "comparison_prompt": "judge_v3.txt",
+  "temperature": 0,
+  "development": {
+    "cases": 28,
+    "comparison": {"exact": 17, "mae": 0.464},
+    "candidate": {"exact": 18, "mae": 0.464}
+  },
+  "holdout": {
+    "cases": 14,
+    "comparison": {"exact": 7, "mae": 0.571},
+    "candidate": {"exact": 9, "mae": 0.429}
+  },
+  "real_exp5_sample": {
+    "cases": 100,
+    "source": "Four prompts across baseline, singleton, full-add, full-clamp, and flipped conditions for five features",
+    "comparison": {
+      "score_counts": {"1": 22, "2": 25, "3": 10, "4": 29, "5": 14},
+      "score_5_rate": 0.14,
+      "mean_expected_score": 2.926
+    },
+    "candidate": {
+      "score_counts": {"1": 22, "2": 17, "3": 19, "4": 23, "5": 19},
+      "score_5_rate": 0.19,
+      "mean_expected_score": 3.006
+    }
+  },
+  "usage": {
+    "comparison": {"calls": 142, "input_tokens": 90172, "output_tokens": 217},
+    "candidate": {"calls": 142, "input_tokens": 105934, "output_tokens": 220}
+  },
+  "interpretation": "The candidate makes score 5 attainable through consistent coverage rather than rhetorical intensity, while explicitly keeping absent traits at score 3. It improved exact agreement on the small development and holdout sets and increased score-5 use on real generations. The real sample has no human labels and is not article-grade validation."
+}

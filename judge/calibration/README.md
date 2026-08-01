@@ -22,6 +22,10 @@ recalibrate. Never tune on the steering test split.
 `judge_v3_calibration_summary.json` records the initial small output-format
 calibration. It is exploratory, not article-grade human validation.
 
+The current engineering prompt audit and its limitations are documented in
+`compositional_calibration_v3_ru.md`. It does not replace the two-annotator
+human set required above.
+
 ## Reporting
 
 - Primary endpoint: paired change in centered integer score (`score - 3`).

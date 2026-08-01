@@ -22,6 +22,8 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -e "judge[dev]"
 export OPENROUTER_API_KEY="..."
+# Optional fallback used only after a 402/429 response from the primary key:
+# export OPENROUTER_FALLBACK_API_KEY="..."
 # Optional:
 # export OPENROUTER_PROXY="http://user:password@host:port"
 ```
@@ -30,6 +32,7 @@ PowerShell:
 
 ```powershell
 $env:OPENROUTER_API_KEY="..."
+$env:OPENROUTER_FALLBACK_API_KEY="..." # optional quota fallback
 $env:OPENROUTER_PROXY="http://user:password@host:port" # optional
 ```
 
@@ -89,8 +92,14 @@ not match. The model is set once in `judge/config/judge.yaml`.
 ```text
 concepts/features.yaml
 judge/config/judge.yaml
-judge/prompts/judge_v3.txt
+judge/prompts/judge_v3_compositional.txt
 ```
+
+The configured prompt is the standard scalar Judge. It scores each active
+feature independently on its feature-specific 1–5 anchors and returns one
+digit. Older prompt files are retained only to reproduce already reported
+calibration runs; new evaluations should use the prompt selected in
+`judge/config/judge.yaml`.
 
 Read [calibration/README.md](calibration/README.md) before using results in an
 article. A valid API response is not proof that the Judge agrees with humans.
