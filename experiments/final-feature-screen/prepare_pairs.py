@@ -107,7 +107,8 @@ def prepare_numbered(source: Path, count: int) -> list[dict[str, Any]]:
         rows = json.loads(text)
     except json.JSONDecodeError:
         rows = [json.loads(line) for line in text.splitlines() if line.strip()]
-    rows = rows.get("pairs", rows) if isinstance(rows, dict) else rows
+    if isinstance(rows, dict):
+        rows = rows.get("pairs", [rows])
     pairs = []
     for index, row in enumerate(rows):
         positive = str(row.get("positive_text", row.get("target", ""))).strip()
