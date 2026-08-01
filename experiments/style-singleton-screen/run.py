@@ -472,6 +472,14 @@ def generate(args_: argparse.Namespace) -> None:
     )[: args_.eval_prompts]
     directions: dict[str, dict[int, torch.Tensor]] = {}
     for feature in FEATURES:
+        full_path = out / "directions" / f"{feature}-full.safetensors"
+        rank1_path = out / "directions" / f"{feature}-rank1.safetensors"
+        if full_path.exists() and rank1_path.exists():
+            directions[feature] = {
+                int(key.removeprefix("layer_")): value
+                for key, value in load_file(full_path, device="cpu").items()
+            }
+            continue
         diffs = []
         for index, pair in enumerate(load_pairs(out, feature)):
             pos = extract_recurrent(
@@ -502,12 +510,12 @@ def generate(args_: argparse.Namespace) -> None:
                 f"layer_{layer}": value.contiguous()
                 for layer, value in directions[feature].items()
             },
-            str(out / "directions" / f"{feature}-full.safetensors"),
+            str(full_path),
         )
         rank1 = low_rank(directions[feature], 1)
         save_file(
             {f"layer_{layer}": value.contiguous() for layer, value in rank1.items()},
-            str(out / "directions" / f"{feature}-rank1.safetensors"),
+            str(rank1_path),
         )
     rows = out / "generations.jsonl"
     done = {row["task_id"] for row in jsonl(rows)}
