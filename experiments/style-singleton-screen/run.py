@@ -636,9 +636,13 @@ def summary(args_: argparse.Namespace) -> None:
     by_feature: dict[str, dict[str, list[float]]] = defaultdict(
         lambda: defaultdict(list)
     )
+    by_rate: dict[str, dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
     for row in results:
         by_feature[row["feature"]][row.get("condition", "unknown")].append(
             float(row.get("expected_score", row.get("trait_score", 0)))
+        )
+        by_rate[row["feature"]][row.get("condition", "unknown")].append(
+            float(row.get("p_ge4", 0.0))
         )
     # Judge rows are compacted by the shell postprocessor below; this remains safe
     # when a provider run is partial.
@@ -659,12 +663,20 @@ def summary(args_: argparse.Namespace) -> None:
         qf = sum(q.get(f"{feature}:full", [0])) / max(
             len(q.get(f"{feature}:full", [])), 1
         )
+        rates = by_rate.get(feature, {})
+        baseline_rate = sum(rates.get("baseline", [0])) / max(
+            len(rates.get("baseline", [])), 1
+        )
+        full_rate = sum(rates.get(f"{feature}:full", [0])) / max(
+            len(rates.get(f"{feature}:full", [])), 1
+        )
         table.append(
             {
                 "feature": feature,
                 "source": FEATURES[feature]["source"],
                 "full_delta": round(full - baseline, 4),
                 "rank1_delta": round(rank - baseline, 4),
+                "p_ge4_delta": round(full_rate - baseline_rate, 4),
                 "quality_delta": round(qf - q0, 4),
                 "visual_check": "see manual_review.json and generated samples",
                 "verdict": "PASS"
@@ -677,6 +689,50 @@ def summary(args_: argparse.Namespace) -> None:
     ranked = sorted(
         table, key=lambda row: (row["full_delta"], row["rank1_delta"]), reverse=True
     )
+    alpha4_screen = []
+    alpha4_path = out / "alpha4" / "compact-results.jsonl"
+    if alpha4_path.exists():
+        alpha4_rows = [
+            json.loads(line)
+            for line in alpha4_path.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        alpha4_group: dict[str, dict[str, list[float]]] = defaultdict(
+            lambda: defaultdict(list)
+        )
+        alpha4_quality: dict[str, list[float]] = defaultdict(list)
+        for row in alpha4_rows:
+            if row["feature"] == "answer_quality":
+                alpha4_quality[row["condition"]].append(
+                    float(row.get("expected_score", 0.0))
+                )
+            else:
+                alpha4_group[row["feature"]][row["condition"]].append(
+                    float(row.get("expected_score", 0.0))
+                )
+        for feature in FEATURES:
+            group = alpha4_group.get(feature, {})
+            b = sum(group.get("baseline", [0])) / max(len(group.get("baseline", [])), 1)
+            f = sum(group.get(f"{feature}:full", [0])) / max(
+                len(group.get(f"{feature}:full", [])), 1
+            )
+            r = sum(group.get(f"{feature}:rank1", [0])) / max(
+                len(group.get(f"{feature}:rank1", [])), 1
+            )
+            qb = sum(alpha4_quality.get("baseline", [0])) / max(
+                len(alpha4_quality.get("baseline", [])), 1
+            )
+            qf = sum(alpha4_quality.get(f"{feature}:full", [0])) / max(
+                len(alpha4_quality.get(f"{feature}:full", [])), 1
+            )
+            alpha4_screen.append(
+                {
+                    "feature": feature,
+                    "full_delta": round(f - b, 4),
+                    "rank1_delta": round(r - b, 4),
+                    "quality_delta": round(qf - qb, 4),
+                }
+            )
     write_json(
         out / "summary.json",
         {
@@ -686,6 +742,7 @@ def summary(args_: argparse.Namespace) -> None:
             "heldout_prompts": args_.eval_prompts,
             "alpha": args_.alpha,
             "table": table,
+            "alpha4_screen": alpha4_screen,
             "ranking": [row["feature"] for row in ranked],
             "recommended_for_combination_with_russian_and_casualness": [
                 row["feature"] for row in ranked[:3]

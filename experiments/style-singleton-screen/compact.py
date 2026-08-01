@@ -31,6 +31,7 @@ def main() -> None:
             result = json.loads(line)
             metadata = inputs.get(result["prompt_id"], {}).get("metadata", {})
             distribution = result.get("score_distribution", {})
+            probabilities = distribution.get("probabilities", {})
             records.append(
                 {
                     "feature": feature,
@@ -40,6 +41,8 @@ def main() -> None:
                         "expected_score", result.get("trait_score")
                     ),
                     "trait_score": result.get("trait_score"),
+                    "p_ge4": float(probabilities.get("4", probabilities.get(4, 0.0)))
+                    + float(probabilities.get("5", probabilities.get(5, 0.0))),
                 }
             )
     (out / "compact-results.jsonl").write_text(
