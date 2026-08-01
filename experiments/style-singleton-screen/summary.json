@@ -1,0 +1,154 @@
+{
+  "experiment": "style-singleton-screen",
+  "model": "Qwen/Qwen3.5-9B",
+  "pairs_per_feature": 32,
+  "heldout_prompts": 12,
+  "alpha": 2.0,
+  "table": [
+    {
+      "feature": "humorous",
+      "source": "FlickrStyle v0.9 humor captions; factual side is a local content-preserving rewrite because the public archive is unpaired",
+      "full_delta": 0.0031,
+      "rank1_delta": -0.016,
+      "p_ge4_delta": 0.0,
+      "quality_delta": 0.0265,
+      "visual_check": "see manual_review.json and generated samples",
+      "verdict": "FAIL"
+    },
+    {
+      "feature": "adjective_emphasis",
+      "source": "StylePTB AEM",
+      "full_delta": 0.0342,
+      "rank1_delta": 0.0755,
+      "p_ge4_delta": 0.0212,
+      "quality_delta": 0.0148,
+      "visual_check": "see manual_review.json and generated samples",
+      "verdict": "FAIL"
+    },
+    {
+      "feature": "action_emphasis",
+      "source": "StylePTB VEM",
+      "full_delta": -0.1501,
+      "rank1_delta": -0.1688,
+      "p_ge4_delta": -0.0353,
+      "quality_delta": -0.0013,
+      "visual_check": "see manual_review.json and generated samples",
+      "verdict": "FAIL"
+    },
+    {
+      "feature": "technical",
+      "source": "synthetic-text-transformation-dataset columns; controlled local rewrites",
+      "full_delta": 0.1521,
+      "rank1_delta": 0.0822,
+      "p_ge4_delta": 0.1349,
+      "quality_delta": 0.0277,
+      "visual_check": "see manual_review.json and generated samples",
+      "verdict": "FAIL"
+    },
+    {
+      "feature": "persuasive",
+      "source": "synthetic-text-transformation-dataset columns; controlled local rewrites",
+      "full_delta": 0.2953,
+      "rank1_delta": 0.2246,
+      "p_ge4_delta": 0.1089,
+      "quality_delta": -0.0298,
+      "visual_check": "see manual_review.json and generated samples",
+      "verdict": "FAIL"
+    },
+    {
+      "feature": "narrative",
+      "source": "synthetic-text-transformation-dataset columns; controlled local rewrites",
+      "full_delta": 0.4753,
+      "rank1_delta": 0.1488,
+      "p_ge4_delta": 0.011,
+      "quality_delta": 0.0143,
+      "visual_check": "see manual_review.json and generated samples",
+      "verdict": "FAIL"
+    }
+  ],
+  "alpha4_screen": [
+    {
+      "feature": "humorous",
+      "full_delta": 0.0143,
+      "rank1_delta": -0.0287,
+      "quality_delta": -0.0001
+    },
+    {
+      "feature": "adjective_emphasis",
+      "full_delta": 0.0022,
+      "rank1_delta": 0.1196,
+      "quality_delta": 0.0086
+    },
+    {
+      "feature": "action_emphasis",
+      "full_delta": 0.161,
+      "rank1_delta": 0.2835,
+      "quality_delta": 0.0004
+    },
+    {
+      "feature": "technical",
+      "full_delta": 0.123,
+      "rank1_delta": 0.0131,
+      "quality_delta": 0.0321
+    },
+    {
+      "feature": "persuasive",
+      "full_delta": 0.3481,
+      "rank1_delta": 0.717,
+      "quality_delta": 0.0004
+    },
+    {
+      "feature": "narrative",
+      "full_delta": 0.0224,
+      "rank1_delta": -0.1122,
+      "quality_delta": -0.8193
+    }
+  ],
+  "ranking": [
+    "narrative",
+    "persuasive",
+    "technical",
+    "adjective_emphasis",
+    "humorous",
+    "action_emphasis"
+  ],
+  "recommended_for_combination_with_russian_and_casualness": [
+    "narrative",
+    "persuasive",
+    "technical"
+  ],
+  "dangerous_pairs": [
+    {
+      "pair": [
+        "humorous",
+        "persuasive"
+      ],
+      "reason": "not tested here; affective framing and rhetorical intent may be confounded"
+    },
+    {
+      "pair": [
+        "narrative",
+        "persuasive"
+      ],
+      "reason": "not tested here; discourse organization and rhetorical intent can co-vary"
+    },
+    {
+      "pair": [
+        "technical",
+        "adjective_emphasis"
+      ],
+      "reason": "not tested here; vocabulary complexity may change adjective salience"
+    },
+    {
+      "pair": [
+        "adjective_emphasis",
+        "action_emphasis"
+      ],
+      "reason": "not tested here; both are lexical emphasis operations"
+    }
+  ],
+  "limitations": [
+    "No human calibration for exploratory rubrics.",
+    "FlickrStyle archive supplies humorous captions without paired factual captions; factual side was locally rewritten."
+  ]
+}
