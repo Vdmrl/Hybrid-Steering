@@ -28,10 +28,10 @@ DEFAULT_STRENGTHS = {
     "russian_language": 2.0344,
     "optimism": 4.0,
     "casualness": 2.3566,
-    "refusal": 1.0,
+    "refusal": 2.0,
 }
 DIRECTION_SIGNS = {
-    "russian_language": -1.0,  # source stores English - Russian
+    "russian_language": 1.0,  # source is already oriented English -> Russian
     "optimism": 1.0,
     "casualness": 1.0,
     "refusal": 1.0,
