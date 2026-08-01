@@ -13,6 +13,8 @@ def main() -> None:
     out = args.output_dir
     records = []
     for path in sorted((out / "judge-results").glob("*.jsonl")):
+        if path.name.endswith(".failures.jsonl"):
+            continue
         feature = path.stem
         input_path = out / "judge-inputs" / f"{feature}.jsonl"
         inputs = {
