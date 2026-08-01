@@ -48,7 +48,22 @@ def test_contracts_and_tasks() -> None:
 
     assert "1:" in prompt and "5:" in prompt
     assert len(trait_tasks(rows)) == 2
-    assert config.evaluation.prompt == "judge_v3_attainable5.txt"
+    assert config.evaluation.prompt == "judge_v3_compositional.txt"
+
+
+def test_compositional_prompt_renders_for_every_feature() -> None:
+    features, _ = load_configs(ROOT)
+    template = (ROOT / "prompts" / "judge_v3_compositional.txt").read_text(
+        encoding="utf-8"
+    )
+
+    for feature in features.features.values():
+        prompt = render_prompt(template, feature, feature.anchors)
+        assert "Feature-specific anchored scale:" in prompt
+        assert "anchors; they are authoritative" in prompt
+        assert "Return exactly one ASCII digit from 1 to 5." in prompt
+        assert "{target}" not in prompt
+        assert all(f"{score}:" in prompt for score in range(1, 6))
 
 
 def test_v3_accepts_one_digit_and_records_probabilities() -> None:
