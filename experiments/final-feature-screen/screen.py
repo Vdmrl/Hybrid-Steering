@@ -28,8 +28,6 @@ PROMPTS = [
     "What should a student do when two sources disagree?",
     "How can a small shop improve its inventory planning?",
 ]
-RANKS = ("full", "rank1", "rank4")
-ALPHAS = (-8.0, -4.0, -2.0, 2.0, 4.0, 8.0)
 
 
 def arguments() -> argparse.Namespace:
@@ -37,6 +35,9 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("phase", choices=("run", "summary"))
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--model", default="Qwen/Qwen3.5-9B")
+    parser.add_argument("--feature", choices=FEATURES)
+    parser.add_argument("--rank", choices=("full", "rank1", "rank4"), default="rank4")
+    parser.add_argument("--alpha", type=float, default=2.0)
     parser.add_argument("--max-new-tokens", type=int, default=128)
     return parser.parse_args()
 
@@ -112,37 +113,35 @@ def build_directions(out: Path, model: Any, tokenizer: Any) -> None:
                 )
 
 
-def run(out: Path, model_id: str, max_new_tokens: int) -> None:
+def run(
+    out: Path,
+    model_id: str,
+    feature: str | None,
+    rank: str,
+    alpha: float,
+    max_new_tokens: int,
+) -> None:
+    if feature is None:
+        raise ValueError("--feature is required for the sequential smoke")
     tokenizer, model = runner.load_model(model_id)
     build_directions(out, model, tokenizer)
-    output = out / "smoke_generations.jsonl"
+    output = out / f"smoke-{feature}-{rank}-alpha={alpha:g}.jsonl"
     done = {row["task_id"] for row in read_jsonl(output)}
-    directions = {
-        (feature, rank): tensor_map(
-            out / "directions" / f"{feature}-{rank}.safetensors"
-        )
-        for feature in FEATURES
-        for rank in RANKS
-    }
+    direction = tensor_map(out / "directions" / f"{feature}-{rank}.safetensors")
     for prompt_id, prompt in enumerate(PROMPTS):
         target = runner.prefill(model, tokenizer, prompt)
         before = runner.snapshot_nonrecurrent(target)
         conditions: list[tuple[str, dict[int, torch.Tensor] | None, float]] = [
-            ("baseline", None, 0.0)
+            ("baseline", None, 0.0),
+            (f"{feature}:{rank}:alpha={alpha:g}", direction, alpha),
         ]
-        conditions.extend(
-            (f"{feature}:{rank}:alpha={alpha:g}", directions[feature, rank], alpha)
-            for feature in FEATURES
-            for rank in RANKS
-            for alpha in ALPHAS
-        )
-        for condition, direction, alpha in conditions:
+        for condition, direction, strength in conditions:
             task_id = f"smoke-{prompt_id:02d}:{condition}"
             if task_id in done:
                 continue
             cache = runner.clone_cache(target)
             if direction is not None:
-                runner.add_direction(cache, direction, alpha)
+                runner.add_direction(cache, direction, strength)
             runner.assert_nonrecurrent_unchanged(before, cache)
             response = runner.decode(model, tokenizer, cache, max_new_tokens)
             append_jsonl(
@@ -169,8 +168,10 @@ def has_loop(text: str) -> bool:
     return len(chunks) != len(set(chunks))
 
 
-def summarize(out: Path) -> None:
-    rows = read_jsonl(out / "smoke_generations.jsonl")
+def summarize(out: Path, feature: str | None, rank: str, alpha: float) -> None:
+    if feature is None:
+        raise ValueError("--feature is required for the sequential smoke")
+    rows = read_jsonl(out / f"smoke-{feature}-{rank}-alpha={alpha:g}.jsonl")
     if not rows:
         raise RuntimeError("no smoke generations")
     report = []
@@ -188,8 +189,7 @@ def summarize(out: Path) -> None:
     write_json(
         out / "smoke_summary.json",
         {
-            "complete": len(rows)
-            == len(PROMPTS) * (1 + len(FEATURES) * len(RANKS) * len(ALPHAS)),
+            "complete": len(rows) == len(PROMPTS) * 2,
             "n": len(rows),
             "rows": report,
         },
@@ -200,9 +200,16 @@ def main() -> None:
     args = arguments()
     args.output_dir.mkdir(parents=True, exist_ok=True)
     if args.phase == "run":
-        run(args.output_dir, args.model, args.max_new_tokens)
+        run(
+            args.output_dir,
+            args.model,
+            args.feature,
+            args.rank,
+            args.alpha,
+            args.max_new_tokens,
+        )
     else:
-        summarize(args.output_dir)
+        summarize(args.output_dir, args.feature, args.rank, args.alpha)
 
 
 if __name__ == "__main__":

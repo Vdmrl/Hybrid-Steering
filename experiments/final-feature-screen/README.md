@@ -17,9 +17,9 @@ Raw sources, directions, generated answers and Judge artifacts are external:
 `/home/student4/Hybrid-Steering-final-feature-screen-output`.
 Only the compact decision manifest belongs in Git.
 
-`run_smoke.sh` performs the data preparation and the four-prompt signed sweep
-on GPU 3. It does not call Judge. Review `smoke_summary.json` before starting
-the 16-prompt development stage.
+`run_smoke.sh` performs one four-prompt sequential smoke candidate on GPU 3.
+Set `FEATURE`, `RANK`, and `ALPHA` only after reviewing the previous candidate;
+it intentionally does not run a rank/alpha grid. It does not call Judge.
 
 ## Gates
 
