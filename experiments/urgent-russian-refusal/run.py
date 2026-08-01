@@ -433,9 +433,7 @@ def smoke_phase(args: argparse.Namespace) -> None:
     keep = {
         name: plan
         for name, plan in plans.items()
-        if name == "baseline"
-        or name.startswith("singleton_")
-        or name.startswith("full_")
+        if name == "baseline" or name.startswith(("singleton_", "full_"))
     }
     row = jsonl(args.dev_prompts)[0]
     original = args.max_new_tokens
