@@ -38,6 +38,9 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--feature", choices=FEATURES)
     parser.add_argument("--rank", choices=("full", "rank1", "rank4"), default="rank4")
     parser.add_argument("--alpha", type=float, default=2.0)
+    parser.add_argument("--prompts-file", type=Path)
+    parser.add_argument("--limit", type=int)
+    parser.add_argument("--tag", default="smoke")
     parser.add_argument("--max-new-tokens", type=int, default=128)
     return parser.parse_args()
 
@@ -68,6 +71,18 @@ def tensor_map(path: Path) -> dict[int, torch.Tensor]:
         int(key.removeprefix("layer_")): value
         for key, value in load_file(path, device="cpu").items()
     }
+
+
+def prompts(path: Path | None, limit: int | None) -> list[tuple[str, str]]:
+    if path is None:
+        rows = [(f"smoke-{index:02d}", prompt) for index, prompt in enumerate(PROMPTS)]
+    else:
+        rows = []
+        for row in read_jsonl(path):
+            prompt = str(row.get("prompt") or row.get("text") or "").strip()
+            if prompt:
+                rows.append((str(row.get("id", f"prompt-{len(rows):03d}")), prompt))
+    return rows if limit is None else rows[:limit]
 
 
 def build_directions(out: Path, model: Any, tokenizer: Any) -> None:
@@ -120,15 +135,21 @@ def run(
     rank: str,
     alpha: float,
     max_new_tokens: int,
+    prompts_file: Path | None,
+    limit: int | None,
+    tag: str,
 ) -> None:
     if feature is None:
         raise ValueError("--feature is required for the sequential smoke")
     tokenizer, model = runner.load_model(model_id)
     build_directions(out, model, tokenizer)
-    output = out / f"smoke-{feature}-{rank}-alpha={alpha:g}.jsonl"
+    prompt_rows = prompts(prompts_file, limit)
+    if not prompt_rows:
+        raise ValueError("no prompts available")
+    output = out / f"{tag}-{feature}-{rank}-alpha={alpha:g}.jsonl"
     done = {row["task_id"] for row in read_jsonl(output)}
     direction = tensor_map(out / "directions" / f"{feature}-{rank}.safetensors")
-    for prompt_id, prompt in enumerate(PROMPTS):
+    for prompt_id, prompt in prompt_rows:
         target = runner.prefill(model, tokenizer, prompt)
         before = runner.snapshot_nonrecurrent(target)
         conditions: list[tuple[str, dict[int, torch.Tensor] | None, float]] = [
@@ -136,7 +157,7 @@ def run(
             (f"{feature}:{rank}:alpha={alpha:g}", direction, alpha),
         ]
         for condition, direction, strength in conditions:
-            task_id = f"smoke-{prompt_id:02d}:{condition}"
+            task_id = f"{tag}:{prompt_id}:{condition}"
             if task_id in done:
                 continue
             cache = runner.clone_cache(target)
@@ -148,7 +169,7 @@ def run(
                 output,
                 {
                     "task_id": task_id,
-                    "prompt_id": f"smoke-{prompt_id:02d}",
+                    "prompt_id": prompt_id,
                     "scenario": prompt,
                     "condition": condition,
                     "response": response,
@@ -168,10 +189,12 @@ def has_loop(text: str) -> bool:
     return len(chunks) != len(set(chunks))
 
 
-def summarize(out: Path, feature: str | None, rank: str, alpha: float) -> None:
+def summarize(
+    out: Path, feature: str | None, rank: str, alpha: float, tag: str, count: int
+) -> None:
     if feature is None:
         raise ValueError("--feature is required for the sequential smoke")
-    rows = read_jsonl(out / f"smoke-{feature}-{rank}-alpha={alpha:g}.jsonl")
+    rows = read_jsonl(out / f"{tag}-{feature}-{rank}-alpha={alpha:g}.jsonl")
     if not rows:
         raise RuntimeError("no smoke generations")
     report = []
@@ -189,7 +212,7 @@ def summarize(out: Path, feature: str | None, rank: str, alpha: float) -> None:
     write_json(
         out / "smoke_summary.json",
         {
-            "complete": len(rows) == len(PROMPTS) * 2,
+            "complete": len(rows) == count * 2,
             "n": len(rows),
             "rows": report,
         },
@@ -207,9 +230,19 @@ def main() -> None:
             args.rank,
             args.alpha,
             args.max_new_tokens,
+            args.prompts_file,
+            args.limit,
+            args.tag,
         )
     else:
-        summarize(args.output_dir, args.feature, args.rank, args.alpha)
+        summarize(
+            args.output_dir,
+            args.feature,
+            args.rank,
+            args.alpha,
+            args.tag,
+            len(prompts(args.prompts_file, args.limit)),
+        )
 
 
 if __name__ == "__main__":
