@@ -30,6 +30,12 @@ DEFAULT_STRENGTHS = {
     "casualness": 2.3566,
     "refusal": 2.0,
 }
+DIRECTION_SIGNS = {
+    "russian_language": -1.0,  # source stores English - Russian
+    "optimism": 1.0,
+    "casualness": 1.0,
+    "refusal": 1.0,
+}
 GDN_DECODER_LAYERS = (
     0,
     1,
@@ -193,7 +199,11 @@ def load_directions(args: argparse.Namespace, rank: int) -> dict[str, dict]:
             raise FileNotFoundError(f"missing direction for {feature}: {candidates}")
         cache = args.output_dir / "directions" / f"{feature}-rank{rank}.safetensors"
         if not cache.exists():
-            save_direction(cache, truncate_direction(load_direction(source), rank))
+            direction = {
+                layer: value * DIRECTION_SIGNS[feature]
+                for layer, value in load_direction(source).items()
+            }
+            save_direction(cache, truncate_direction(direction, rank))
         result[feature] = load_direction(cache)
     layer_sets = [set(value) for value in result.values()]
     if any(layers != layer_sets[0] for layers in layer_sets[1:]):

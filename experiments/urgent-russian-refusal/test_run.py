@@ -40,6 +40,12 @@ def test_strengths_are_the_validated_singleton_values() -> None:
         "casualness": 2.3566,
         "refusal": 2.0,
     }
+    assert RUN.DIRECTION_SIGNS == {
+        "russian_language": -1.0,
+        "optimism": 1.0,
+        "casualness": 1.0,
+        "refusal": 1.0,
+    }
 
 
 def test_npz_ordinals_map_to_absolute_decoder_layers() -> None:
