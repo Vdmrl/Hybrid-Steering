@@ -1,4 +1,10 @@
-from prepare_pairs import headline_from_edit, numbered_items, prepare_numbered, validate
+from prepare_pairs import (
+    headline_from_edit,
+    headline_from_original,
+    numbered_items,
+    prepare_numbered,
+    validate,
+)
 
 
 def test_headline_edit_and_numbered_validation() -> None:
@@ -6,6 +12,7 @@ def test_headline_edit_and_numbered_validation() -> None:
         headline_from_edit("Dog <runs/> across field", "dances")
         == "Dog dances across field"
     )
+    assert headline_from_original("Dog <runs/> across field") == "Dog runs across field"
     assert numbered_items("- First item\n- Second item\n- Third item") == [
         "First item",
         "Second item",

@@ -41,6 +41,11 @@ def headline_from_edit(original: str, edit: str) -> str:
     return re.sub(r"<[^>]*?/>", edit.strip(), original, count=1).strip()
 
 
+def headline_from_original(original: str) -> str:
+    """Remove Humicroedit markup while retaining the original headline word."""
+    return re.sub(r"<([^<>]*?)/>", r"\1", original, count=1).strip()
+
+
 def prepare_humor(source_dir: Path, count: int) -> list[dict[str, Any]]:
     archive = source_dir / "humicroedit.zip"
     if not archive.exists():
@@ -63,12 +68,13 @@ def prepare_humor(source_dir: Path, count: int) -> list[dict[str, Any]]:
                     grade = float(find_column(row, "meanGrade", "mean_grade"))
                 except (ValueError, TypeError):
                     continue
+                negative = headline_from_original(original)
                 positive = headline_from_edit(original, edit)
-                if not positive or positive == original or len(original.split()) < 4:
+                if not positive or positive == negative or len(negative.split()) < 4:
                     continue
-                prior = best.get(original)
+                prior = best.get(negative)
                 if prior is None or grade > prior[0]:
-                    best[original] = (grade, positive, path.name)
+                    best[negative] = (grade, positive, path.name)
 
     selected = sorted(best.items(), key=lambda item: (-item[1][0], item[0]))[:count]
     if len(selected) < count:
@@ -144,6 +150,8 @@ def validate(pairs: list[dict[str, Any]], numbered: bool = False) -> None:
         negative, positive = pair["negative_text"], pair["positive_text"]
         if not negative or not positive or negative == positive:
             raise ValueError(f"invalid pair {pair['source_id']}")
+        if "<" in negative or "/>" in negative or "<" in positive or "/>" in positive:
+            raise ValueError(f"unresolved markup: {pair['source_id']}")
         if positive in seen:
             raise ValueError(f"duplicate positive text: {pair['source_id']}")
         seen.add(positive)
