@@ -297,10 +297,12 @@ def load_style_pairs(sources: Path, code: str, count: int) -> list[dict[str, Any
             or parts[0] == parts[1]
         ):
             continue
+        neutral = parts[0].rsplit(" ; ", 1)[0].strip()
+        target = parts[1].rsplit(" ; ", 1)[0].strip()
         rows.append(
             {
-                "positive_text": parts[1].strip(),
-                "negative_text": parts[0].strip(),
+                "positive_text": target,
+                "negative_text": neutral,
                 "source_id": f"{code}:{len(rows)}",
             }
         )
