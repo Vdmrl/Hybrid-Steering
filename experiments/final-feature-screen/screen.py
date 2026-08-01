@@ -21,7 +21,7 @@ if spec is None or spec.loader is None:
 runner = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(runner)
 
-FEATURES = ("humorous", "numbered_list", "technical")
+FEATURES = ("humorous", "numbered_list", "technical", "persuasive")
 PROMPTS = [
     "How should a team decide whether to postpone a software release?",
     "Explain how a household can reduce its electricity use.",
