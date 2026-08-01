@@ -42,6 +42,12 @@ def test_strengths_are_the_validated_singleton_values() -> None:
     }
 
 
+def test_npz_ordinals_map_to_absolute_decoder_layers() -> None:
+    assert RUN.GDN_DECODER_LAYERS == tuple(
+        layer for layer in range(32) if layer % 4 != 3
+    )
+
+
 def test_prepare_judge_groups_conditions() -> None:
     spec = importlib.util.spec_from_file_location(
         "prepare_judge", PATH.with_name("prepare_judge.py")

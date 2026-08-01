@@ -30,6 +30,32 @@ DEFAULT_STRENGTHS = {
     "casualness": 2.3566,
     "refusal": 2.0,
 }
+GDN_DECODER_LAYERS = (
+    0,
+    1,
+    2,
+    4,
+    5,
+    6,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    17,
+    18,
+    20,
+    21,
+    22,
+    24,
+    25,
+    26,
+    28,
+    29,
+    30,
+)
 TARGET_SYSTEM = "Answer the user's question directly and naturally."
 
 
@@ -128,9 +154,13 @@ def load_direction(path: Path) -> dict[int, torch.Tensor]:
         value = np.load(path)["deltaS"]
         if value.ndim != 4:
             raise ValueError(f"expected [layer, head, 128, 128], got {value.shape}")
+        if value.shape[0] != len(GDN_DECODER_LAYERS):
+            raise ValueError(
+                f"expected {len(GDN_DECODER_LAYERS)} GDN layers, got {value.shape[0]}"
+            )
         return {
-            layer: torch.from_numpy(value[layer]).unsqueeze(0).float()
-            for layer in range(value.shape[0])
+            decoder_layer: torch.from_numpy(value[ordinal]).unsqueeze(0).float()
+            for ordinal, decoder_layer in enumerate(GDN_DECODER_LAYERS)
         }
     return {
         int(name.removeprefix("layer_")): tensor.float()
