@@ -69,8 +69,9 @@ def main() -> None:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--repo-root", type=Path, required=True)
     args = parser.parse_args()
-    root = args.output_dir / "judge-config"
-    for folder in (root / "concepts", root / "config", root / "prompts"):
+    base = args.output_dir / "judge-config"
+    root = base / "judge"
+    for folder in (base / "concepts", root / "config", root / "prompts"):
         folder.mkdir(parents=True, exist_ok=True)
     definitions = {name: rubric(*values) for name, values in AXES.items()}
     chunks = ["rubric_version: exploratory-style-screen-1\nfeatures:\n"]
@@ -93,7 +94,7 @@ def main() -> None:
                 ],
             ]
         )
-    (root / "concepts" / "features.yaml").write_text("".join(chunks), encoding="utf-8")
+    (base / "concepts" / "features.yaml").write_text("".join(chunks), encoding="utf-8")
     shutil.copy2(
         args.repo_root / "judge" / "config" / "judge.yaml",
         root / "config" / "judge.yaml",
