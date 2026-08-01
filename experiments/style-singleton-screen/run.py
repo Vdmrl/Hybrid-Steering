@@ -463,6 +463,7 @@ def load_pairs(out: Path, feature: str) -> list[dict[str, Any]]:
 
 def generate(args_: argparse.Namespace) -> None:
     out = args_.output_dir
+    (out / "directions").mkdir(parents=True, exist_ok=True)
     tokenizer, model = load_model(args_.model)
     prompts = json.loads(
         (out / "data" / "heldout_prompts.json").read_text(encoding="utf-8")
