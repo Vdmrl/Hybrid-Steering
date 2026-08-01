@@ -16,5 +16,5 @@ strengths:
   russian_language: 2.0344
   optimism: 4.0
   casualness: 2.3566
-  refusal: 1.25
+  refusal: 1.0
 conditions: [baseline, singletons, all_pairs, all_triples, full_four]
