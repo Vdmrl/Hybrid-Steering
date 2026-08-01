@@ -1,4 +1,4 @@
-from prepare_pairs import headline_from_edit, numbered_items, validate
+from prepare_pairs import headline_from_edit, numbered_items, prepare_numbered, validate
 
 
 def test_headline_edit_and_numbered_validation() -> None:
@@ -19,3 +19,13 @@ def test_headline_edit_and_numbered_validation() -> None:
         }
     ]
     validate(rows, numbered=True)
+
+
+def test_numbered_source_accepts_jsonl(tmp_path) -> None:
+    source = tmp_path / "bullets.jsonl"
+    source.write_text(
+        '{"source_id":"x","positive_text":"- First item\\n- Second item\\n- Third item","negative_text":"First item. Second item. Third item."}\n',
+        encoding="utf-8",
+    )
+    pairs = prepare_numbered(source, 1)
+    assert pairs[0]["positive_text"].startswith("1. First item")

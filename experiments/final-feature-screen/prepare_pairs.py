@@ -102,7 +102,11 @@ def numbered_items(text: str) -> list[str]:
 
 
 def prepare_numbered(source: Path, count: int) -> list[dict[str, Any]]:
-    rows = json.loads(source.read_text(encoding="utf-8"))
+    text = source.read_text(encoding="utf-8")
+    try:
+        rows = json.loads(text)
+    except json.JSONDecodeError:
+        rows = [json.loads(line) for line in text.splitlines() if line.strip()]
     rows = rows.get("pairs", rows) if isinstance(rows, dict) else rows
     pairs = []
     for index, row in enumerate(rows):
