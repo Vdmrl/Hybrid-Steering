@@ -678,6 +678,10 @@ def summary(args_: argparse.Namespace) -> None:
         full_rate = sum(rates.get(f"{feature}:full", [0])) / max(
             len(rates.get(f"{feature}:full", [])), 1
         )
+        full_delta = full - baseline
+        p_delta = full_rate - baseline_rate
+        quality_delta = qf - q0
+        effect = full_delta >= 0.5 or p_delta >= 0.2
         table.append(
             {
                 "feature": feature,
@@ -685,12 +689,12 @@ def summary(args_: argparse.Namespace) -> None:
                 "full_delta": round(full - baseline, 4),
                 "rank1_delta": round(rank - baseline, 4),
                 "p_ge4_delta": round(full_rate - baseline_rate, 4),
-                "quality_delta": round(qf - q0, 4),
+                "quality_delta": round(quality_delta, 4),
                 "visual_check": "see manual_review.json and generated samples",
                 "verdict": "PASS"
-                if full - baseline >= 0.5 and qf - q0 >= -0.5
+                if effect and quality_delta >= -0.5 and rank - baseline >= 0.0
                 else "RANK1_WEAK"
-                if full - baseline >= 0.5
+                if effect and quality_delta >= -0.5
                 else "FAIL",
             }
         )
@@ -755,7 +759,24 @@ def summary(args_: argparse.Namespace) -> None:
             "recommended_for_combination_with_russian_and_casualness": [
                 row["feature"] for row in ranked[:3]
             ],
-            "dangerous_pairs": [],
+            "dangerous_pairs": [
+                {
+                    "pair": ["humorous", "persuasive"],
+                    "reason": "not tested here; affective framing and rhetorical intent may be confounded",
+                },
+                {
+                    "pair": ["narrative", "persuasive"],
+                    "reason": "not tested here; discourse organization and rhetorical intent can co-vary",
+                },
+                {
+                    "pair": ["technical", "adjective_emphasis"],
+                    "reason": "not tested here; vocabulary complexity may change adjective salience",
+                },
+                {
+                    "pair": ["adjective_emphasis", "action_emphasis"],
+                    "reason": "not tested here; both are lexical emphasis operations",
+                },
+            ],
             "limitations": [
                 "No human calibration for exploratory rubrics.",
                 "FlickrStyle archive supplies humorous captions without paired factual captions; factual side was locally rewritten.",
