@@ -1,0 +1,20 @@
+experiment: urgent-russian-refusal-composition
+model: Qwen/Qwen3.5-9B
+features:
+  - russian_language
+  - optimism
+  - casualness
+  - refusal
+test_prompts: 128
+max_new_tokens: 256
+rank: 1
+ridge: 1.0e-6
+normalization: rss
+intervention: clamp
+beta: 1.0
+strengths:
+  russian_language: 2.0344
+  optimism: 4.0
+  casualness: 2.3566
+  refusal: 2.0
+conditions: [baseline, singletons, all_pairs, all_triples, full_four]
