@@ -28,7 +28,7 @@ DEFAULT_STRENGTHS = {
     "russian_language": 2.0344,
     "optimism": 4.0,
     "casualness": 2.3566,
-    "refusal": 2.0,
+    "refusal": 1.0,
 }
 DIRECTION_SIGNS = {
     "russian_language": -1.0,  # source stores English - Russian
@@ -433,7 +433,9 @@ def smoke_phase(args: argparse.Namespace) -> None:
     keep = {
         name: plan
         for name, plan in plans.items()
-        if name == "baseline" or name.startswith("singleton_")
+        if name == "baseline"
+        or name.startswith("singleton_")
+        or name.startswith("full_")
     }
     row = jsonl(args.dev_prompts)[0]
     original = args.max_new_tokens

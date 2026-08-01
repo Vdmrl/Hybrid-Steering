@@ -38,7 +38,7 @@ def test_strengths_are_the_validated_singleton_values() -> None:
         "russian_language": 2.0344,
         "optimism": 4.0,
         "casualness": 2.3566,
-        "refusal": 2.0,
+        "refusal": 1.0,
     }
     assert RUN.DIRECTION_SIGNS == {
         "russian_language": -1.0,
