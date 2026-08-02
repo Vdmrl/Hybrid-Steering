@@ -78,6 +78,29 @@ def wikisplit_page(offset: int) -> list[dict[str, Any]]:
         return json.load(response)["rows"]
 
 
+def prepare_atomic_generated(source: Path, count: int) -> list[dict[str, Any]]:
+    candidates = []
+    for row in jsonl(source):
+        positive = str(row["positive_text"]).strip()
+        negative = str(row["negative_text"]).strip()
+        length_ratio = ratio(positive, negative)
+        if (
+            sentence_length(positive) < sentence_length(negative) * 0.7
+            and 0.75 <= length_ratio <= 1.3
+        ):
+            candidates.append(
+                {
+                    "source_id": row["source_id"],
+                    "positive_text": positive,
+                    "negative_text": negative,
+                    "length_ratio": round(length_ratio, 3),
+                }
+            )
+        if len(candidates) == count:
+            return candidates
+    raise RuntimeError(f"only {len(candidates)}/{count} clean atomic rewrites")
+
+
 def prepare_atomic(count: int) -> list[dict[str, Any]]:
     candidates = []
     seen = set()
@@ -187,12 +210,17 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--optimism-source", type=Path, required=True)
     parser.add_argument("--russian-source", type=Path, required=True)
+    parser.add_argument("--atomic-source", type=Path)
     parser.add_argument("--count", type=int, default=128)
     args = parser.parse_args()
     feature_rows = {
         "russian_language": prepare_russian(args.russian_source, args.count),
         "optimism": prepare_optimism(args.optimism_source, args.count),
-        "atomic_sentences": prepare_atomic(args.count),
+        "atomic_sentences": (
+            prepare_atomic_generated(args.atomic_source, args.count)
+            if args.atomic_source
+            else prepare_atomic(args.count)
+        ),
     }
     common_n = min(map(len, feature_rows.values()))
     feature_rows = {feature: rows[:common_n] for feature, rows in feature_rows.items()}
