@@ -162,6 +162,7 @@ def generate_condition(
     max_new_tokens: int,
 ) -> tuple[str, list[dict[str, Any]]]:
     cache = runner.clone_cache(base_cache)
+    before = runner.snapshot_nonrecurrent(cache)
     coefficients = {
         item["name"]: float(item["alpha"]) * float(item["c"]) for item in selected
     }
@@ -169,6 +170,7 @@ def generate_condition(
     deltas = rss_coefficients(active, coefficients)
     runtime = make_clamp_runtime(cache, active, deltas)
     clamp_cache(cache, runtime, 1.0)
+    runner.assert_nonrecurrent_unchanged(before, cache)
     return decode(model, tokenizer, cache, max_new_tokens, (runtime, 1.0))
 
 
@@ -180,20 +182,24 @@ def run(args: argparse.Namespace) -> None:
         raise ValueError(f"expected {args.expect_prompts} prompts, got {len(rows)}")
     names = tuple(str(item["name"]) for item in selected)
     conditions = condition_sets(names, args.subsets)
-    (args.output_dir / f"{args.tag}-selection.json").write_text(
-        json.dumps(
-            {
-                "model": args.model,
-                "seed": args.seed,
-                "prompts": str(args.prompts),
-                "selection": selected,
-                "subsets": args.subsets,
-                "conditions": ["+".join(value) for value in conditions],
-                "method": "gdn_rss_clamp",
-            },
-            ensure_ascii=False,
-            indent=2,
-        ),
+    manifest = {
+        "model": args.model,
+        "seed": args.seed,
+        "prompts": str(args.prompts),
+        "selection": selected,
+        "subsets": args.subsets,
+        "conditions": ["+".join(value) for value in conditions],
+        "method": "gdn_rss_clamp",
+    }
+    manifest_path = args.output_dir / f"{args.tag}-selection.json"
+    serialized = json.dumps(manifest, ensure_ascii=False, indent=2)
+    if (
+        manifest_path.exists()
+        and manifest_path.read_text(encoding="utf-8") != serialized
+    ):
+        raise RuntimeError("selection differs from the existing resumable run")
+    manifest_path.write_text(
+        serialized,
         encoding="utf-8",
     )
     output = args.output_dir / f"{args.tag}-generations.jsonl"
