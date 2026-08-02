@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import re
 from typing import Any
 
 import torch
@@ -75,3 +76,8 @@ def clamp_cache(
             name: float(final[index]) for index, name in enumerate(values["names"])
         }
     return observed
+
+
+def clean_response(text: str) -> str:
+    """Remove a leaked decoder delimiter, without changing answer content."""
+    return re.sub(r"^(?:</think>\s*)+", "", text).strip()

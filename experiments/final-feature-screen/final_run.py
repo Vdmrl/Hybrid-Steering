@@ -11,7 +11,12 @@ from pathlib import Path
 from typing import Any
 
 import torch
-from composition import clamp_cache, make_clamp_runtime, rss_coefficients
+from composition import (
+    clamp_cache,
+    clean_response,
+    make_clamp_runtime,
+    rss_coefficients,
+)
 from safetensors.torch import load_file
 
 ROOT = Path(__file__).parents[2]
@@ -153,7 +158,7 @@ def decode(
         if step in checkpoints:
             trace.append({"token": step + 1, "coefficients": observed})
         logits = output.logits[:, -1, :]
-    return tokenizer.decode(generated, skip_special_tokens=True).strip(), trace
+    return clean_response(tokenizer.decode(generated, skip_special_tokens=True)), trace
 
 
 def generate_condition(

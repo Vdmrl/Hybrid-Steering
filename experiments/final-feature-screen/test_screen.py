@@ -19,3 +19,7 @@ def test_gram_inverse_recovers_nonorthogonal_coordinates() -> None:
     state = 2.0 * first - 0.5 * second
     actual = SCREEN.gram_inverse(basis) @ (basis @ state)
     assert torch.allclose(actual, torch.tensor([2.0, -0.5]), atol=1e-5)
+
+
+def test_clean_response_removes_only_leaked_delimiter() -> None:
+    assert SCREEN.clean_response("</think>\nAnswer") == "Answer"
