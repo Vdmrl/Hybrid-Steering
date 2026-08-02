@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "status": "complete",
+  "interaction_conditions_run": false,
+  "judge_api_spend_usd": 0.0,
+  "features": [
+    {
+      "feature": "russian_language",
+      "selected": {
+        "rank": "rank4",
+        "alpha": 1.5,
+        "rss": true,
+        "clamp_beta": 1.0
+      },
+      "n": 4,
+      "cyrillic_fraction": [0.972, 1.0, 0.988, 1.0],
+      "cjk_failures": 0,
+      "visual_check": "All four answers are coherent and almost entirely Russian.",
+      "verdict": "PASS"
+    },
+    {
+      "feature": "technical",
+      "selected": {
+        "rank": "rank4",
+        "alpha": 2.0,
+        "rss": true,
+        "clamp_beta": 1.0
+      },
+      "n": 8,
+      "visual_check": "Technical register is visibly stronger without a quality failure.",
+      "prior_same_configuration": {
+        "n": 128,
+        "expected_score_delta": 0.587,
+        "quality_delta": 0.027,
+        "source": "experiments/final-feature-screen/results/summary.json"
+      },
+      "verdict": "PASS"
+    },
+    {
+      "feature": "numbered_list",
+      "selected": {
+        "rank": "rank4",
+        "alpha": 4.0,
+        "rss": true,
+        "clamp_beta": 1.0
+      },
+      "n": 8,
+      "numbered_items_total": {
+        "baseline": 4,
+        "steered": 10
+      },
+      "prompts_with_visible_increase": 3,
+      "prior_same_configuration": {
+        "n": 128,
+        "expected_score_delta": 0.833,
+        "quality_delta": 0.211,
+        "source": "experiments/final-feature-screen/results/summary.json"
+      },
+      "visual_check": "Works, but only when a list is contextually natural.",
+      "verdict": "PROMPT_DEPENDENT"
+    },
+    {
+      "feature": "passive_voice",
+      "source": "StylePTB ATP, 128 pairs",
+      "tested": [
+        {"rank": "full", "alpha": 2.0},
+        {"rank": "rank4", "alpha": 2.0},
+        {"rank": "rank1", "alpha": 2.0},
+        {"rank": "rank4", "alpha": 4.0}
+      ],
+      "n_per_condition": 4,
+      "passive_proxy_total": {
+        "baseline": 5,
+        "full_alpha2": 3,
+        "rank4_alpha2": 4,
+        "rank1_alpha2": 4,
+        "rank4_alpha4": 3
+      },
+      "visual_check": "No consistent increase in passive constructions.",
+      "verdict": "FAIL"
+    }
+  ],
+  "decision": {
+    "keep": ["russian_language", "technical", "numbered_list"],
+    "drop": ["passive_voice"],
+    "next_step": "Find one replacement singleton before testing interactions."
+  }
+}
