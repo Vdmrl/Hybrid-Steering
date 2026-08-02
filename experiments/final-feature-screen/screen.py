@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 import torch
+from hybrid_steering.cache import recurrent_tensor
 from safetensors.torch import load_file, save_file
 
 ROOT = Path(__file__).parents[2]
@@ -38,6 +39,7 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--feature", choices=FEATURES)
     parser.add_argument("--rank", choices=("full", "rank1", "rank4"), default="rank4")
     parser.add_argument("--alpha", type=float, default=2.0)
+    parser.add_argument("--clamp-beta", type=float, default=1.0)
     parser.add_argument("--prompts-file", type=Path)
     parser.add_argument("--limit", type=int)
     parser.add_argument("--tag", default="smoke")
@@ -128,6 +130,88 @@ def build_directions(out: Path, model: Any, tokenizer: Any) -> None:
                 )
 
 
+def gram_inverse(flat_basis: torch.Tensor, ridge: float = 1e-6) -> torch.Tensor:
+    gram = flat_basis @ flat_basis.T
+    scale = torch.diag(gram).mean().clamp_min(1e-12)
+    return torch.linalg.inv(
+        gram + torch.eye(len(flat_basis), device=gram.device) * ridge * scale
+    )
+
+
+def make_clamp_runtime(
+    cache: Any, direction: dict[int, torch.Tensor], alpha: float
+) -> dict[int, dict[str, torch.Tensor]]:
+    """Prepare a one-feature clamp; RSS is the identity for a singleton."""
+    runtime = {}
+    for layer, value in direction.items():
+        state = recurrent_tensor(cache, layer)
+        basis = value.to(state).float().flatten().unsqueeze(0)
+        inverse = gram_inverse(basis)
+        initial = inverse @ (basis @ state.float().flatten())
+        runtime[layer] = {
+            "basis": basis,
+            "inverse": inverse,
+            "target": initial + alpha,
+        }
+    return runtime
+
+
+@torch.no_grad()
+def clamp_cache(
+    cache: Any, runtime: dict[int, dict[str, torch.Tensor]], beta: float
+) -> None:
+    for layer, values in runtime.items():
+        state = recurrent_tensor(cache, layer)
+        current = values["inverse"] @ (values["basis"] @ state.float().flatten())
+        correction = values["target"] - current
+        state.add_(
+            (correction @ values["basis"]).reshape(state.shape).to(state), alpha=beta
+        )
+
+
+@torch.inference_mode()
+def decode(
+    model: Any,
+    tokenizer: Any,
+    cache: Any,
+    max_new_tokens: int,
+    clamp: tuple[dict[int, dict[str, torch.Tensor]], float] | None,
+) -> str:
+    output = None
+    for token_id in tokenizer.encode("\n", add_special_tokens=False):
+        output = model(
+            input_ids=torch.tensor([[token_id]], device="cuda"),
+            past_key_values=cache,
+            use_cache=True,
+            return_dict=True,
+        )
+        cache = output.past_key_values
+        if clamp is not None:
+            clamp_cache(cache, *clamp)
+    if output is None:
+        raise RuntimeError("bridge text produced no tokens")
+    logits = output.logits[:, -1, :]
+    generated: list[int] = []
+    eos = tokenizer.eos_token_id
+    eos_ids = {eos} if isinstance(eos, int) else set(eos or [])
+    for _ in range(max_new_tokens):
+        token_id = int(logits.argmax(dim=-1).item())
+        if token_id in eos_ids:
+            break
+        generated.append(token_id)
+        output = model(
+            input_ids=torch.tensor([[token_id]], device="cuda"),
+            past_key_values=cache,
+            use_cache=True,
+            return_dict=True,
+        )
+        cache = output.past_key_values
+        if clamp is not None:
+            clamp_cache(cache, *clamp)
+        logits = output.logits[:, -1, :]
+    return tokenizer.decode(generated, skip_special_tokens=True).strip()
+
+
 def run(
     out: Path,
     model_id: str,
@@ -138,6 +222,7 @@ def run(
     prompts_file: Path | None,
     limit: int | None,
     tag: str,
+    clamp_beta: float,
 ) -> None:
     if feature is None:
         raise ValueError("--feature is required for the sequential smoke")
@@ -154,17 +239,24 @@ def run(
         before = runner.snapshot_nonrecurrent(target)
         conditions: list[tuple[str, dict[int, torch.Tensor] | None, float]] = [
             ("baseline", None, 0.0),
-            (f"{feature}:{rank}:alpha={alpha:g}", direction, alpha),
+            (
+                f"{feature}:{rank}:alpha={alpha:g}:rss:clamp={clamp_beta:g}",
+                direction,
+                alpha,
+            ),
         ]
         for condition, direction, strength in conditions:
             task_id = f"{tag}:{prompt_id}:{condition}"
             if task_id in done:
                 continue
             cache = runner.clone_cache(target)
+            clamp = None
             if direction is not None:
-                runner.add_direction(cache, direction, strength)
+                runtime = make_clamp_runtime(cache, direction, strength)
+                clamp_cache(cache, runtime, 1.0)
+                clamp = (runtime, clamp_beta)
             runner.assert_nonrecurrent_unchanged(before, cache)
-            response = runner.decode(model, tokenizer, cache, max_new_tokens)
+            response = decode(model, tokenizer, cache, max_new_tokens, clamp)
             append_jsonl(
                 output,
                 {
@@ -173,6 +265,12 @@ def run(
                     "scenario": prompt,
                     "condition": condition,
                     "response": response,
+                    "generation": {
+                        "rank": rank,
+                        "alpha": strength,
+                        "rss": True,
+                        "clamp_beta": clamp_beta if direction is not None else None,
+                    },
                 },
             )
             print(task_id, flush=True)
@@ -233,6 +331,7 @@ def main() -> None:
             args.prompts_file,
             args.limit,
             args.tag,
+            args.clamp_beta,
         )
     else:
         summarize(
