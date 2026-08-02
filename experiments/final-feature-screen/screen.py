@@ -95,10 +95,12 @@ def prompts(path: Path | None, limit: int | None) -> list[tuple[str, str]]:
     return rows if limit is None else rows[:limit]
 
 
-def build_directions(out: Path, model: Any, tokenizer: Any) -> None:
+def build_directions(
+    out: Path, model: Any, tokenizer: Any, features: tuple[str, ...]
+) -> None:
     direction_dir = out / "directions"
     direction_dir.mkdir(parents=True, exist_ok=True)
-    for feature in FEATURES:
+    for feature in features:
         full_path = direction_dir / f"{feature}-full.safetensors"
         if full_path.exists():
             full = tensor_map(full_path)
@@ -203,7 +205,7 @@ def run(
     output = out / f"{tag}-{feature}-{rank}-alpha={alpha:g}.jsonl"
     done = {row["task_id"] for row in read_jsonl(output)}
     if direction_path is None:
-        build_directions(out, model, tokenizer)
+        build_directions(out, model, tokenizer, (feature,))
         direction_path = out / "directions" / f"{feature}-{rank}.safetensors"
     direction = tensor_map(direction_path)
     for prompt_id, prompt in prompt_rows:
