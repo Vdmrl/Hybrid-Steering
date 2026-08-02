@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "status": "complete",
+  "judge_api_spend_usd": 0.0,
+  "pair_version": "minimal-v1",
+  "direction_pairs": 10,
+  "prompts": 4,
+  "tested": {
+    "singleton": [
+      {"rank": "rank1", "alpha": 4.0},
+      {"rank": "rank4", "alpha": 4.0}
+    ],
+    "composition": {
+      "confident": {"rank": "rank1", "alpha": 4.0},
+      "optimism": {"rank": "rank1", "alpha": 4.0},
+      "rss": true,
+      "clamp_beta": 1.0
+    }
+  },
+  "proxy": {
+    "baseline_hedge_markers": 1,
+    "confident_hedge_markers": 0,
+    "optimism_hedge_markers": 0,
+    "confident_plus_optimism_hedge_markers": 0,
+    "cjk_failures": 0,
+    "repetition_failures": 0
+  },
+  "conclusion": "The shared prompts already have a confident ceiling. The repaired direction is clean but produces no clearly separable confident effect, alone or with optimism.",
+  "verdict": "FAIL_FOR_CURRENT_PROMPT_SET"
+}
