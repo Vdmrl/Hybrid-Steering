@@ -11,13 +11,7 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
-import pandas as pd
-
 WIKISPLIT_ROWS = "https://datasets-server.huggingface.co/rows"
-OPUS_TEST = (
-    "https://huggingface.co/datasets/Helsinki-NLP/opus-100/resolve/main/"
-    "en-ru/test-00000-of-00001.parquet?download=true"
-)
 CYRILLIC = re.compile(r"[А-Яа-яЁё]")
 LATIN = re.compile(r"[A-Za-z]")
 POSITIVE = re.compile(
@@ -122,36 +116,48 @@ def prepare_atomic(count: int) -> list[dict[str, Any]]:
     raise RuntimeError(f"only {len(candidates)}/{count} clean WikiSplit++ pairs")
 
 
-def prepare_russian(out: Path, count: int) -> list[dict[str, Any]]:
-    parquet = out / "sources" / "opus100-en-ru-test.parquet"
-    parquet.parent.mkdir(parents=True, exist_ok=True)
-    if not parquet.exists():
-        urllib.request.urlretrieve(OPUS_TEST, parquet)
-    frame = pd.read_parquet(parquet)
+def flores_rows(config: str, split: str, offset: int) -> list[dict[str, Any]]:
+    query = urllib.parse.urlencode(
+        {
+            "dataset": "openlanguagedata/flores_plus",
+            "config": config,
+            "split": split,
+            "offset": offset,
+            "length": 100,
+        }
+    )
+    with urllib.request.urlopen(f"{WIKISPLIT_ROWS}?{query}", timeout=60) as response:
+        return json.load(response)["rows"]
+
+
+def prepare_russian(count: int) -> list[dict[str, Any]]:
+    english = {}
+    russian = {}
+    for offset in range(0, 400, 100):
+        for wrapped in flores_rows("eng_Latn", "dev", offset):
+            english[str(wrapped["row"]["id"])] = str(wrapped["row"]["text"]).strip()
+        for wrapped in flores_rows("rus_Cyrl", "dev", offset):
+            russian[str(wrapped["row"]["id"])] = str(wrapped["row"]["text"]).strip()
     candidates = []
-    seen = set()
-    for index, value in enumerate(frame["translation"]):
-        english = str(value["en"]).strip()
-        russian = str(value["ru"]).strip()
-        key = english.casefold()
-        length_ratio = len(russian) / max(len(english), 1)
-        cyrillic_ratio = len(CYRILLIC.findall(russian)) / max(len(russian), 1)
-        latin_ratio = len(LATIN.findall(english)) / max(len(english), 1)
+    for row_id in sorted(set(english) & set(russian), key=int):
+        en_text = english[row_id]
+        ru_text = russian[row_id]
+        length_ratio = len(ru_text) / max(len(en_text), 1)
+        cyrillic_ratio = len(CYRILLIC.findall(ru_text)) / max(len(ru_text), 1)
+        latin_ratio = len(LATIN.findall(en_text)) / max(len(en_text), 1)
         if (
-            key in seen
-            or not 6 <= len(english.split()) <= 80
+            not 6 <= len(en_text.split()) <= 80
             or not 0.6 <= length_ratio <= 2.2
             or cyrillic_ratio < 0.45
             or latin_ratio < 0.45
         ):
             continue
-        seen.add(key)
         candidates.append(
             {
-                "source_id": f"opus100:test:{index}",
-                "positive_text": russian,
-                "negative_text": english,
-                "length_ratio": round(ratio(russian, english), 3),
+                "source_id": f"flores+:dev:{row_id}",
+                "positive_text": ru_text,
+                "negative_text": en_text,
+                "length_ratio": round(ratio(ru_text, en_text), 3),
             }
         )
         if len(candidates) == count:
@@ -202,15 +208,18 @@ def main() -> None:
     parser.add_argument("--count", type=int, default=128)
     args = parser.parse_args()
     feature_rows = {
-        "russian_language": prepare_russian(args.output, args.count),
+        "russian_language": prepare_russian(args.count),
         "optimism": prepare_optimism(args.optimism_source, args.count),
         "atomic_sentences": prepare_atomic(args.count),
     }
+    common_n = min(map(len, feature_rows.values()))
+    feature_rows = {feature: rows[:common_n] for feature, rows in feature_rows.items()}
     for feature, rows in feature_rows.items():
         write_jsonl(args.output / "data" / f"{feature}_pairs.jsonl", rows)
     rng = random.Random(20260802)
     report = {
         "requested_pairs": args.count,
+        "selected_pairs_per_feature": common_n,
         "features": {
             feature: summarize(rows) for feature, rows in feature_rows.items()
         },
