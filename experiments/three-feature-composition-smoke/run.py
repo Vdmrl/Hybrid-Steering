@@ -29,6 +29,7 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--atomic-alpha", type=float, default=3)
     parser.add_argument("--scale", type=float, default=0.85)
     parser.add_argument("--russian-scale", type=float, default=1)
+    parser.add_argument("--clamp-beta", type=float, default=0.5)
     parser.add_argument("--tag", default="atomic3")
     return parser.parse_args()
 
@@ -87,7 +88,7 @@ def main() -> None:
                 )
             else:
                 response, trace = run.generate_condition(
-                    model, tokenizer, base, directions, features, 128, 1
+                    model, tokenizer, base, directions, features, 128, args.clamp_beta
                 )
             append(
                 output,
