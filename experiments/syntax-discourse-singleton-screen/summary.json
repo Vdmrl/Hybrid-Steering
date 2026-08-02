@@ -1,0 +1,47 @@
+{
+  "experiment": "syntax-discourse-singleton-screen",
+  "model": "Qwen/Qwen3.5-9B",
+  "pairs_per_feature": 16,
+  "heldout_prompts": 4,
+  "judge_api_used": false,
+  "results": [
+    {
+      "feature": "atomic_sentences",
+      "best_config": "rank4 alpha=4 rss clamp=1",
+      "baseline_words_per_sentence": 19.268,
+      "steered_words_per_sentence": 12.259,
+      "relative_change": -0.364,
+      "cjk_detected": false,
+      "visual_check": "clear shorter-sentence effect; answers remain relevant and readable",
+      "verdict": "PASS_CANDIDATE"
+    },
+    {
+      "feature": "explicit_connectives",
+      "best_config": "rank1 alpha=2 rss clamp=1",
+      "donor_connectives_per_text": {
+        "target": 4.9375,
+        "opposite": 0.0625
+      },
+      "baseline_connectives_per_100_words": 0.245,
+      "steered_connectives_per_100_words": 0.269,
+      "stronger_configs_connectives_per_100_words": 0.0,
+      "cjk_detected": false,
+      "visual_check": "no transferable increase in explicit logical connectives",
+      "verdict": "FAIL"
+    },
+    {
+      "feature": "rhetorical_questions",
+      "best_config": "rank1 alpha=4 rss clamp=1",
+      "donor_questions_per_text": {
+        "target": 4.0625,
+        "opposite": 0.0625
+      },
+      "baseline_questions_per_response": 0.0,
+      "steered_questions_per_response": 1.0,
+      "cjk_detected": false,
+      "visual_check": "questions appear, but conversationality, enthusiasm, examples, and exclamation marks rise together",
+      "verdict": "CONFOUNDED"
+    }
+  ],
+  "recommendation": "Keep atomic_sentences as the only candidate from this screen. Do not compose the other two."
+}
