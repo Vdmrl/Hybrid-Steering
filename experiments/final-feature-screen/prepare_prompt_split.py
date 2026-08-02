@@ -29,8 +29,7 @@ def write_split(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         "".join(
-            json.dumps({"id": f"final-dev-{index:02d}", "prompt": prompt)
-            + "\n"
+            json.dumps({"id": f"final-dev-{index:02d}", "prompt": prompt}) + "\n"
             for index, prompt in enumerate(DEV_PROMPTS)
         ),
         encoding="utf-8",
