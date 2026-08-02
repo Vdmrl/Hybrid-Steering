@@ -28,6 +28,7 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--limit", type=int, default=6)
     parser.add_argument("--atomic-alpha", type=float, default=3)
     parser.add_argument("--scale", type=float, default=0.85)
+    parser.add_argument("--russian-scale", type=float, default=1)
     parser.add_argument("--tag", default="atomic3")
     return parser.parse_args()
 
@@ -46,7 +47,7 @@ def main() -> None:
             "direction": str(args.russian),
             "rank": "rank4",
             "alpha": 1.5,
-            "c": args.scale,
+            "c": args.russian_scale,
         },
         {
             "name": "optimism",
