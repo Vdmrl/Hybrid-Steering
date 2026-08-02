@@ -12,10 +12,6 @@ from pathlib import Path
 from typing import Any
 
 WIKISPLIT_ROWS = "https://datasets-server.huggingface.co/rows"
-FLORES_DEV = (
-    "https://huggingface.co/datasets/openlanguagedata/flores_plus/resolve/main/"
-    "dev/{language}.jsonl?download=true"
-)
 CYRILLIC = re.compile(r"[А-Яа-яЁё]")
 LATIN = re.compile(r"[A-Za-z]")
 POSITIVE = re.compile(
@@ -120,27 +116,11 @@ def prepare_atomic(count: int) -> list[dict[str, Any]]:
     raise RuntimeError(f"only {len(candidates)}/{count} clean WikiSplit++ pairs")
 
 
-def flores_language(language: str) -> dict[str, str]:
-    with urllib.request.urlopen(
-        FLORES_DEV.format(language=language), timeout=60
-    ) as response:
-        return {
-            str(row["id"]): str(row["text"]).strip()
-            for row in (
-                json.loads(line)
-                for line in response.read().decode("utf-8").splitlines()
-                if line.strip()
-            )
-        }
-
-
-def prepare_russian(count: int) -> list[dict[str, Any]]:
-    english = flores_language("eng_Latn")
-    russian = flores_language("rus_Cyrl")
+def prepare_russian(source: Path, count: int) -> list[dict[str, Any]]:
     candidates = []
-    for row_id in sorted(set(english) & set(russian), key=int):
-        en_text = english[row_id]
-        ru_text = russian[row_id]
+    for row in jsonl(source):
+        en_text = str(row["negative_text"]).strip()
+        ru_text = str(row["positive_text"]).strip()
         length_ratio = len(ru_text) / max(len(en_text), 1)
         cyrillic_ratio = len(CYRILLIC.findall(ru_text)) / max(len(ru_text), 1)
         latin_ratio = len(LATIN.findall(en_text)) / max(len(en_text), 1)
@@ -153,7 +133,7 @@ def prepare_russian(count: int) -> list[dict[str, Any]]:
             continue
         candidates.append(
             {
-                "source_id": f"flores+:dev:{row_id}",
+                "source_id": row["source_id"],
                 "positive_text": ru_text,
                 "negative_text": en_text,
                 "length_ratio": round(ratio(ru_text, en_text), 3),
@@ -204,10 +184,11 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--optimism-source", type=Path, required=True)
+    parser.add_argument("--russian-source", type=Path, required=True)
     parser.add_argument("--count", type=int, default=128)
     args = parser.parse_args()
     feature_rows = {
-        "russian_language": prepare_russian(args.count),
+        "russian_language": prepare_russian(args.russian_source, args.count),
         "optimism": prepare_optimism(args.optimism_source, args.count),
         "atomic_sentences": prepare_atomic(args.count),
     }
