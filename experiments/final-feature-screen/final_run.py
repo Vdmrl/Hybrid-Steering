@@ -60,7 +60,7 @@ def tensor_map(path: Path, sign: float) -> dict[int, torch.Tensor]:
     }
 
 
-def load_selection(path: Path) -> list[dict[str, Any]]:
+def load_selection(path: Path) -> tuple[list[dict[str, Any]], float]:
     value = json.loads(path.read_text(encoding="utf-8"))
     features = value.get("features")
     if not isinstance(features, list) or not 4 <= len(features) <= 5:
@@ -78,7 +78,10 @@ def load_selection(path: Path) -> list[dict[str, Any]]:
             raise ValueError(f"invalid alpha/c for {item['name']}")
         if not Path(item["direction"]).is_file():
             raise FileNotFoundError(item["direction"])
-    return features
+    clamp_beta = float(value.get("clamp_beta", 1.0))
+    if not 0 < clamp_beta <= 1:
+        raise ValueError("clamp_beta must be in (0, 1]")
+    return features, clamp_beta
 
 
 def prompt_rows(path: Path, limit: int | None) -> list[dict[str, str]]:
@@ -160,6 +163,7 @@ def generate_condition(
     directions: dict[str, dict[int, torch.Tensor]],
     selected: list[dict[str, Any]],
     max_new_tokens: int,
+    clamp_beta: float,
 ) -> tuple[str, list[dict[str, Any]]]:
     cache = runner.clone_cache(base_cache)
     before = runner.snapshot_nonrecurrent(cache)
@@ -171,12 +175,12 @@ def generate_condition(
     runtime = make_clamp_runtime(cache, active, deltas)
     clamp_cache(cache, runtime, 1.0)
     runner.assert_nonrecurrent_unchanged(before, cache)
-    return decode(model, tokenizer, cache, max_new_tokens, (runtime, 1.0))
+    return decode(model, tokenizer, cache, max_new_tokens, (runtime, clamp_beta))
 
 
 def run(args: argparse.Namespace) -> None:
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    selected = load_selection(args.selection)
+    selected, clamp_beta = load_selection(args.selection)
     rows = prompt_rows(args.prompts, args.limit)
     if args.expect_prompts is not None and len(rows) != args.expect_prompts:
         raise ValueError(f"expected {args.expect_prompts} prompts, got {len(rows)}")
@@ -188,6 +192,7 @@ def run(args: argparse.Namespace) -> None:
         "prompts": str(args.prompts),
         "selection": selected,
         "subsets": args.subsets,
+        "clamp_beta": clamp_beta,
         "conditions": ["+".join(value) for value in conditions],
         "method": "gdn_rss_clamp",
     }
@@ -227,6 +232,7 @@ def run(args: argparse.Namespace) -> None:
                     directions,
                     chosen,
                     args.max_new_tokens,
+                    clamp_beta,
                 )
             else:
                 cache = runner.clone_cache(base_cache)
