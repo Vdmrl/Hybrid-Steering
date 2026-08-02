@@ -241,7 +241,9 @@ def run(args: argparse.Namespace) -> None:
                 )
             else:
                 cache = runner.clone_cache(base_cache)
-                response = runner.decode(model, tokenizer, cache, args.max_new_tokens)
+                response = clean_response(
+                    runner.decode(model, tokenizer, cache, args.max_new_tokens)
+                )
                 trace = []
             runner.assert_nonrecurrent_unchanged(before, base_cache)
             append_jsonl(
