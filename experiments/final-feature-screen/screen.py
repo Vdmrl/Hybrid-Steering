@@ -30,6 +30,7 @@ FEATURES = (
     "technical",
     "persuasive",
     "action_emphasis",
+    "adjective_emphasis",
 )
 PROMPTS = [
     "How should a team decide whether to postpone a software release?",

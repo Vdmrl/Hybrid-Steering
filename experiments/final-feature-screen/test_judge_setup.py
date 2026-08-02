@@ -34,3 +34,8 @@ def test_blind_inputs_cover_every_feature_and_quality(tmp_path: Path) -> None:
 def test_action_emphasis_has_a_complete_exploratory_rubric() -> None:
     value = SETUP.config_features(["action_emphasis"])["action_emphasis"]
     assert set(value["anchors"]) == {1, 2, 3, 4, 5}
+
+
+def test_adjective_emphasis_has_a_complete_exploratory_rubric() -> None:
+    value = SETUP.config_features(["adjective_emphasis"])["adjective_emphasis"]
+    assert set(value["anchors"]) == {1, 2, 3, 4, 5}

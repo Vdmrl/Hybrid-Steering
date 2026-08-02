@@ -69,6 +69,18 @@ EXPLORATORY = {
             5: "Strongly and consistently foregrounds concrete actions and processes throughout the answer.",
         },
     ),
+    "adjective_emphasis": (
+        "adjective emphasis",
+        "neutral adjective use",
+        "Adjective emphasis deliberately uses descriptive modifiers to foreground qualities and attributes.",
+        {
+            1: "Avoids descriptive modifiers and uses almost no meaningful adjectives.",
+            2: "Uses only occasional incidental adjectives without emphasizing qualities.",
+            3: "Neutral or mixed descriptive emphasis.",
+            4: "Clearly uses descriptive modifiers to foreground relevant qualities or attributes.",
+            5: "Strongly and consistently foregrounds qualities with relevant descriptive modifiers throughout the answer.",
+        },
+    ),
 }
 
 
