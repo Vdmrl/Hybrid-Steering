@@ -1,0 +1,53 @@
+{
+  "status": "complete",
+  "n_prompts": 6,
+  "configuration": {
+    "russian_language": "matched rank4, alpha=1.5, c=1",
+    "optimism": "rank1, alpha=4, c=0.85",
+    "atomic_sentences": "rank4, alpha=3, c=0.85",
+    "composition": "RSS",
+    "clamp_beta": 0.5
+  },
+  "expected_scores": {
+    "russian_language": {
+      "baseline": 1.288,
+      "triple": 4.999,
+      "delta": 3.712
+    },
+    "optimism": {
+      "baseline": 3.003,
+      "triple": 3.307,
+      "delta": 0.304
+    },
+    "atomic_sentences": {
+      "baseline": 2.386,
+      "triple": 2.373,
+      "delta": -0.013
+    },
+    "answer_quality": {
+      "baseline": 4.33,
+      "triple": 3.758,
+      "delta": -0.572
+    }
+  },
+  "integer_score_ge4_rates": {
+    "russian_language": {
+      "baseline": 0.0,
+      "triple": 1.0
+    },
+    "optimism": {
+      "baseline": 0.0,
+      "triple": 0.333
+    },
+    "atomic_sentences": {
+      "baseline": 0.0,
+      "triple": 0.0
+    },
+    "answer_quality": {
+      "baseline": 1.0,
+      "triple": 0.833
+    }
+  },
+  "verdict": "DO_NOT_LAUNCH_FULL_RUN",
+  "reason": "Only Russian is reliable; optimism is weak, atomic does not improve under blind Judge, and mean answer quality drops by more than 0.5 points."
+}
