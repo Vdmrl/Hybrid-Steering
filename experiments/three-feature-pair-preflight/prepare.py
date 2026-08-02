@@ -12,6 +12,10 @@ from pathlib import Path
 from typing import Any
 
 WIKISPLIT_ROWS = "https://datasets-server.huggingface.co/rows"
+FLORES_DEV = (
+    "https://huggingface.co/datasets/openlanguagedata/flores_plus/resolve/main/"
+    "dev/{language}.jsonl?download=true"
+)
 CYRILLIC = re.compile(r"[А-Яа-яЁё]")
 LATIN = re.compile(r"[A-Za-z]")
 POSITIVE = re.compile(
@@ -116,28 +120,23 @@ def prepare_atomic(count: int) -> list[dict[str, Any]]:
     raise RuntimeError(f"only {len(candidates)}/{count} clean WikiSplit++ pairs")
 
 
-def flores_rows(config: str, split: str, offset: int) -> list[dict[str, Any]]:
-    query = urllib.parse.urlencode(
-        {
-            "dataset": "openlanguagedata/flores_plus",
-            "config": config,
-            "split": split,
-            "offset": offset,
-            "length": 100,
+def flores_language(language: str) -> dict[str, str]:
+    with urllib.request.urlopen(
+        FLORES_DEV.format(language=language), timeout=60
+    ) as response:
+        return {
+            str(row["id"]): str(row["text"]).strip()
+            for row in (
+                json.loads(line)
+                for line in response.read().decode("utf-8").splitlines()
+                if line.strip()
+            )
         }
-    )
-    with urllib.request.urlopen(f"{WIKISPLIT_ROWS}?{query}", timeout=60) as response:
-        return json.load(response)["rows"]
 
 
 def prepare_russian(count: int) -> list[dict[str, Any]]:
-    english = {}
-    russian = {}
-    for offset in range(0, 400, 100):
-        for wrapped in flores_rows("eng_Latn", "dev", offset):
-            english[str(wrapped["row"]["id"])] = str(wrapped["row"]["text"]).strip()
-        for wrapped in flores_rows("rus_Cyrl", "dev", offset):
-            russian[str(wrapped["row"]["id"])] = str(wrapped["row"]["text"]).strip()
+    english = flores_language("eng_Latn")
+    russian = flores_language("rus_Cyrl")
     candidates = []
     for row_id in sorted(set(english) & set(russian), key=int):
         en_text = english[row_id]
