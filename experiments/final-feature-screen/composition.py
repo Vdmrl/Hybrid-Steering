@@ -59,7 +59,10 @@ def make_clamp_runtime(
 
 
 @torch.no_grad()
-def clamp_cache(cache: Any, runtime: dict[int, dict[str, Any]], beta: float) -> None:
+def clamp_cache(
+    cache: Any, runtime: dict[int, dict[str, Any]], beta: float
+) -> dict[int, dict[str, float]]:
+    observed = {}
     for layer, values in runtime.items():
         state = recurrent_tensor(cache, layer)
         current = values["inverse"] @ (values["basis"] @ state.float().flatten())
@@ -67,3 +70,8 @@ def clamp_cache(cache: Any, runtime: dict[int, dict[str, Any]], beta: float) -> 
         state.add_(
             (correction @ values["basis"]).reshape(state.shape).to(state), alpha=beta
         )
+        final = current + beta * correction
+        observed[layer] = {
+            name: float(final[index]) for index, name in enumerate(values["names"])
+        }
+    return observed
