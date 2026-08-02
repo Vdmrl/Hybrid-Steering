@@ -1,0 +1,59 @@
+{
+  "schema_version": "final-feature-screen-manifest-1",
+  "generation_model": "Qwen/Qwen3.5-9B",
+  "prompt_split": {
+    "kind": "held_out",
+    "n_prompts": 128
+  },
+  "intervention": {
+    "composition": "RSS-normalized direction sum",
+    "clamp": {
+      "enabled": true,
+      "beta": 1.0
+    },
+    "features": [
+      {
+        "name": "optimism",
+        "rank": "rank1",
+        "alpha": 4,
+        "c": 1,
+        "sign": 1
+      },
+      {
+        "name": "technical",
+        "rank": "rank4",
+        "alpha": 2,
+        "c": 1,
+        "sign": 1
+      },
+      {
+        "name": "numbered_list",
+        "rank": "rank4",
+        "alpha": 4,
+        "c": 1,
+        "sign": 1
+      },
+      {
+        "name": "persuasive",
+        "rank": "rank1",
+        "alpha": 8,
+        "c": 1,
+        "sign": 1
+      }
+    ]
+  },
+  "evaluation": {
+    "judge": "standard blind Judge v3",
+    "endpoints": [
+      "trait_score",
+      "score_distribution",
+      "expected_score",
+      "p_ge4",
+      "answer_quality"
+    ],
+    "bootstrap": {
+      "samples": 2000,
+      "confidence": 0.95
+    }
+  }
+}
