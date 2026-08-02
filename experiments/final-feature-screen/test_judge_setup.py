@@ -29,3 +29,8 @@ def test_blind_inputs_cover_every_feature_and_quality(tmp_path: Path) -> None:
         row = json.loads((tmp_path / "judge-inputs" / f"{name}.jsonl").read_text())
         assert row["answers"][0]["answer_id"] == "answer_0"
         assert "method" not in row["metadata"]
+
+
+def test_action_emphasis_has_a_complete_exploratory_rubric() -> None:
+    value = SETUP.config_features(["action_emphasis"])["action_emphasis"]
+    assert set(value["anchors"]) == {1, 2, 3, 4, 5}

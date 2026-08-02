@@ -57,6 +57,18 @@ EXPLORATORY = {
             5: "Sustained evidence-based advocacy with clear reasons and a concrete call to action.",
         },
     ),
+    "action_emphasis": (
+        "action emphasis",
+        "neutral action description",
+        "Action emphasis foregrounds concrete actions, decisions, and processes with explicit verbs.",
+        {
+            1: "Mostly describes states or properties and gives little attention to actions or processes.",
+            2: "Mentions actions incidentally but focuses mainly on static descriptions.",
+            3: "Neutral or mixed emphasis between actions and descriptions.",
+            4: "Clearly foregrounds concrete actions, decisions, or processes with explicit verbs.",
+            5: "Strongly and consistently foregrounds concrete actions and processes throughout the answer.",
+        },
+    ),
 }
 
 
