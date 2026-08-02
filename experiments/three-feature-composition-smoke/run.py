@@ -28,6 +28,7 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--limit", type=int, default=6)
     parser.add_argument("--atomic-alpha", type=float, default=3)
     parser.add_argument("--scale", type=float, default=0.85)
+    parser.add_argument("--optimism-scale", type=float, default=0.85)
     parser.add_argument("--russian-scale", type=float, default=1)
     parser.add_argument("--clamp-beta", type=float, default=0.5)
     parser.add_argument("--tag", default="atomic3")
@@ -55,7 +56,7 @@ def main() -> None:
             "direction": str(args.optimism),
             "rank": "rank1",
             "alpha": 4,
-            "c": args.scale,
+            "c": args.optimism_scale,
         },
         {
             "name": "atomic_sentences",
