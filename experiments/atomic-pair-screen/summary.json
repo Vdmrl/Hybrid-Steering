@@ -1,0 +1,49 @@
+{
+  "experiment": "atomic-pair-screen",
+  "model": "Qwen/Qwen3.5-9B",
+  "heldout_prompts": 4,
+  "judge_api_used": false,
+  "selection": {
+    "atomic_sentences": "rank4 alpha=4",
+    "optimism": "rank1 alpha=4",
+    "numbered_list": "rank4 alpha=4",
+    "composition": "RSS clamp=1"
+  },
+  "pairs": [
+    {
+      "features": [
+        "atomic_sentences",
+        "optimism"
+      ],
+      "words_per_sentence": {
+        "baseline": 22.35,
+        "atomic_sentences": 12.79,
+        "optimism": 18.9,
+        "atomic_sentences+optimism": 10.17
+      },
+      "visual_check": "Atomicity is clear and survives composition. Optimism is not consistently visible in either its singleton or the pair.",
+      "verdict": "OPTIMISM_INCONCLUSIVE"
+    },
+    {
+      "features": [
+        "atomic_sentences",
+        "numbered_list"
+      ],
+      "words_per_sentence": {
+        "baseline": 22.35,
+        "atomic_sentences": 12.79,
+        "numbered_list": 12.11,
+        "atomic_sentences+numbered_list": 9.03
+      },
+      "numbered_items_across_4_answers": {
+        "baseline": 4,
+        "atomic_sentences": 7,
+        "numbered_list": 9,
+        "atomic_sentences+numbered_list": 10
+      },
+      "visual_check": "Both effects are present together, but each singleton also raises the other feature's proxy.",
+      "verdict": "WORKS_BUT_CONFOUNDED"
+    }
+  ],
+  "recommendation": "Do not use atomic_sentences together with numbered_list in a diagonal independence demonstration. Keep atomic_sentences as a candidate only if numbered_list is removed. Optimism needs a stronger singleton or a different replacement."
+}
