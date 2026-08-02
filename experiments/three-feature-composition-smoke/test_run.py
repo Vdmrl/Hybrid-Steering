@@ -7,3 +7,4 @@ def test_smoke_contains_only_baseline_and_triple():
     assert '"russian_language"' in text
     assert '"optimism"' in text
     assert '"atomic_sentences"' in text
+    assert "default=3" in text

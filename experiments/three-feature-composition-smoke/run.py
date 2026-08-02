@@ -26,6 +26,8 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--optimism", type=Path, required=True)
     parser.add_argument("--atomic", type=Path, required=True)
     parser.add_argument("--limit", type=int, default=6)
+    parser.add_argument("--atomic-alpha", type=float, default=3)
+    parser.add_argument("--tag", default="atomic3")
     return parser.parse_args()
 
 
@@ -56,7 +58,7 @@ def main() -> None:
             "name": "atomic_sentences",
             "direction": str(args.atomic),
             "rank": "rank4",
-            "alpha": 4,
+            "alpha": args.atomic_alpha,
             "c": 1,
         },
     ]
@@ -64,7 +66,7 @@ def main() -> None:
         item["name"]: run.tensor_map(Path(item["direction"]), 1) for item in features
     }
     names = tuple(item["name"] for item in features)
-    output = args.output / "generations.jsonl"
+    output = args.output / f"{args.tag}.jsonl"
     done = (
         {row["task_id"] for row in run.read_jsonl(output)} if output.exists() else set()
     )
