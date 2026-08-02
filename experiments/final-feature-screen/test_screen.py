@@ -5,8 +5,8 @@ from pathlib import Path
 
 import torch
 
-PATH = Path(__file__).with_name("screen.py")
-SPEC = importlib.util.spec_from_file_location("final_feature_screen", PATH)
+PATH = Path(__file__).with_name("composition.py")
+SPEC = importlib.util.spec_from_file_location("composition", PATH)
 assert SPEC and SPEC.loader
 SCREEN = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(SCREEN)

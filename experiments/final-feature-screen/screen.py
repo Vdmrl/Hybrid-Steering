@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 import torch
-from hybrid_steering.cache import recurrent_tensor
+from composition import clamp_cache, make_clamp_runtime
 from safetensors.torch import load_file, save_file
 
 ROOT = Path(__file__).parents[2]
@@ -130,45 +130,6 @@ def build_directions(out: Path, model: Any, tokenizer: Any) -> None:
                 )
 
 
-def gram_inverse(flat_basis: torch.Tensor, ridge: float = 1e-6) -> torch.Tensor:
-    gram = flat_basis @ flat_basis.T
-    scale = torch.diag(gram).mean().clamp_min(1e-12)
-    return torch.linalg.inv(
-        gram + torch.eye(len(flat_basis), device=gram.device) * ridge * scale
-    )
-
-
-def make_clamp_runtime(
-    cache: Any, direction: dict[int, torch.Tensor], alpha: float
-) -> dict[int, dict[str, torch.Tensor]]:
-    """Prepare a one-feature clamp; RSS is the identity for a singleton."""
-    runtime = {}
-    for layer, value in direction.items():
-        state = recurrent_tensor(cache, layer)
-        basis = value.to(state).float().flatten().unsqueeze(0)
-        inverse = gram_inverse(basis)
-        initial = inverse @ (basis @ state.float().flatten())
-        runtime[layer] = {
-            "basis": basis,
-            "inverse": inverse,
-            "target": initial + alpha,
-        }
-    return runtime
-
-
-@torch.no_grad()
-def clamp_cache(
-    cache: Any, runtime: dict[int, dict[str, torch.Tensor]], beta: float
-) -> None:
-    for layer, values in runtime.items():
-        state = recurrent_tensor(cache, layer)
-        current = values["inverse"] @ (values["basis"] @ state.float().flatten())
-        correction = values["target"] - current
-        state.add_(
-            (correction @ values["basis"]).reshape(state.shape).to(state), alpha=beta
-        )
-
-
 @torch.inference_mode()
 def decode(
     model: Any,
@@ -252,7 +213,8 @@ def run(
             cache = runner.clone_cache(target)
             clamp = None
             if direction is not None:
-                runtime = make_clamp_runtime(cache, direction, strength)
+                deltas = {layer: {feature: strength} for layer in direction}
+                runtime = make_clamp_runtime(cache, {feature: direction}, deltas)
                 clamp_cache(cache, runtime, 1.0)
                 clamp = (runtime, clamp_beta)
             runner.assert_nonrecurrent_unchanged(before, cache)
