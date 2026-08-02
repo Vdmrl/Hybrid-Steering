@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 from pathlib import Path
 
@@ -27,6 +28,17 @@ setup.EXPLORATORY["atomic_sentences"] = (
         5: "Consistently expresses distinct claims as concise, complete standalone sentences.",
     },
 )
+
+
+def read_jsonl(path: Path) -> list[dict]:
+    return [
+        json.loads(line)
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+
+
+setup.read_jsonl = read_jsonl
 
 
 if __name__ == "__main__":
