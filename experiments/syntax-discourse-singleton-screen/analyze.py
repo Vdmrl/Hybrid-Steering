@@ -29,7 +29,8 @@ def metrics(text: str) -> dict[str, float | bool]:
     sentences = [part for part in re.split(r"[.!?]+", text) if part.strip()]
     return {
         "words_per_sentence": len(words) / max(len(sentences), 1),
-        "connectives_per_100_words": 100 * len(CONNECTIVES.findall(text))
+        "connectives_per_100_words": 100
+        * len(CONNECTIVES.findall(text))
         / max(len(words), 1),
         "questions_per_response": text.count("?"),
         "has_cjk": bool(CJK.search(text)),
