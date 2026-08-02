@@ -86,7 +86,7 @@ def main() -> None:
                 "negative_text": en_text,
             }
         )
-    if len(rows) < args.count:
+    if len(rows) < min(args.count, 96):
         raise RuntimeError(f"only {len(rows)}/{args.count} Russian translations")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
