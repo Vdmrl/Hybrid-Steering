@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -120,6 +121,49 @@ def prepare_confidence(args: argparse.Namespace) -> None:
     )
 
 
+def repair_confidence(args: argparse.Namespace) -> None:
+    old = json.loads(args.source_pairs.read_text(encoding="utf-8"))["pairs"]
+    positive = [row["positive_text"] for row in old[: args.candidates]]
+    tokenizer, model = runner.load_model(args.model)
+    negative = rewrite(
+        model,
+        tokenizer,
+        positive,
+        (
+            "cautious and hedged using may, might, likely, perhaps, or appears. "
+            "Make minimal word-level edits only; preserve sentence count, length, "
+            "formality, emotion, voice, vocabulary, punctuation, and formatting"
+        ),
+        args.batch,
+    )
+    pairs = []
+    for index, (target, opposite) in enumerate(zip(positive, negative, strict=True)):
+        ratio = len(opposite.split()) / max(len(target.split()), 1)
+        hedge = re.search(
+            r"\b(may|might|likely|perhaps|possibly|appears?|seems?)\b",
+            opposite,
+            re.IGNORECASE,
+        )
+        if not 0.9 <= ratio <= 1.1 or not hedge:
+            continue
+        pairs.append(
+            {
+                "source_id": f"minimal:{index}",
+                "positive_text": target,
+                "negative_text": opposite,
+                "length_ratio": round(ratio, 3),
+            }
+        )
+        if len(pairs) == args.count:
+            break
+    if len(pairs) < args.count:
+        raise RuntimeError(f"only {len(pairs)}/{args.count} clean pairs")
+    write_json(
+        args.output / "data" / "confident_pairs.json",
+        {"feature": "confident", "pair_version": "minimal-v1", "pairs": pairs},
+    )
+
+
 def prepare_past(args: argparse.Namespace) -> None:
     target = args.style_root / "TPA" / "train.tsv"
     if not target.exists():
@@ -210,7 +254,13 @@ def screen(args: argparse.Namespace) -> None:
 def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="command", required=True)
-    for name in ("prepare-confidence", "prepare-past", "build-direction", "screen"):
+    for name in (
+        "prepare-confidence",
+        "repair-confidence",
+        "prepare-past",
+        "build-direction",
+        "screen",
+    ):
         command = sub.add_parser(name)
         command.add_argument("--output", type=Path, required=True)
         command.add_argument("--model", default="Qwen/Qwen3.5-9B")
@@ -218,6 +268,9 @@ def arguments() -> argparse.Namespace:
         command.add_argument("--batch", type=int, default=8)
         if name == "prepare-confidence":
             command.add_argument("--source", type=Path, required=True)
+        elif name == "repair-confidence":
+            command.add_argument("--source-pairs", type=Path, required=True)
+            command.add_argument("--candidates", type=int, default=48)
         elif name == "prepare-past":
             command.add_argument("--style-root", type=Path, required=True)
         elif name == "build-direction":
@@ -236,6 +289,8 @@ def main() -> None:
     args = arguments()
     if args.command == "prepare-confidence":
         prepare_confidence(args)
+    elif args.command == "repair-confidence":
+        repair_confidence(args)
     elif args.command == "prepare-past":
         prepare_past(args)
     elif args.command == "build-direction":
