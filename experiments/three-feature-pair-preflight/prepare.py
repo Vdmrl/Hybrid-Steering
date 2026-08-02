@@ -141,7 +141,9 @@ def prepare_russian(source: Path, count: int) -> list[dict[str, Any]]:
         )
         if len(candidates) == count:
             return candidates
-    raise RuntimeError(f"only {len(candidates)}/{count} clean OPUS-100 pairs")
+    if len(candidates) < min(count, 96):
+        raise RuntimeError(f"only {len(candidates)}/{count} clean Russian pairs")
+    return candidates
 
 
 def sentence_length(text: str) -> float:
