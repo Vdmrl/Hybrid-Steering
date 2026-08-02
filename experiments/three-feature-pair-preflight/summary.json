@@ -1,0 +1,36 @@
+{
+  "status": "ready_for_composition_smoke",
+  "requested_pairs": 128,
+  "selected_pairs_per_feature": 99,
+  "features": {
+    "russian_language": {
+      "source": "OPUS-100 English texts translated locally with Qwen3.5-9B",
+      "manual_review": "5/5 content-matched",
+      "positive_cyrillic_rate": 1.0,
+      "negative_cyrillic_rate": 0.0,
+      "verdict": "PASS"
+    },
+    "optimism": {
+      "source": "existing paired optimism/pessimism corpus",
+      "manual_review": "5/5 clear target contrast",
+      "mean_length_ratio": 1.072,
+      "verdict": "PASS_WITH_COMPOSITION_RISK"
+    },
+    "atomic_sentences": {
+      "source": "OPUS-100 English texts split locally with Qwen3.5-9B",
+      "manual_review": "5/5 meaning-preserving",
+      "positive_words_per_sentence": 16.328,
+      "negative_words_per_sentence": 31.293,
+      "verdict": "PASS"
+    }
+  },
+  "cross_axis_checks": {
+    "atomic_optimism_marker_delta": 0.0,
+    "russian_optimism_marker_delta": -0.051,
+    "known_risk": "Earlier small composition smoke showed weak optimism retention."
+  },
+  "recommendation": {
+    "full_run": false,
+    "next_step": "Run a small blind three-feature composition smoke before any full run."
+  }
+}

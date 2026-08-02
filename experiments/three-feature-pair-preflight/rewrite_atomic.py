@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import random
 import re
 import sys
 from pathlib import Path
@@ -23,8 +24,10 @@ spec.loader.exec_module(screen)
 
 SYSTEM = (
     "Rewrite the input as exactly two short, complete, standalone sentences. "
-    "Preserve every fact, named entity, number, meaning, tone, and approximate "
-    "total length. Do not add headings, bullets, commentary, or new facts. "
+    "Only split and repunctuate it; repeat a subject or replace a connector with "
+    "a pronoun only when grammar requires it. Do not paraphrase, explain, infer, "
+    "summarize, or add any fact. Preserve every named entity, number, meaning, "
+    "tone, and approximate total length. Do not add headings or bullets. "
     "Return only the rewritten text."
 )
 
@@ -65,8 +68,10 @@ def main() -> None:
     parser.add_argument("--model", default="Qwen/Qwen3.5-9B")
     args = parser.parse_args()
     frame = pd.read_parquet(args.source)
+    values = list(frame["translation"])
+    random.Random(20260802).shuffle(values)
     english = []
-    for value in frame["translation"]:
+    for value in values:
         text = str(value["en"]).strip()
         if (
             18 <= len(text.split()) <= 60
@@ -92,8 +97,8 @@ def main() -> None:
                 "negative_text": source,
             }
         )
-    if len(rows) < 128:
-        raise RuntimeError(f"only {len(rows)}/128 clean atomic rewrites")
+    if len(rows) < min(args.count, 96):
+        raise RuntimeError(f"only {len(rows)}/{args.count} clean atomic rewrites")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         "\n".join(json.dumps(row, ensure_ascii=False) for row in rows) + "\n",

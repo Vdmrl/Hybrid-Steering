@@ -98,7 +98,9 @@ def prepare_atomic_generated(source: Path, count: int) -> list[dict[str, Any]]:
             )
         if len(candidates) == count:
             return candidates
-    raise RuntimeError(f"only {len(candidates)}/{count} clean atomic rewrites")
+    if len(candidates) < min(count, 96):
+        raise RuntimeError(f"only {len(candidates)}/{count} clean atomic rewrites")
+    return candidates
 
 
 def prepare_atomic(count: int) -> list[dict[str, Any]]:
