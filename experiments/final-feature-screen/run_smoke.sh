@@ -15,9 +15,11 @@ CLAMP_BETA="${CLAMP_BETA:-1}"
 PROMPTS_FILE="${PROMPTS_FILE:-}"
 LIMIT="${LIMIT:-}"
 TAG="${TAG:-smoke}"
+DIRECTION_PATH="${DIRECTION_PATH:-}"
 EXTRA=()
 [ -n "$PROMPTS_FILE" ] && EXTRA+=(--prompts-file "$PROMPTS_FILE")
 [ -n "$LIMIT" ] && EXTRA+=(--limit "$LIMIT")
+[ -n "$DIRECTION_PATH" ] && EXTRA+=(--direction-path "$DIRECTION_PATH")
 
 mkdir -p "$OUTPUT"
 "$PYTHON" "$ROOT/experiments/final-feature-screen/prepare_pairs.py" \

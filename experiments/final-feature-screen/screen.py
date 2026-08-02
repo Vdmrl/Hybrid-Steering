@@ -22,7 +22,14 @@ if spec is None or spec.loader is None:
 runner = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(runner)
 
-FEATURES = ("humorous", "numbered_list", "technical", "persuasive")
+FEATURES = (
+    "russian_language",
+    "optimism",
+    "humorous",
+    "numbered_list",
+    "technical",
+    "persuasive",
+)
 PROMPTS = [
     "How should a team decide whether to postpone a software release?",
     "Explain how a household can reduce its electricity use.",
@@ -38,6 +45,7 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--model", default="Qwen/Qwen3.5-9B")
     parser.add_argument("--feature", choices=FEATURES)
     parser.add_argument("--rank", choices=("full", "rank1", "rank4"), default="rank4")
+    parser.add_argument("--direction-path", type=Path)
     parser.add_argument("--alpha", type=float, default=2.0)
     parser.add_argument("--clamp-beta", type=float, default=1.0)
     parser.add_argument("--prompts-file", type=Path)
@@ -184,17 +192,20 @@ def run(
     limit: int | None,
     tag: str,
     clamp_beta: float,
+    direction_path: Path | None,
 ) -> None:
     if feature is None:
         raise ValueError("--feature is required for the sequential smoke")
     tokenizer, model = runner.load_model(model_id)
-    build_directions(out, model, tokenizer)
     prompt_rows = prompts(prompts_file, limit)
     if not prompt_rows:
         raise ValueError("no prompts available")
     output = out / f"{tag}-{feature}-{rank}-alpha={alpha:g}.jsonl"
     done = {row["task_id"] for row in read_jsonl(output)}
-    direction = tensor_map(out / "directions" / f"{feature}-{rank}.safetensors")
+    if direction_path is None:
+        build_directions(out, model, tokenizer)
+        direction_path = out / "directions" / f"{feature}-{rank}.safetensors"
+    direction = tensor_map(direction_path)
     for prompt_id, prompt in prompt_rows:
         target = runner.prefill(model, tokenizer, prompt)
         before = runner.snapshot_nonrecurrent(target)
@@ -294,6 +305,7 @@ def main() -> None:
             args.limit,
             args.tag,
             args.clamp_beta,
+            args.direction_path,
         )
     else:
         summarize(
