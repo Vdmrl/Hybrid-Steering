@@ -1,4 +1,4 @@
-rubric_version: "3.3.0"
+rubric_version: "3.4.0"
 
 features:
   answer_quality:
@@ -183,3 +183,118 @@ features:
       3: "Mixed, unclear, or too little substantive content to establish either layout."
       4: "Predominantly organized as substantive bullet items, with minor surrounding prose."
       5: "Consistently presents all substantive content as a clear multi-item bullet list."
+
+  technical_language:
+    target: "technical language"
+    opposite: "plain language"
+    definition: >-
+      Technical language uses accurate subject-matter terminology and explains
+      the relevant mechanism behind a claim. Plain language conveys the same
+      content in everyday words, naming outcomes without the underlying
+      mechanism or its specialized vocabulary.
+    exclusions:
+      - "Technical language is not length, formality, confidence, or difficulty on their own."
+      - "Isolated jargon, a units-and-numbers string, or a product name without an explained mechanism stays plain."
+      - "Simplified wording is not an error; judge register, not correctness or helpfulness."
+      - "Do not reward a domain topic by itself: an everyday answer about medicine is still plain."
+    anchors:
+      1: "Everyday wording throughout; no specialized terms and no mechanism."
+      2: "Isolated specialized words or figures, but the explanation stays everyday."
+      3: "Mixed, brief, or unclear: some terminology without mechanism, or a mechanism without terminology."
+      4: "Appropriate domain terminology used with a stated mechanism in the substantive part."
+      5: "Sustained accurate terminology and explicit mechanisms across the substantive content."
+
+  russian_language:
+    target: "Russian language"
+    opposite: "non-Russian language"
+    definition: >-
+      Russian language means that the substantive answer is written in natural
+      Russian. The opposite is an answer whose substantive content is written
+      in another language.
+    exclusions:
+      - "A Russian name, quotation, or isolated phrase does not make an answer Russian."
+      - "Cyrillic script alone is not enough: judge the language of the substantive content."
+      - "Judge language separately from correctness, helpfulness, tone, and topic."
+      - "Minor borrowed words, identifiers, or code snippets do not change the answer's main language."
+    anchors:
+      1: "The substantive answer is consistently written in a non-Russian language."
+      2: "The answer is mostly non-Russian, with only short Russian fragments."
+      3: "The language is genuinely mixed, unclear, or there is too little text to judge."
+      4: "The answer is predominantly natural Russian with minor non-Russian material."
+      5: "The substantive answer is consistently and fluently written in Russian."
+
+  probabilistic_framing:
+    target: "probabilistic framing"
+    opposite: "binary framing"
+    definition: >-
+      Probabilistic framing treats outcomes as graded: it assigns likelihoods,
+      admits alternatives, or conditions claims on uncertainty. Binary framing
+      treats outcomes as settled categories, with one result and no admitted
+      alternative.
+    exclusions:
+      - "Hedging politeness ('perhaps I can help') is not probabilistic framing about the outcome."
+      - "A numeral or percentage is not required; graded natural-language likelihood counts."
+      - "Confidence about a genuinely certain fact is not binary framing."
+      - "Judge the framing of outcomes, not answer quality, caution, or verbosity."
+    anchors:
+      1: "States outcomes as certain categories throughout, admitting no alternative."
+      2: "Mostly categorical, with one weak or incidental gesture at uncertainty."
+      3: "Mixed, absent, or too little content to establish either framing."
+      4: "Clearly weighs at least one outcome as more or less likely, admitting alternatives."
+      5: "Sustains graded likelihoods and alternative outcomes across the substantive content."
+
+  comparative_framing:
+    target: "comparative framing"
+    opposite: "isolated framing"
+    definition: >-
+      Comparative framing sets the subject against at least one explicit
+      alternative, baseline, or earlier state and draws the contrast. Isolated
+      framing describes the subject on its own terms without such a reference
+      point.
+    exclusions:
+      - "A list of several items is not a comparison unless the answer relates them to each other."
+      - "The word 'better' without a named reference point does not establish a comparison."
+      - "Judge the presence of contrast, not which side the answer prefers, nor answer quality."
+    anchors:
+      1: "Describes the subject entirely on its own, with no reference point."
+      2: "Mentions another option or an earlier state in passing without drawing a contrast."
+      3: "Mixed, implicit, or too little content to establish either framing."
+      4: "Explicitly contrasts the subject with an alternative or baseline in the substantive part."
+      5: "Sustains explicit contrast against alternatives or a baseline across the substantive content."
+
+  fictional_narrative:
+    target: "fictional narrative"
+    opposite: "factual reporting"
+    definition: >-
+      Fictional narrative presents invented events as a story, with narrative
+      framing such as characters, scene, or plot. Factual reporting presents
+      events as claims about the real world, in the register of a report.
+    exclusions:
+      - "Vivid or figurative wording in a report is not a fictional narrative."
+      - "A story is not established by first-person voice or emotional language alone."
+      - "Judge the narrative register, not literary quality, length, or whether claims are true."
+    anchors:
+      1: "Reports events as real-world claims throughout, in a factual register."
+      2: "Mostly report register, with an isolated narrative flourish."
+      3: "Mixed, ambiguous, or too little content to establish either register."
+      4: "Clearly narrates invented events with story framing in the substantive part."
+      5: "Sustains an invented story with narrative framing across the substantive content."
+
+  theistic_framing:
+    target: "theistic framing"
+    opposite: "atheistic framing"
+    definition: >-
+      Theistic framing attributes meaning, agency, or guidance to a divine
+      being, or reasons from the premise that one exists. Atheistic framing
+      reasons from the premise that no deity exists, explaining events by
+      natural or human causes.
+    exclusions:
+      - "Neutrally describing what believers hold is neither pole; the answer's own premise decides."
+      - "Religious vocabulary in an idiom ('thank God') does not establish theistic framing."
+      - "Judge the premise, not reverence, politeness, morality, or answer quality."
+    anchors:
+      1: "Reasons explicitly from the premise that no deity exists."
+      2: "Leans on natural or human causes with an incidental rejection of divine agency."
+      3: "Neutral, descriptive, mixed, or too little content to establish either premise."
+      4: "Clearly reasons from divine agency or guidance in the substantive part."
+      5: "Sustains divine agency, meaning, or guidance as the premise throughout."
