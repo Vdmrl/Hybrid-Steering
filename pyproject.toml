@@ -1,0 +1,14 @@
+# Workspace-level configuration. The three packages (judge, steering,
+# gdn_interp) keep their own pyproject.toml and are installed editable through
+# requirements.txt; this file only carries settings that must be shared.
+
+[tool.uv]
+package = false
+
+# causal-conv1d publishes CUDA-specific wheels that PyPI does not carry.
+[tool.uv.sources]
+causal-conv1d = { index = "astral-cu126" }
+
+[[tool.uv.index]]
+name = "astral-cu126"
+url = "https://wheels.astral.sh/simple/cu126/"

@@ -1,6 +1,7 @@
 # Exact installed versions are recorded by scripts/capture_environment.py.
 -e ./judge[dev]
 -e ./steering[dev]
+-e ./gdn_interp[dev,plots,notebooks]
 
 torch==2.7.1
 transformers==5.14.1
@@ -21,3 +22,18 @@ requests
 fsspec
 aiohttp
 httpx
+
+# gdn_interp runtime: tracing, typed tensors, concept detection, data
+nnsight>=0.7.0
+jaxtyping>=0.3.11
+lingua-language-detector>=2.2.0
+litellm
+duckdb
+datasets
+plotly
+
+# Fused GDN kernels. Not installed by default: causal-conv1d resolves only
+# from the astral cu126 index declared in pyproject.toml and needs a matching
+# CUDA toolchain. Install with:
+#   uv pip install -e './gdn_interp[fast-kernels]'
+# flash-linear-attention is pure Python and can be installed on its own.
