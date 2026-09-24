@@ -37,6 +37,20 @@ class _FallbackCompletions:
                         raise
 
 
+def judge_client(config: JudgeConfig, api_key: str) -> Any:
+    """Build the client for the configured provider. A self-hosted
+    OpenAI-compatible server (vLLM, SGLang) needs no key and no fallback
+    chain; it is addressed by base_url alone."""
+    if config.provider == "openai_compatible":
+        return OpenAI(
+            api_key=api_key or "EMPTY",
+            base_url=config.base_url,
+            timeout=config.generation.timeout_seconds,
+            max_retries=config.generation.max_retries,
+        )
+    return openrouter_client(config, api_key)
+
+
 def openrouter_client(config: JudgeConfig, api_key: str) -> Any:
     proxy = os.environ.get("OPENROUTER_PROXY", "").strip() or None
     fallback = os.environ.get("OPENROUTER_FALLBACK_API_KEY", "").strip()

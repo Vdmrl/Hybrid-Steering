@@ -1,0 +1,30 @@
+{
+  "date": "2026-09-24",
+  "status": "exploratory",
+  "judge_model": "Qwen/Qwen3.8-27B",
+  "provider": "openai_compatible (self-hosted vLLM, thinking disabled)",
+  "temperature": 0,
+  "rubric_version": "3.4.0",
+  "n": 1436,
+  "design": "Pole-labeled corpora, no per-text human scores: 218 aligned PLABA-MU pairs (technical_language, from hybrid-steering-concepts) and 100 texts per pole for five GDN-project stimulus concepts. Scenarios are neutral placeholders; the builder refuses elicitation prompts that name the concept.",
+  "endpoint": "auc = P(target outscores opposite), ties at half",
+  "prompts": {
+    "judge_v3_compositional.txt": {"macro_auc": 0.861, "min_auc": 0.599, "note": "current runtime default"},
+    "judge_v3.txt": {"macro_auc": 0.911, "min_auc": 0.651, "note": "older strict prompt"}
+  },
+  "by_feature_auc": {
+    "comparative_framing": {"compositional": 0.599, "judge_v3": 0.871},
+    "fictional_narrative": {"compositional": 0.940, "judge_v3": 0.980},
+    "probabilistic_framing": {"compositional": 0.930, "judge_v3": 0.964},
+    "russian_language": {"compositional": 1.0, "judge_v3": 1.0},
+    "technical_language": {"compositional": 0.698, "judge_v3": 0.651},
+    "theistic_framing": {"compositional": 1.0, "judge_v3": 1.0}
+  },
+  "findings": [
+    "The compositional prompt, adopted to make score 5 attainable, loses discrimination on four of six concepts: it puts 85% of comparative_framing answers at 5 versus 59% for the strict prompt. Agreement-only metrics cannot see this, because inflating every score preserves MAE on balanced label sets while destroying ranking.",
+    "expected_score AUC stays at 0.99 where integer AUC collapses to 0.60, so the probability distribution still ranks answers the integer score can no longer separate. This supports keeping the full distribution as the sensitive endpoint.",
+    "technical_language is the weakest concept for both prompts (AUC 0.65-0.70, paired win rate 0.44) on human-written PLABA-MU pairs, the only corpus here with no model-generated text. Plain and technical rewrites of the same sentence differ by a few terms, which is the hardest and most realistic case.",
+    "The comparison stimulus corpus is contaminated: its opposite-pole texts discuss comparison in order to disclaim it ('I avoid drawing comparisons to past events'), so 76 of 100 were scored as comparative. Directions extracted from this corpus may encode talking about the axis rather than the behavior."
+  ],
+  "limits": "Pole labels say which side a text was written for, not how strongly it expresses the trait, so these numbers bound ranking ability, not calibration. No independent human labels. One judge model, one temperature, single run."
+}

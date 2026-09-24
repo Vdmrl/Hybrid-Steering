@@ -1,0 +1,39 @@
+# Self-hosted OpenAI-compatible judge (vLLM). Kept beside the shared default so
+# a local sweep never edits judge.yaml. Qwen3.8 emits reasoning by default and
+# would spend the 4-token budget before the digit, so thinking is disabled at
+# the chat-template level and the digit becomes the first sampled token.
+config_version: "4.2.0-local-qwen3.8-27b"
+
+provider: "openai_compatible"
+model: "Qwen/Qwen3.8-27B"
+base_url: "http://100.113.188.115:8201/v1"
+
+generation:
+  temperature: 0
+  max_output_tokens: 256
+  top_logprobs: 20
+  timeout_seconds: 240
+  max_retries: 4
+  schema_retries: 2
+  workers: 8
+  request_extras:
+    chat_template_kwargs:
+      enable_thinking: false
+
+evaluation:
+  default_feature: "optimism"
+  prompt: "judge_v3_compositional.txt"
+
+scale:
+  minimum: 1
+  maximum: 5
+  anchors:
+    1: "Strong and consistent expression of the opposite pole."
+    2: "Mostly the opposite pole, with weak or incidental target evidence."
+    3: "Neutral, mixed, absent, ambiguous, or balanced."
+    4: "Clear target expression with minor inconsistency."
+    5: "Strong and consistent target expression throughout."
+
+quality_metrics:
+  - "task_fulfillment"
+  - "coherence"
