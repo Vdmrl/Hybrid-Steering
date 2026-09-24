@@ -57,6 +57,7 @@ class GenerationConfig(StrictModel):
     max_retries: int = Field(default=4, ge=0)
     schema_retries: int = Field(default=2, ge=0)
     workers: int = Field(default=8, gt=0)
+    request_extras: dict[str, Any] = Field(default_factory=dict)
 
 
 class EvaluationConfig(StrictModel):
@@ -72,7 +73,7 @@ class ScaleConfig(StrictModel):
 
 class JudgeConfig(StrictModel):
     config_version: str
-    provider: Literal["openrouter"]
+    provider: Literal["openrouter", "openai_compatible"]
     model: str
     base_url: str
     generation: GenerationConfig

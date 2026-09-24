@@ -78,6 +78,7 @@ def completion(
     extract_json_object: bool = True,
     logprobs: bool = False,
     top_logprobs: int | None = None,
+    request_extras: dict[str, Any] | None = None,
 ) -> tuple[str, Usage, str, list[tuple[str, float]] | None]:
     request = {
         "model": model,
@@ -90,6 +91,8 @@ def completion(
     }
     if logprobs:
         request.update(logprobs=True, top_logprobs=top_logprobs)
+    if request_extras:
+        request["extra_body"] = dict(request_extras)
     response = client.chat.completions.create(**request)
     content = response.choices[0].message.content
     if not content:
@@ -223,6 +226,7 @@ def judge_task_v3(
     config_version: str,
     config_sha256: str,
     seed: int,
+    request_extras: dict[str, Any] | None = None,
 ) -> JudgeResultV3:
     row, answer = task
     parsed, raw, usage, response_ids, token_logprobs = validated_completion(
@@ -245,6 +249,7 @@ def judge_task_v3(
         extract_json_object=False,
         logprobs=True,
         top_logprobs=top_logprobs,
+        request_extras=request_extras,
     )
     score = parsed.root
     distribution = score_distribution(score, token_logprobs or [])
