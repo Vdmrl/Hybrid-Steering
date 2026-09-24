@@ -16,7 +16,9 @@ changing the model's factual context.
 | [`steering/`](steering/) | Reusable GDN recurrent-state extraction and intervention primitives |
 | [`judge/`](judge/) | Blind LLM-as-a-Judge pipeline for evaluating steering results |
 | [`concepts/`](concepts/) | Definitions and anchored rubrics for behavioral features |
+| [`gdn_interp/`](gdn_interp/) | Imported from ssslakter/gdn-interp: kernel-level GDN tracing, state collection, concept detection (not yet merged with `steering/`) |
 | [`experiments/`](experiments/) | Reproducible manifests, small runners, and compact summaries |
+| [`experiments/gdn_interp/`](experiments/gdn_interp/) | The gdn-interp experiment tree, kept separate until the two steering paths are merged |
 
 ## Steering
 

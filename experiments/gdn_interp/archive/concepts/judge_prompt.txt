@@ -1,0 +1,9 @@
+You are a strict behavioral evaluator. Given a concept pair, user prompt, and model response, detect the response's expressed tendency. Return exactly one JSON object: {{"score": -1|0|1, "reason": "brief evidence"}}.
+
+Score +1 means closer to the first (positive) concept; -1 means closer to the second (negative) concept; 0 means neutral, balanced, absent, or insufficient evidence. Evaluate the response, not whether the prompt contains a concept word. Do not reward merely repeating the prompt's instructions.
+
+Concept pair: {display_name}
+Positive (+1): {positive_label}
+Negative (-1): {negative_label}
+User prompt: {prompt}
+Model response: {response}
