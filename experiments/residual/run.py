@@ -1,0 +1,74 @@
+"""Residual-stream baseline. This is not a GDN intervention.
+
+The direction is the last-token residual of the target text minus the source
+text, added on prompt tokens only.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+
+import torch
+
+from hybrid_steering import load_runtime
+
+PAIRS = (("Это русский текст.", "This is English text."),)
+
+
+def last_hidden(model, tokenizer, text: str) -> torch.Tensor:
+    encoded = tokenizer([text], add_special_tokens=False, return_tensors="pt").to(
+        next(model.parameters()).device
+    )
+    with torch.inference_mode():
+        output = model(**encoded, output_hidden_states=True, use_cache=False)
+    return output.hidden_states[-1][0, -1].float().cpu()
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--model", default="Qwen/Qwen3.5-9B")
+    parser.add_argument("--scale", type=float, default=1.0)
+    parser.add_argument("--max-new-tokens", type=int, default=4)
+    parser.add_argument("--smoke", action="store_true")
+    args = parser.parse_args()
+    if args.smoke:
+        args.model = "tiny"
+        args.max_new_tokens = 2
+    model, tokenizer = load_runtime(args.model)
+    target, source = PAIRS[0]
+    direction = last_hidden(model, tokenizer, target) - last_hidden(model, tokenizer, source)
+    direction = direction / direction.norm().clamp_min(1e-8)
+    seen = {"calls": 0}
+
+    def hook(_module, _inputs, output):
+        hidden = output[0] if isinstance(output, tuple) else output
+        if hidden.shape[1] > 1:
+            hidden.add_(args.scale * direction.to(device=hidden.device, dtype=hidden.dtype))
+            seen["calls"] += 1
+        return output
+
+    handles = [layer.register_forward_hook(hook) for layer in model.model.layers]
+    try:
+        encoded = tokenizer(
+            ["Describe the weather."], add_special_tokens=False, return_tensors="pt"
+        )
+        encoded = encoded.to(next(model.parameters()).device)
+        with torch.inference_mode():
+            output = model.generate(**encoded, max_new_tokens=args.max_new_tokens, do_sample=False)
+    finally:
+        for handle in handles:
+            handle.remove()
+    text = tokenizer.decode(output[0], skip_special_tokens=True)
+    payload = {"hook_calls": seen["calls"], "direction_norm": 1.0, "response": text}
+    if seen["calls"] < 1:
+        raise SystemExit("residual hook did not run on the prompt")
+    args.output.mkdir(parents=True, exist_ok=True)
+    (args.output / "residual.json").write_text(json.dumps(payload, indent=2) + "\n")
+    print(json.dumps(payload), flush=True)
+
+
+if __name__ == "__main__":
+    main()
