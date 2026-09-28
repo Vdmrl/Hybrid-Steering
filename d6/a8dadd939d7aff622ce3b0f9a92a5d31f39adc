@@ -1,0 +1,50 @@
+README.md
+  h_cec284cdd16cba 44,50
+experiments/README.md
+  h_cec284cdd16cba 3-4
+experiments/benchmarks/benchmark-kernels/run.py
+  h_cec284cdd16cba 3-4,40
+experiments/benchmarks/benchmark-steering/run.py
+  h_cec284cdd16cba 6,20-21,37-43
+experiments/chunk-dynamics/run.py
+  h_cec284cdd16cba 3,14,19-21,68-70,73,76-78,80-90
+experiments/compose/run.py
+  h_cec284cdd16cba 21
+experiments/context-length/run.py
+  h_cec284cdd16cba 12,18,21-31,35-40,44,48,52,60,72,74-79,81-82,86-87,89,91-104
+experiments/core-smoke/run.py
+  h_cec284cdd16cba 29-33
+experiments/forgetting-squad/run.py
+  h_cec284cdd16cba 1,3-4,10,12,15-16,21,30-31,34-41,43-44,46,48-49,54-58,62,65-73,75-81,83-84,86-87,93-94,97-102,104-109,111-142
+experiments/forgetting/questions.py
+  h_cec284cdd16cba 1-64
+experiments/forgetting/run.py
+  h_cec284cdd16cba 1-6,12,15-16,28-29,32-34,40,42-50,53-58,60-71,74-79,81-86,90-91,93,95,97-101,104
+experiments/publish_pairs.py
+  h_cec284cdd16cba 1-115
+experiments/residual/run.py
+  h_cec284cdd16cba 14,32,34,37-46,61-63
+experiments/state-dynamics/run.py
+  h_cec284cdd16cba 11,15,22-25,28-41,45-46,50-51,54
+experiments/steering-clamp/run.py
+  h_cec284cdd16cba 20,29,36-39,51
+experiments/steering/run.py
+  h_cec284cdd16cba 1,3-4,13,26,28-36,39-56,60-63,65,67,69-77,82-89,93,98,103,107,111
+src/hybrid_steering/capture.py
+  h_cec284cdd16cba 16
+src/hybrid_steering/detect.py
+  h_cec284cdd16cba 7,22-44
+tests/test_judge.py
+  h_cec284cdd16cba 50-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d6a8dadd939d7aff622ce3b0f9a92a5d31f39adc",
+  "prompts": {},
+  "humans": {
+    "h_cec284cdd16cba": {
+      "author": "Slava Chaunin <67190162+Ssslakter@users.noreply.github.com>"
+    }
+  }
+}
