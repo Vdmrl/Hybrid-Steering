@@ -1,7 +1,7 @@
 # Experiments
 
-Each directory is one experiment. `--smoke` uses the random tiny Qwen and a few
-examples, so the path can be checked without a checkpoint download.
+Each directory is one experiment. Runs load a real checkpoint and the dataset
+that experiment was built for.
 
 | Directory | What it runs |
 | --- | --- |

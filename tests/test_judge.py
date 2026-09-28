@@ -14,7 +14,6 @@ from hybrid_steering.judge.runner import (
     complete_text,
     judge_task_v3,
     parse_score,
-    read_jsonl,
     render_prompt,
     run_tasks,
     trait_tasks,
@@ -48,7 +47,16 @@ def test_contracts_and_tasks() -> None:
         feature,
         feature.anchors,
     )
-    rows = read_jsonl(ROOT / "examples" / "input.example.jsonl")
+    rows = [
+        JudgeInput(
+            prompt_id="scenario-001",
+            scenario="A team must decide whether to continue a risky project after mixed evidence.",
+            answers=[
+                Answer("baseline", "Review the evidence and decide tomorrow."),
+                Answer("steered", "Everything will probably fail."),
+            ],
+        )
+    ]
 
     assert "1:" in prompt and "5:" in prompt
     assert len(trait_tasks(rows)) == 2

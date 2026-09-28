@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import time
 from pathlib import Path
@@ -16,16 +17,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--model", default="Qwen/Qwen3.5-9B")
-    parser.add_argument("--batch-size", type=int, default=2)
-    parser.add_argument("--max-new-tokens", type=int, default=4)
+    parser.add_argument("--batch-size", type=int, default=8)
+    parser.add_argument("--max-new-tokens", type=int, default=32)
     parser.add_argument("--repeats", type=int, default=3)
-    parser.add_argument("--smoke", action="store_true")
     args = parser.parse_args()
-    if args.smoke:
-        args.model = "tiny"
-        args.batch_size = 2
-        args.max_new_tokens = 2
-        args.repeats = 1
     model, tokenizer = load_runtime(args.model)
     layers = gdn_layers(model)
     device = next(model.parameters()).device
@@ -39,7 +34,13 @@ def main() -> None:
         for layer in layers
     }
     runner = Runner(model, tokenizer, layers, deltas, normalize=False)
-    texts = [f"Prompt number {index}." for index in range(args.batch_size)]
+    path = Path(__file__).resolve().parents[1] / "forgetting" / "questions.py"
+    spec = importlib.util.spec_from_file_location("forgetting_questions", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load {path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    texts = [row["question"] for row in module.simple_questions(args.batch_size, seed=42)]
     samples = []
     for _ in range(args.repeats):
         start = time.perf_counter()

@@ -1,7 +1,7 @@
 """Compare the PyTorch Gated DeltaNet reference with FLA when both are present.
 
-Smoke always runs the PyTorch reference on CPU. The fused kernel is recorded
-as skipped when CUDA or flash-linear-attention is unavailable.
+The fused kernel is recorded as skipped when CUDA or flash-linear-attention
+is unavailable.
 """
 
 from __future__ import annotations
@@ -36,13 +36,8 @@ def main() -> None:
     parser.add_argument("--seq-len", type=int, default=32)
     parser.add_argument("--heads", type=int, default=2)
     parser.add_argument("--head-dim", type=int, default=8)
-    parser.add_argument("--smoke", action="store_true")
     args = parser.parse_args()
-    if args.smoke:
-        args.seq_len = 16
-        args.heads = 2
-        args.head_dim = 8
-    device = "cuda" if torch.cuda.is_available() and not args.smoke else "cpu"
+    device = "cuda" if torch.cuda.is_available() else "cpu"
     dtype = torch.bfloat16 if device == "cuda" else torch.float32
     torch.manual_seed(0)
     shape = (1, args.seq_len, args.heads, args.head_dim)

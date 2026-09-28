@@ -41,14 +41,13 @@ re-applies the direction during decoding.
 
 ## Experiments
 
-Each directory under `experiments/` is one experiment. `--smoke` runs it on the
-random tiny model with a handful of examples. See `experiments/README.md`.
+Each directory under `experiments/` is one experiment. See `experiments/README.md`.
 
 ## Judge
 
 ```bash
 export OPENROUTER_API_KEY="..."
-uv run hybrid-judge examples/input.example.jsonl runs/judgments.jsonl --feature optimism
+uv run hybrid-judge input.jsonl runs/judgments.jsonl --feature optimism
 ```
 
 The judge sees a scenario and an answer. It does not see the steering method.

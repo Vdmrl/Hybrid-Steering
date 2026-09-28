@@ -8,38 +8,50 @@ import math
 from pathlib import Path
 
 import torch
+from datasets import load_dataset
 
 from hybrid_steering import Runner, final_states, gdn_layers, load_runtime
 
-TEXTS = (
-    "Rain.",
-    "Rain on the window for a whole quiet hour.",
-    "Rain on the window while the street stays empty and the bus is late again tonight.",
-)
+DATASET = "claran/pg19-sample"
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--model", default="Qwen/Qwen3.5-9B")
-    parser.add_argument("--smoke", action="store_true")
+    parser.add_argument("--dataset", default=DATASET)
+    parser.add_argument("--count", type=int, default=100)
+    parser.add_argument("--length", type=int, default=10_000)
+    parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
-    if args.smoke:
-        args.model = "tiny"
     model, tokenizer = load_runtime(args.model)
+    texts = []
+    for row in load_dataset(args.dataset, split="train", streaming=True).shuffle(
+        seed=args.seed, buffer_size=1_000
+    ):
+        ids = tokenizer(
+            row["text"], add_special_tokens=False, truncation=True, max_length=args.length
+        ).input_ids
+        if len(ids) < args.length:
+            continue
+        texts.append(tokenizer.decode(ids[: args.length], clean_up_tokenization_spaces=False))
+        if len(texts) == args.count:
+            break
+    if len(texts) < args.count:
+        raise SystemExit(f"found only {len(texts)} texts of {args.length} tokens")
     layers = gdn_layers(model)
     runner = Runner(model, tokenizer, layers)
-    states = final_states(runner, list(TEXTS))
     rows = []
-    for index, text in enumerate(TEXTS):
+    for index, text in enumerate(texts):
+        states = final_states(runner, [text])
         for layer, tensor in states.items():
             rows.append(
                 {
-                    "text": text,
-                    "tokens": len(tokenizer.encode(text)),
+                    "text_id": index,
+                    "tokens": args.length,
                     "layer": layer,
                     "frobenius": float(
-                        torch.linalg.matrix_norm(tensor[index].float(), dim=(-2, -1)).mean()
+                        torch.linalg.matrix_norm(tensor[0].float(), dim=(-2, -1)).mean()
                     ),
                 }
             )

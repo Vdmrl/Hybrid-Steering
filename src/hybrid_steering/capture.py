@@ -13,7 +13,7 @@ from transformers import DynamicCache, PreTrainedModel
 from .runner import unwrap_forward
 
 MetricRow = tuple[int, int, int, int, str, float]
-# Full-run positions used by the chunk-dynamics experiment. Smoke runs pass a short subset.
+# Token positions measured by the chunk-dynamics experiment.
 CAPTURE_POSITIONS = (*range(1, 32), 64, 128, 256, 512, 1024, 2048, 4096, 8192)
 CHUNK = 64
 

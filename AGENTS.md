@@ -61,14 +61,6 @@ uv run ruff format --check src tests experiments
 uv run pytest
 ```
 
-Squeezed experiment check, no checkpoint download:
-
-```bash
-uv run python experiments/steering/run.py --output artifacts/steering --smoke
-uv run python experiments/forgetting/run.py --output artifacts/forgetting --smoke
-uv run python experiments/forgetting-squad/run.py --output artifacts/forgetting-squad --smoke
-```
-
 ## Change discipline
 
 - Before editing a tracked file, run `git branch --show-current`. If it is `main` or `master`, create a branch first.

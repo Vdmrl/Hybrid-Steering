@@ -11,10 +11,9 @@ import json
 from pathlib import Path
 
 import torch
+from huggingface_hub import hf_hub_download
 
 from hybrid_steering import load_runtime
-
-PAIRS = (("Это русский текст.", "This is English text."),)
 
 
 def last_hidden(model, tokenizer, text: str) -> torch.Tensor:
@@ -30,15 +29,21 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--model", default="Qwen/Qwen3.5-9B")
+    parser.add_argument("--concept", default="en-ru")
     parser.add_argument("--scale", type=float, default=1.0)
-    parser.add_argument("--max-new-tokens", type=int, default=4)
-    parser.add_argument("--smoke", action="store_true")
+    parser.add_argument("--max-new-tokens", type=int, default=32)
     args = parser.parse_args()
-    if args.smoke:
-        args.model = "tiny"
-        args.max_new_tokens = 2
     model, tokenizer = load_runtime(args.model)
-    target, source = PAIRS[0]
+    slug = args.concept.replace("->", "-")
+    path = Path(
+        hf_hub_download(
+            "hybrid-steering/hybrid-steering-concepts",
+            f"concepts/{slug}/data/pairs.jsonl",
+            repo_type="dataset",
+        )
+    )
+    row = json.loads(path.read_text(encoding="utf-8").splitlines()[0])
+    target, source = row["positive_text"], row["negative_text"]
     direction = last_hidden(model, tokenizer, target) - last_hidden(model, tokenizer, source)
     direction = direction / direction.norm().clamp_min(1e-8)
     seen = {"calls": 0}
@@ -53,7 +58,9 @@ def main() -> None:
     handles = [layer.register_forward_hook(hook) for layer in model.model.layers]
     try:
         encoded = tokenizer(
-            ["Describe the weather."], add_special_tokens=False, return_tensors="pt"
+            ["What might happen if someone misses the last bus home?"],
+            add_special_tokens=False,
+            return_tensors="pt",
         )
         encoded = encoded.to(next(model.parameters()).device)
         with torch.inference_mode():

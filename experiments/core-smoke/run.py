@@ -23,15 +23,14 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--model", default="Qwen/Qwen3.5-9B")
     parser.add_argument("--scale", type=float, default=0.5)
-    parser.add_argument("--smoke", action="store_true")
     args = parser.parse_args()
-    if args.smoke:
-        args.model = "tiny"
     model, tokenizer = load_runtime(args.model)
     device = next(model.parameters()).device
-    encoded = tokenizer(["A short prompt."], add_special_tokens=False, return_tensors="pt").to(
-        device
-    )
+    encoded = tokenizer(
+        ["What might happen if someone misses the last bus home?"],
+        add_special_tokens=False,
+        return_tensors="pt",
+    ).to(device)
     with torch.inference_mode():
         cache = model(**encoded, use_cache=True).past_key_values
         before = snapshot_nonrecurrent(cache)

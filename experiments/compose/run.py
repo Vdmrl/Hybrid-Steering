@@ -18,11 +18,8 @@ from hybrid_steering import Runner, add_delta, combine, gdn_layers, load_runtime
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--model", default="tiny")
-    parser.add_argument("--smoke", action="store_true")
+    parser.add_argument("--model", default="Qwen/Qwen3.5-9B")
     args = parser.parse_args()
-    if args.smoke:
-        args.model = "tiny"
     torch.manual_seed(0)
     model, tokenizer = load_runtime(args.model)
     layers = gdn_layers(model)

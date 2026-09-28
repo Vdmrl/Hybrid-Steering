@@ -4,7 +4,7 @@ Natural-language features in ``LANGUAGE_FEATURES`` are scored with Lingua.
 Every other feature is scored from its ``concepts/features.yaml`` definition,
 through a 0/1 prompt. The anchored 1–5 judge is a separate article path.
 Answer equivalence is not a concept score: it asks whether two answers state
-the same fact.
+the same fact. ``QUESTIONS`` are the held-out English prompts for that score.
 """
 
 from __future__ import annotations
@@ -19,13 +19,29 @@ LANGUAGES = (
     Language.ENGLISH,
     Language.RUSSIAN,
     Language.FRENCH,
-    Language.GERMAN,
-    Language.SPANISH,
-    Language.ITALIAN,
-    Language.PORTUGUESE,
-    Language.DUTCH,
-    Language.UKRAINIAN,
-    Language.POLISH,
+)
+
+EVAL_QUESTIONS = (
+    "Why do leaves fall in autumn?",
+    "How can I remove a coffee stain from a shirt?",
+    "What is the purpose of a computer's memory?",
+    "Why does bread rise?",
+    "How do bees communicate?",
+    "What is the difference between a lake and a river?",
+    "How can I keep cut flowers fresh?",
+    "Why do we see lightning before hearing thunder?",
+    "What makes a good password?",
+    "How does a refrigerator keep food cold?",
+    "Why do onions make people cry?",
+    "How can I organize a small desk?",
+    "What is the difference between a planet and a star?",
+    "Why does soap make cleaning easier?",
+    "How does a parachute slow someone down?",
+    "What is an algorithm?",
+    "Why is the sea salty?",
+    "How can I learn to play the guitar?",
+    "What causes a rainbow?",
+    "Why does a compass point north?",
 )
 
 # Feature ids whose target is a natural language. Other ``*_language`` features
