@@ -20,6 +20,7 @@ uv run python experiments/steering/report.py --rows runs/en-ru/score/generations
 | `context-length` | Initial, prompt-end, repeated, and periodic steering | Concept score by mode and scale |
 | `steering-clamp` | Additive update and coordinate clamp | |
 | `residual` | Residual-stream baseline, scored once | |
+| `code-leak` | GDN rank-1 clamp vs one-layer CAA on code tasks: language in the prose and in the code | Both by method and scale |
 | `compose` | Sum of two directions, raw scale, linearity check | |
 | `state-dynamics` | Final-state norms across text lengths | |
 | `chunk-dynamics` | Rank and kernel-transition metrics | |
