@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+import importlib.util
+import json
+from collections.abc import Callable, Iterable
+from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
@@ -155,6 +159,89 @@ def token_prefixes(
         length: tokenizer.decode(tokens[:length], clean_up_tokenization_spaces=False)
         for length in lengths
     }
+
+
+def import_path(path: str | Path) -> Any:
+    """Load a module from a file path. Used by experiment scripts that are not a package."""
+    path = Path(path)
+    spec = importlib.util.spec_from_file_location(path.stem, path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load {path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def read_jsonl(path: str | Path) -> list[dict]:
+    """Read one JSON object per line."""
+    path = Path(path)
+    rows = [
+        json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()
+    ]
+    if not rows:
+        raise ValueError(f"{path} is empty")
+    return rows
+
+
+def write_jsonl(path: str | Path, rows: Iterable[dict]) -> None:
+    """Write one JSON object per line, creating parent directories."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows),
+        encoding="utf-8",
+    )
+
+
+def batched(items: list, size: int):
+    """Yield successive slices of ``size``."""
+    if size < 1:
+        raise ValueError("size must be positive")
+    for start in range(0, len(items), size):
+        yield items[start : start + size]
+
+
+def collect_steered_rows(
+    runner: Any,
+    tokenizer: Any,
+    examples: list[dict[str, str]],
+    prefixes: dict[int, str],
+    scales: Iterable[float],
+    *,
+    batch_size: int,
+    token_budget: int,
+    max_new_tokens: int,
+    build_row: Callable[[int, dict[str, str], str, float, str], dict],
+) -> list[dict]:
+    """Baseline, then each scale, for every filler prefix.
+
+    ``build_row`` receives the prefix length, example, baseline text, scale,
+    and steered response.
+    """
+    rows: list[dict] = []
+    scale_list = list(scales)
+    for length, prefix in prefixes.items():
+        width = min(batch_size, max(1, token_budget // max(length, 1)))
+        for batch in batched(examples, width):
+            questions = [item["question"] for item in batch]
+            texts = chat_prompts(tokenizer, questions, prefix)
+            baseline_tokens = runner.generate(
+                texts, prompt_position=None, max_new_tokens=max_new_tokens
+            )
+            baseline_text = [
+                tokenizer.decode(tokens, skip_special_tokens=True) for tokens in baseline_tokens
+            ]
+            for scale in scale_list:
+                steered_tokens = runner.generate(
+                    texts, scale=scale, prompt_position=0, max_new_tokens=max_new_tokens
+                )
+                for example, base, steered in zip(
+                    batch, baseline_text, steered_tokens, strict=True
+                ):
+                    response = tokenizer.decode(steered, skip_special_tokens=True)
+                    rows.append(build_row(length, example, base, scale, response))
+        print(f"prefix {length}: {len(rows)} rows", flush=True)
+    return rows
 
 
 def chat_prompts(tokenizer: Any, questions: list[str], prefix: str = "") -> list[str]:

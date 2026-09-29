@@ -105,6 +105,26 @@ def truncate_direction(
     }
 
 
+def effective_rank(
+    singular: Float[Tensor, "*batch spectrum"],
+) -> Float[Tensor, "*batch"]:
+    """Shannon effective rank. The last axis is the singular-value spectrum."""
+    probability = singular / singular.sum(dim=-1, keepdim=True).clamp_min(
+        torch.finfo(singular.dtype).tiny
+    )
+    return (-torch.special.xlogy(probability, probability).sum(dim=-1)).exp()
+
+
+def _row_scale(scale: Scale, batch: int, *, device: torch.device, dtype: torch.dtype) -> Tensor:
+    """Scalar scale, or one value per batch row broadcast over a head matrix."""
+    scales = torch.as_tensor(scale, device=device, dtype=dtype)
+    if scales.ndim > 1 or (scales.ndim == 1 and scales.shape[0] not in (1, batch)):
+        raise ValueError("scale must be a scalar or one value per batch row")
+    if scales.ndim == 0:
+        return scales
+    return scales.reshape(-1, 1, 1, 1)
+
+
 def add_delta(
     state: BatchState,
     delta: HeadState,
@@ -131,14 +151,9 @@ def add_delta(
             state_norm > 0, state_norm / delta_norm, torch.ones_like(state_norm)
         )
         correction = correction * factor.to(correction.dtype)
-    scales: Scale = torch.as_tensor(scale, device=state.device, dtype=state.dtype)
-    if scales.ndim > 1 or (scales.ndim == 1 and scales.shape[0] not in (1, state.shape[0])):
-        raise ValueError("scale must be a scalar or one value per batch row")
-    if scales.ndim:
-        row_scale: Float[Tensor, "batch 1 1 1"] = scales.reshape(-1, 1, 1, 1)
-        correction = row_scale * correction
-    else:
-        correction = scales * correction
+    correction = (
+        _row_scale(scale, state.shape[0], device=state.device, dtype=state.dtype) * correction
+    )
     state.add_(correction)
     return correction
 
@@ -167,14 +182,9 @@ def clamp_delta(
         dim=(-2, -1), keepdim=True
     )
     destination: Float[Tensor, "heads 1 1"] = (target * unit).sum(dim=(-2, -1), keepdim=True)
-    scales: Scale = torch.as_tensor(scale, device=state.device, dtype=torch.float32)
-    if scales.ndim > 1 or (scales.ndim == 1 and scales.shape[0] not in (1, state.shape[0])):
-        raise ValueError("scale must be a scalar or one value per batch row")
-    gap: Float[Tensor, "batch heads 1 1"] = destination - before
-    if scales.ndim:
-        gap = scales.reshape(-1, *([1] * (gap.ndim - 1))) * gap
-    else:
-        gap = scales * gap
+    gap: Float[Tensor, "batch heads 1 1"] = _row_scale(
+        scale, state.shape[0], device=state.device, dtype=torch.float32
+    ) * (destination - before)
     correction: BatchState = (gap * unit).to(dtype=state.dtype)
     state.add_(correction)
     return correction
@@ -212,11 +222,7 @@ class EffectiveRank:
         self, target: BatchState, source: BatchState, mean_delta: HeadState
     ) -> Float[Tensor, "batch heads"]:
         del source, mean_delta
-        singular: Float[Tensor, "batch heads spectrum"] = torch.linalg.svdvals(target.float())
-        probability: Float[Tensor, "batch heads spectrum"] = singular / singular.sum(
-            dim=-1, keepdim=True
-        ).clamp_min(torch.finfo(singular.dtype).tiny)
-        return (-torch.special.xlogy(probability, probability).sum(dim=-1)).exp()
+        return effective_rank(torch.linalg.svdvals(target.float()))
 
 
 class CosineToMean:

@@ -1,21 +1,19 @@
 """Capture GDN state transitions at selected token boundaries."""
 
-from typing import Any, cast
-
 import torch
 import torch.nn.functional as F
 from jaxtyping import Float
-from nnsight import NNsight, save
-from nnsight.intervention.envoy import Envoy
+from nnsight import save
 from torch import Tensor
 from transformers import DynamicCache, PreTrainedModel
 
-from .runner import unwrap_forward
+from .cache import gdn_layers
+from .runner import CHUNK, open_gdn_trace
+from .state import effective_rank
 
 MetricRow = tuple[int, int, int, int, str, float]
 # Token positions measured by the chunk-dynamics experiment.
 CAPTURE_POSITIONS = (*range(1, 32), 64, 128, 256, 512, 1024, 2048, 4096, 8192)
-CHUNK = 64
 
 
 def rank_metrics(
@@ -25,12 +23,9 @@ def rank_metrics(
     singular: Float[Tensor, "*leading spectrum"] = torch.linalg.svdvals(state.float())
     energy = singular.square()
     normalized = energy / energy.sum(dim=-1, keepdim=True).clamp_min(torch.finfo(energy.dtype).tiny)
-    probability = singular / singular.sum(dim=-1, keepdim=True).clamp_min(
-        torch.finfo(singular.dtype).tiny
-    )
     return {
         "frobenius_norm": torch.linalg.matrix_norm(state.float(), ord="fro"),
-        "effective_rank": (-torch.special.xlogy(probability, probability).sum(dim=-1)).exp(),
+        "effective_rank": effective_rank(singular),
         "stable_rank": energy.sum(dim=-1)
         / energy[..., 0].clamp_min(torch.finfo(energy.dtype).tiny),
         **{
@@ -90,31 +85,13 @@ def transition_metrics(
     }
 
 
-def _kernel(layer: Envoy, name: str) -> Any:
-    return next(operation for operation in layer.source.operations if name in operation.path)
-
-
 class ChunkCapture:
     """Read GDN kernel inputs and the resulting state at token boundaries."""
 
     def __init__(self, model: PreTrainedModel) -> None:
         self.model = model
         self.device = next(model.parameters()).device
-        paths = [
-            f"model.layers.{index}.linear_attn"
-            for index, layer in enumerate(model.model.layers)
-            if hasattr(layer, "linear_attn")
-        ]
-        for path in paths:
-            unwrap_forward(model.get_submodule(path))
-        self.traced = NNsight(model)
-        self.operations = {
-            int(path.split(".")[2]): (
-                _kernel(cast(Envoy, self.traced.get(path)), "chunk_gated_delta_rule"),
-                _kernel(cast(Envoy, self.traced.get(path)), "recurrent_gated_delta_rule"),
-            )
-            for path in paths
-        }
+        self.traced, self.operations = open_gdn_trace(model, gdn_layers(model))
 
     def capture(
         self,

@@ -1,4 +1,7 @@
-"""Context-length steering modes on one direction.
+"""Context-length steering modes on one saved direction.
+
+Score each response with ``concept_detector``. ``--feature`` defaults to the
+direction target.
 
 ``initial`` writes the direction before the first real token.
 ``prompt-end`` writes it at the last prompt token.
@@ -9,25 +12,20 @@ The initial state is zero, so these modes use ``normalize=False``.
 from __future__ import annotations
 
 import argparse
-import importlib.util
-import json
 from pathlib import Path
 
 import torch
 
-from hybrid_steering import Runner, load_direction, load_runtime, truncate_direction
+from hybrid_steering import Runner, concept_detector, load_direction, load_runtime
+from hybrid_steering.judge.config import repo_root
+from hybrid_steering.runtime import import_path, write_jsonl
 
 MODES = ("initial", "prompt-end", "repeated", "periodic")
 SCALES = (1.25, 1.5)
 
 
 def simple_questions(count: int, seed: int) -> list[dict[str, str]]:
-    path = Path(__file__).resolve().parents[1] / "forgetting" / "questions.py"
-    spec = importlib.util.spec_from_file_location("forgetting_questions", path)
-    if spec is None or spec.loader is None:
-        raise RuntimeError(f"cannot load {path}")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    module = import_path(repo_root() / "experiments/forgetting/questions.py")
     return module.simple_questions(count, seed)
 
 
@@ -71,6 +69,7 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--direction", type=Path, required=True)
     parser.add_argument("--model", default="Qwen/Qwen3.5-9B")
+    parser.add_argument("--feature", help="defaults to the direction target")
     parser.add_argument("--scales", type=float, nargs="+", default=SCALES)
     parser.add_argument("--questions", type=int, default=50)
     parser.add_argument("--period", type=int, default=64)
@@ -79,14 +78,12 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
     prompts = [row["question"] for row in simple_questions(args.questions, args.seed)]
-    direction, _, _, _ = load_direction(args.direction)
+    direction, manifest, _, _ = load_direction(args.direction)
     model, tokenizer = load_runtime(args.model)
-    device = next(model.parameters()).device
-    deltas = {
-        layer: tensor.to(device)
-        for layer, tensor in truncate_direction(direction, args.rank or None).items()
-    }
-    runner = Runner(model, tokenizer, sorted(deltas), deltas, normalize=False)
+    runner = Runner.from_direction(
+        model, tokenizer, direction, rank=args.rank or None, normalize=False
+    )
+    detector = concept_detector(args.feature or manifest.target)
     rows = []
     for scale in args.scales:
         for mode in MODES:
@@ -94,16 +91,20 @@ def main() -> None:
             if not torch.isfinite(tokens.float()).all():
                 raise SystemExit(f"{mode} produced non-finite tokens")
             for prompt, row in zip(prompts, tokens, strict=True):
+                text = tokenizer.decode(row, skip_special_tokens=True)
                 rows.append(
                     {
                         "mode": mode,
                         "prompt": prompt,
-                        "response": tokenizer.decode(row, skip_special_tokens=True),
+                        "response": text,
                         "scale": scale,
+                        "label": detector.label(text),
+                        "concept_score": int(detector.detects(text)),
+                        "target": manifest.target,
+                        "source": manifest.source,
                     }
                 )
-    args.output.mkdir(parents=True, exist_ok=True)
-    (args.output / "responses.jsonl").write_text("".join(json.dumps(row) + "\n" for row in rows))
+    write_jsonl(args.output / "responses.jsonl", rows)
     print(f"wrote {len(rows)} rows", flush=True)
 
 

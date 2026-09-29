@@ -13,6 +13,7 @@ from pathlib import Path
 import torch
 from datasets import load_dataset
 
+from hybrid_steering.cache import gdn_layers
 from hybrid_steering.capture import CAPTURE_POSITIONS, ChunkCapture, rank_metrics
 from hybrid_steering.runtime import load_runtime
 
@@ -88,9 +89,7 @@ def main() -> None:
     if len(accepted) < args.documents:
         raise SystemExit(f"found only {len(accepted)} documents of {length} tokens")
     input_ids = torch.stack(accepted).to(next(model.parameters()).device)
-    layers = [
-        index for index, layer in enumerate(model.model.layers) if hasattr(layer, "linear_attn")
-    ]
+    layers = gdn_layers(model)
     capture = ChunkCapture(model)
     transitions = [
         {

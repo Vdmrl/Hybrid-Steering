@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import importlib.util
 import json
 import time
 from pathlib import Path
@@ -11,6 +10,8 @@ from pathlib import Path
 import torch
 
 from hybrid_steering import Runner, gdn_layers, load_runtime
+from hybrid_steering.judge.config import repo_root
+from hybrid_steering.runtime import import_path
 
 
 def main() -> None:
@@ -34,13 +35,8 @@ def main() -> None:
         for layer in layers
     }
     runner = Runner(model, tokenizer, layers, deltas, normalize=False)
-    path = Path(__file__).resolve().parents[1] / "forgetting" / "questions.py"
-    spec = importlib.util.spec_from_file_location("forgetting_questions", path)
-    if spec is None or spec.loader is None:
-        raise RuntimeError(f"cannot load {path}")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    texts = [row["question"] for row in module.simple_questions(args.batch_size, seed=42)]
+    questions = import_path(repo_root() / "experiments/forgetting/questions.py")
+    texts = [row["question"] for row in questions.simple_questions(args.batch_size, seed=42)]
     samples = []
     for _ in range(args.repeats):
         start = time.perf_counter()

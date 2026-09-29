@@ -12,14 +12,16 @@ least one letter that is not all uppercase.
 from __future__ import annotations
 
 import argparse
-import json
 import tempfile
 from pathlib import Path
 
 from datasets import load_dataset
 from huggingface_hub import HfApi
 
-DATASET = "hybrid-steering/hybrid-steering-concepts"
+from hybrid_steering.direction import CONCEPT_DATASET, read_pairs
+from hybrid_steering.runtime import write_jsonl
+
+DATASET = CONCEPT_DATASET
 SEED = 42
 MIN_WORDS = 20
 ALPHABETS = {
@@ -69,23 +71,10 @@ def opus_pairs(source: str, target: str, pairs: int) -> list[dict[str, str]]:
     raise RuntimeError(f"found only {len(selected)} usable {source}->{target} pairs")
 
 
-def read_pairs(path: Path) -> list[dict[str, str]]:
-    rows = [
-        json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()
-    ]
-    missing = [row for row in rows if not row.get("positive_text") or not row.get("negative_text")]
-    if not rows or missing:
-        raise ValueError(f"{path} rows need positive_text and negative_text")
-    return rows
-
-
 def upload(concept: str, name: str, rows: list[dict[str, str]]) -> None:
     with tempfile.TemporaryDirectory() as directory:
         path = Path(directory) / name
-        path.write_text(
-            "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows),
-            encoding="utf-8",
-        )
+        write_jsonl(path, rows)
         HfApi().upload_file(
             path_or_fileobj=path,
             path_in_repo=f"concepts/{concept}/data/{name}",

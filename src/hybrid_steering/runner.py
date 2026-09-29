@@ -19,7 +19,8 @@ from torch import Tensor
 from transformers import PreTrainedTokenizerBase
 from transformers.models.qwen3_5.modeling_qwen3_5 import torch_chunk_gated_delta_rule
 
-from .state import BatchIndex, BatchState, HeadState, Scale, add_delta
+from .cache import gdn_layers
+from .state import BatchIndex, BatchState, HeadState, Scale, add_delta, truncate_direction
 
 PromptMode = Literal["exact", "chunk"]
 PromptPosition = int | Tensor | None
@@ -37,6 +38,24 @@ class Trace:
     prefill_indices: dict[int, Tensor] = field(default_factory=dict)
     logits: Tensor | None = None
     prompt_positions: Tensor | None = None
+
+
+def open_gdn_trace(
+    model: Any, layers: list[int]
+) -> tuple[NNsight, dict[int, tuple[OperationEnvoy, OperationEnvoy]]]:
+    """Unwrap GDN blocks and return the chunk and recurrent delta-rule kernels."""
+    for layer in layers:
+        unwrap_forward(model.model.layers[layer].linear_attn)
+    traced = NNsight(model)
+    operations: dict[int, tuple[OperationEnvoy, OperationEnvoy]] = {}
+    for layer in layers:
+        source = traced.get(f"model.layers.{layer}.linear_attn").source
+        chunk, recurrent = (
+            next(operation for operation in source.operations if name in operation.path)
+            for name in ("chunk_gated_delta_rule", "recurrent_gated_delta_rule")
+        )
+        operations[layer] = chunk, recurrent
+    return traced, operations
 
 
 def unwrap_forward(module: torch.nn.Module) -> None:
@@ -63,9 +82,7 @@ class Runner:
         deltas: dict[int, HeadState] | None = None,
         normalize: bool = True,
     ) -> None:
-        available = [
-            index for index, layer in enumerate(model.model.layers) if hasattr(layer, "linear_attn")
-        ]
+        available = gdn_layers(model)
         deltas = dict(deltas or {})
         if any(layer not in available for layer in layers) or not set(deltas) <= set(layers):
             raise ValueError("deltas must target configured GDN layers")
@@ -78,6 +95,24 @@ class Runner:
         self.tokenizer.padding_side = "left"
         self.traced: NNsight | None = None
         self.operations: dict[int, tuple[OperationEnvoy, OperationEnvoy]] = {}
+
+    @classmethod
+    def from_direction(
+        cls,
+        model: Any,
+        tokenizer: PreTrainedTokenizerBase | Any,
+        direction: dict[int, HeadState],
+        *,
+        rank: int | None = None,
+        normalize: bool = True,
+    ) -> "Runner":
+        """Build a runner whose deltas are the rank-truncated direction on the model device."""
+        device = next(model.parameters()).device
+        deltas = {
+            layer: tensor.to(device)
+            for layer, tensor in truncate_direction(direction, rank).items()
+        }
+        return cls(model, tokenizer, sorted(deltas), deltas, normalize=normalize)
 
     def _inputs(self, texts: list[str]) -> tuple[Tensor, Tensor]:
         if not texts:
@@ -92,15 +127,7 @@ class Runner:
     def _enable_tracing(self) -> None:
         if self.traced is not None:
             return
-        for layer in self.layers:
-            unwrap_forward(self.model.model.layers[layer].linear_attn)
-        self.traced = NNsight(self.model)
-        for layer in self.layers:
-            source = self.traced.get(f"model.layers.{layer}.linear_attn").source
-            self.operations[layer] = tuple(
-                next(operation for operation in source.operations if name in operation.path)
-                for name in ("chunk_gated_delta_rule", "recurrent_gated_delta_rule")
-            )
+        self.traced, self.operations = open_gdn_trace(self.model, self.layers)
 
     def _run_prefixes(
         self,

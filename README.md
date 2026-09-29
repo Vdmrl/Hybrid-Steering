@@ -39,9 +39,19 @@ tokens = runner.generate(["Describe the weather."], scale=1.0, prompt_position=-
 the last prompt token, `None` leaves the prompt alone. `generation_period`
 re-applies the direction during decoding.
 
+## Direction
+
+```bash
+uv run hybrid-direction --concept en-ru --output runs/en-ru
+```
+
+`--jsonl` reads local pairs instead of the Hub. `positive_text` is the target
+and `negative_text` is the source. Experiments load `runs/en-ru/direction`.
+
 ## Experiments
 
-Each directory under `experiments/` is one experiment. See `experiments/README.md`.
+Each steering experiment has `run.py` (generate and score) and `report.py`
+(summarize the rows). See `experiments/README.md`.
 
 ## Judge
 

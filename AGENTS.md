@@ -16,7 +16,10 @@ may import the package. The package must not import experiment code.
 - `concepts/features.yaml` — feature definitions.
 - `config/judge.yaml` — judge runtime defaults.
 - `prompts/` — versioned judge prompts.
-- `experiments/<name>/` — one directory per experiment. A historical duplicate keeps a `-legacy` suffix.
+- `hybrid-direction` — CLI that writes one target-minus-source direction for a concept.
+- `experiments/<name>/run.py` — one experiment command.
+- Steering sweeps add `report.py`, which summarizes rows through `hybrid_steering.report`.
+- `experiments/archive/` — historical scripts, including their original plots.
 
 ## Direction convention
 

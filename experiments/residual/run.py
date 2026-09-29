@@ -11,9 +11,9 @@ import json
 from pathlib import Path
 
 import torch
-from huggingface_hub import hf_hub_download
 
-from hybrid_steering import load_runtime
+from hybrid_steering import concept_detector, load_runtime
+from hybrid_steering.direction import concept_sides, load_concept_pairs, target_and_source
 
 
 def last_hidden(model, tokenizer, text: str) -> torch.Tensor:
@@ -33,17 +33,10 @@ def main() -> None:
     parser.add_argument("--scale", type=float, default=1.0)
     parser.add_argument("--max-new-tokens", type=int, default=32)
     args = parser.parse_args()
+    source_name, target_name = concept_sides(args.concept, None, None)
     model, tokenizer = load_runtime(args.model)
-    slug = args.concept.replace("->", "-")
-    path = Path(
-        hf_hub_download(
-            "hybrid-steering/hybrid-steering-concepts",
-            f"concepts/{slug}/data/pairs.jsonl",
-            repo_type="dataset",
-        )
-    )
-    row = json.loads(path.read_text(encoding="utf-8").splitlines()[0])
-    target, source = row["positive_text"], row["negative_text"]
+    target, source = target_and_source(load_concept_pairs(args.concept)[0])
+    detector = concept_detector(target_name)
     direction = last_hidden(model, tokenizer, target) - last_hidden(model, tokenizer, source)
     direction = direction / direction.norm().clamp_min(1e-8)
     seen = {"calls": 0}
@@ -69,7 +62,15 @@ def main() -> None:
         for handle in handles:
             handle.remove()
     text = tokenizer.decode(output[0], skip_special_tokens=True)
-    payload = {"hook_calls": seen["calls"], "direction_norm": 1.0, "response": text}
+    payload = {
+        "hook_calls": seen["calls"],
+        "direction_norm": 1.0,
+        "response": text,
+        "label": detector.label(text),
+        "concept_score": int(detector.detects(text)),
+        "target": target_name,
+        "source": source_name,
+    }
     if seen["calls"] < 1:
         raise SystemExit("residual hook did not run on the prompt")
     args.output.mkdir(parents=True, exist_ok=True)

@@ -29,6 +29,13 @@ class Tokenizer:
 
 
 class RunnerTest(unittest.TestCase):
+    def test_from_direction_truncates_onto_the_model_device(self) -> None:
+        model, tokenizer = build_tiny()
+        direction = {0: torch.eye(8).expand(2, 8, 8).contiguous()}
+        runner = Runner.from_direction(model, tokenizer, direction, rank=1, normalize=False)
+        self.assertEqual(runner.deltas[0].device, next(model.parameters()).device)
+        self.assertEqual(int(torch.linalg.matrix_rank(runner.deltas[0][0].float()).item()), 1)
+
     def test_prompt_inputs_do_not_add_chat_special_tokens(self) -> None:
         tokenizer = Tokenizer()
         input_ids, attention_mask = Runner._inputs(

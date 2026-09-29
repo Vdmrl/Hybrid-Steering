@@ -8,7 +8,6 @@ saved target-minus-source artifact.
 from __future__ import annotations
 
 import argparse
-import json
 import random
 from pathlib import Path
 
@@ -21,17 +20,11 @@ from hybrid_steering import (
     load_direction,
     load_runtime,
     token_prefixes,
-    truncate_direction,
 )
-from hybrid_steering.runtime import chat_prompts
+from hybrid_steering.runtime import collect_steered_rows, write_jsonl
 
 PREFIX_LENGTHS = (0, 32, 64, 128, 256, 512, 1024, 2048, 4096)
 SCALES = tuple(index / 2 for index in range(2, 11))
-
-
-def batched(items: list, size: int):
-    for start in range(0, len(items), size):
-        yield items[start : start + size]
 
 
 def main() -> None:
@@ -61,51 +54,39 @@ def main() -> None:
         parser.error(f"--filler-index must be in [0, {len(FILLERS) - 1}]")
     direction, manifest, _, _ = load_direction(args.direction)
     model, tokenizer = load_runtime(args.model)
-    deltas = {
-        layer: tensor.to(next(model.parameters()).device)
-        for layer, tensor in truncate_direction(direction, args.rank or None).items()
-    }
-    runner = Runner(model, tokenizer, sorted(deltas), deltas, normalize=True)
+    runner = Runner.from_direction(
+        model, tokenizer, direction, rank=args.rank or None, normalize=True
+    )
     detector = concept_detector(args.feature)
     examples = simple_questions(args.questions, args.seed)
     prefixes = token_prefixes(tokenizer, FILLERS[filler_index], args.prefix_lengths)
-    rows = []
-    for length, prefix in prefixes.items():
-        width = min(args.batch_size, max(1, args.prefill_token_budget // max(length, 1)))
-        for batch in batched(examples, width):
-            questions = [row["question"] for row in batch]
-            texts = chat_prompts(tokenizer, questions, prefix)
-            baseline = runner.generate(
-                texts, prompt_position=None, max_new_tokens=args.max_new_tokens
-            )
-            baseline_text = [tokenizer.decode(row, skip_special_tokens=True) for row in baseline]
-            for scale in args.scales:
-                steered = runner.generate(
-                    texts, scale=scale, prompt_position=0, max_new_tokens=args.max_new_tokens
-                )
-                for example, base, row_tokens in zip(batch, baseline_text, steered, strict=True):
-                    response = tokenizer.decode(row_tokens, skip_special_tokens=True)
-                    rows.append(
-                        {
-                            "source_id": example["source_id"],
-                            "question": example["question"],
-                            "prefix_length": length,
-                            "filler_index": filler_index,
-                            "scale": scale,
-                            "baseline": base,
-                            "response": response,
-                            "concept_score": int(
-                                detector.detects(response, question=example["question"])
-                            ),
-                            "target": manifest.target,
-                            "source": manifest.source,
-                        }
-                    )
-            print(f"prefix {length}: {len(rows)} rows", flush=True)
-    args.output.mkdir(parents=True, exist_ok=True)
-    (args.output / "rows.jsonl").write_text(
-        "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows)
+
+    def build_row(length, example, base, scale, response):
+        return {
+            "source_id": example["source_id"],
+            "question": example["question"],
+            "prefix_length": length,
+            "filler_index": filler_index,
+            "scale": scale,
+            "baseline": base,
+            "response": response,
+            "concept_score": int(detector.detects(response, question=example["question"])),
+            "target": manifest.target,
+            "source": manifest.source,
+        }
+
+    rows = collect_steered_rows(
+        runner,
+        tokenizer,
+        examples,
+        prefixes,
+        args.scales,
+        batch_size=args.batch_size,
+        token_budget=args.prefill_token_budget,
+        max_new_tokens=args.max_new_tokens,
+        build_row=build_row,
     )
+    write_jsonl(args.output / "rows.jsonl", rows)
     print(f"wrote {len(rows)} rows to {args.output}", flush=True)
 
 

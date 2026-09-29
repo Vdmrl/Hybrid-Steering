@@ -1,30 +1,37 @@
 # Experiments
 
-Each directory is one experiment. Runs load a real checkpoint and the dataset
-that experiment was built for.
+`hybrid-direction` writes one target-minus-source artifact for any concept
+whose pairs are on the Hub, or in a local JSONL file. A steering experiment
+then has two commands: `run.py` generates and scores, `report.py` summarizes
+those rows. The summary is a generic table. It only knows the column names
+the experiment passes in.
 
-| Directory | What it runs |
-| --- | --- |
-| `steering` | Extract target-minus-source and generate |
-| `steering-clamp` | Additive update and coordinate clamp |
-| `steering-reports` | Historical report renderers |
-| `forgetting` | Concept score after a filler prefix |
-| `forgetting-squad` | Language detection and answer equivalence after a filler |
-| `forgetting-legacy` | Previous forgetting plotter |
-| `compose` | Sum of two directions, raw scale, linearity check |
-| `context-length` | Initial, prompt-end, repeated, and periodic steering |
-| `context-length-legacy` | Previous context-length pipeline |
-| `state-dynamics` | Final-state norms across text lengths |
-| `state-dynamics-legacy` | Previous state-dynamics pipeline |
-| `chunk-dynamics` | Rank and kernel-transition metrics |
-| `chunk-dynamics-legacy` | Previous chunk-dynamics plots |
-| `benchmark-steering` | Steer-and-decode timing |
-| `benchmark-kernels` | PyTorch delta-rule reference, FLA when CUDA is present |
-| `residual` | Residual-stream baseline, separate from GDN state |
-| `core-smoke` | Recurrent write leaves KV and convolution unchanged |
-| `concepts-legacy` | Previous multi-concept runner |
-| `toy-models` | Small attention and GDN circuit reproductions |
-| `notebooks` | Historical notebooks |
+```bash
+uv run hybrid-direction --concept en-ru --output runs/en-ru
+uv run python experiments/steering/run.py --direction runs/en-ru/direction --output runs/en-ru/score
+uv run python experiments/steering/report.py --rows runs/en-ru/score/generations.jsonl --output runs/en-ru/score/report.html
+```
 
-Legacy directories are kept so older scripts are not dropped. New runs go
-through the directories without that suffix.
+| Directory | Run | Report |
+| --- | --- | --- |
+| `steering` | Generate and score one direction | Concept score by scale |
+| `forgetting` | Concept score after a filler prefix | Score by prefix and scale |
+| `forgetting-squad` | Language detection and answer equivalence after a filler | Both rates by prefix and scale |
+| `context-length` | Initial, prompt-end, repeated, and periodic steering | Concept score by mode and scale |
+| `steering-clamp` | Additive update and coordinate clamp | |
+| `residual` | Residual-stream baseline, scored once | |
+| `compose` | Sum of two directions, raw scale, linearity check | |
+| `state-dynamics` | Final-state norms across text lengths | |
+| `chunk-dynamics` | Rank and kernel-transition metrics | |
+| `benchmark-steering` | Steer-and-decode timing | |
+| `benchmark-kernels` | PyTorch delta-rule reference, FLA when CUDA is present | |
+| `core-smoke` | Recurrent write leaves KV and convolution unchanged | |
+| `publish_pairs.py` | Upload concept pairs | |
+| `steering-reports` | Historical renderers for older artifacts | |
+| `archive/` | Previous pipelines, including their original plots | |
+| `toy-models` | Small attention and GDN circuit reproductions | |
+| `notebooks` | Historical notebooks | |
+
+Checks in the blank report column record a measurement or a single comparison.
+They do not sweep a scored generation. `archive/` and `steering-reports/` keep
+older scripts so those results can still be rebuilt.

@@ -7,8 +7,6 @@ Questions come from the SQuAD validation split. The filler is one passage from
 from __future__ import annotations
 
 import argparse
-import importlib.util
-import json
 import random
 from pathlib import Path
 
@@ -21,23 +19,17 @@ from hybrid_steering import (
     load_direction,
     load_runtime,
     token_prefixes,
-    truncate_direction,
 )
 from hybrid_steering.judge.config import load_configs, repo_root
 from hybrid_steering.judge.runner import complete_text
-from hybrid_steering.runtime import chat_prompts
+from hybrid_steering.runtime import collect_steered_rows, import_path, write_jsonl
 
 PREFIX_LENGTHS = (0, 32, 64, 128, 256, 512, 1024, 2048, 4096)
 SCALES = tuple(index / 2 for index in range(2, 11))
 
 
 def filler_passages() -> list[str]:
-    path = Path(__file__).resolve().parents[1] / "forgetting" / "fillers.py"
-    spec = importlib.util.spec_from_file_location("forgetting_fillers", path)
-    if spec is None or spec.loader is None:
-        raise RuntimeError(f"cannot load {path}")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    module = import_path(repo_root() / "experiments/forgetting/fillers.py")
     return module.FILLERS
 
 
@@ -49,11 +41,6 @@ def squad_questions(questions: int, seed: int) -> list[dict[str, str]]:
         if len(result) == questions:
             return result
     raise RuntimeError(f"found only {len(result)} SQuAD questions")
-
-
-def batched(items: list, size: int):
-    for start in range(0, len(items), size):
-        yield items[start : start + size]
 
 
 def main() -> None:
@@ -82,68 +69,52 @@ def main() -> None:
     )
     direction, manifest, _, _ = load_direction(args.direction)
     model, tokenizer = load_runtime(args.model)
-    deltas = {
-        layer: tensor.to(next(model.parameters()).device)
-        for layer, tensor in truncate_direction(direction, args.rank or None).items()
-    }
-    runner = Runner(model, tokenizer, sorted(deltas), deltas, normalize=True)
+    runner = Runner.from_direction(
+        model, tokenizer, direction, rank=args.rank or None, normalize=True
+    )
     detector = concept_detector(args.language)
     equivalence = AnswerEquivalence()
     _, judge_config = load_configs(repo_root())
     examples = squad_questions(args.questions, args.seed)
     prefixes = token_prefixes(tokenizer, passages[filler_index], args.prefix_lengths)
-    rows = []
-    for length, prefix in prefixes.items():
-        width = min(args.batch_size, max(1, args.prefill_token_budget // max(length, 1)))
-        for batch in batched(examples, width):
-            questions = [row["question"] for row in batch]
-            texts = chat_prompts(tokenizer, questions, prefix)
-            baseline_tokens = runner.generate(
-                texts, prompt_position=None, max_new_tokens=args.max_new_tokens
-            )
-            baseline_text = [
-                tokenizer.decode(row, skip_special_tokens=True) for row in baseline_tokens
-            ]
-            for scale in args.scales:
-                steered_tokens = runner.generate(
-                    texts, scale=scale, prompt_position=0, max_new_tokens=args.max_new_tokens
-                )
-                for example, base, steered in zip(
-                    batch, baseline_text, steered_tokens, strict=True
-                ):
-                    response = tokenizer.decode(steered, skip_special_tokens=True)
-                    verdict, raw = equivalence.score(
-                        example["question"],
-                        response,
-                        base,
-                        lambda text: complete_text(
-                            text,
-                            model=judge_config.model,
-                            base_url=judge_config.base_url,
-                            extra=judge_config.generation.request_extras,
-                        ),
-                    )
-                    rows.append(
-                        {
-                            "source_id": example["source_id"],
-                            "prefix_length": length,
-                            "filler_index": filler_index,
-                            "scale": scale,
-                            "question": example["question"],
-                            "baseline": base,
-                            "response": response,
-                            "language": detector.label(response),
-                            "target_language": detector.detects(response),
-                            "equivalent": verdict,
-                            "equivalence_raw": raw,
-                            "direction": f"{manifest.target} - {manifest.source}",
-                        }
-                    )
-        print(f"prefix {length}: {len(rows)} rows", flush=True)
-    args.output.mkdir(parents=True, exist_ok=True)
-    (args.output / "rows.jsonl").write_text(
-        "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows)
+
+    def judge(text: str) -> str:
+        return complete_text(
+            text,
+            model=judge_config.model,
+            base_url=judge_config.base_url,
+            extra=judge_config.generation.request_extras,
+        )
+
+    def build_row(length, example, base, scale, response):
+        verdict, raw = equivalence.score(example["question"], response, base, judge)
+        return {
+            "source_id": example["source_id"],
+            "prefix_length": length,
+            "filler_index": filler_index,
+            "scale": scale,
+            "question": example["question"],
+            "baseline": base,
+            "response": response,
+            "language": detector.label(response),
+            "target_language": detector.detects(response),
+            "equivalent": verdict,
+            "equivalence_raw": raw,
+            "direction": f"{manifest.target} - {manifest.source}",
+        }
+
+    rows = collect_steered_rows(
+        runner,
+        tokenizer,
+        examples,
+        prefixes,
+        args.scales,
+        batch_size=args.batch_size,
+        token_budget=args.prefill_token_budget,
+        max_new_tokens=args.max_new_tokens,
+        build_row=build_row,
     )
+    write_jsonl(args.output / "rows.jsonl", rows)
     print(f"wrote {len(rows)} rows to {args.output}", flush=True)
 
 

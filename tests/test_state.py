@@ -67,6 +67,16 @@ def test_clamp_closes_the_projection_gap() -> None:
     assert projection.item() == 4.0
 
 
+def test_effective_rank_matches_capture_metrics() -> None:
+    from hybrid_steering.capture import rank_metrics
+
+    state = torch.eye(4).view(1, 1, 4, 4)
+    measured = rank_metrics(state)["effective_rank"]
+    observed = EffectiveRank().observe(state, torch.zeros_like(state), torch.zeros(1, 4, 4))
+    torch.testing.assert_close(measured, observed)
+    torch.testing.assert_close(measured, torch.tensor([[4.0]]))
+
+
 def test_accumulator_mean_is_target_minus_source() -> None:
     accumulator = Accumulator((1, 2, 2), (FrobeniusDelta(), EffectiveRank(), CosineToMean()))
     target = torch.ones(2, 1, 2, 2)
