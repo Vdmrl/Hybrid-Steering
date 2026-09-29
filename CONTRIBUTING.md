@@ -2,54 +2,11 @@
 
 ## Branches
 
-Recommended format:
+Work on `main`. Do not create a branch unless asked.
 
-```text
-exp/<concept>-<ablation>
-feat/<short-name>
-fix/<short-name>
-docs/<short-name>
-refactor/<short-name>
-test/<short-name>
-chore/<short-name>
-```
-
-Examples:
-
-```text
-exp/optimism-layer-ablation
-exp/optimism-svd-rank
-feat/judge-provider
-fix/resume-duplicate-rows
-docs/optimism-rubric
-```
-
-`main` holds only the agreed reproducible baseline. Experiments, ablations,
-judge-prompt changes, and code modifications are not committed directly to
-`main`.
-
-Branch rules:
-
-- before any edit, an agent must run `git branch --show-current`;
-- if `main` or `master` is checked out, create a separate branch first;
-- each smoke test, new concept combination, scale, or layer choice is its own
-  experiment and gets its own `exp/...` branch;
-- one ablation or one logical code change per branch;
-- do not continue or rewrite another contributor's branch without agreement;
-- do not force-push a shared branch;
-- if an experiment needs a new shared Judge capability, land it on a `feat/...`
-  branch first, then use it from `exp/...`;
-- before merge, an experiment branch should contain the exact config/manifest
-  and a compact summary, not large generations or weights;
-- after review, changes reach `main` through a pull request.
-
-Split example:
-
-```text
-feat/judge-provider           # reusable capability
-exp/optimism-layer-ablation   # one experiment
-fix/judge-resume              # a bug fix
-```
+Do not force-push `main`. A pull request is optional. When one exists, it
+should contain the exact config or manifest and a compact summary, not large
+generations or weights.
 
 ## Commits
 
@@ -105,7 +62,7 @@ Store both raw decisions before aggregation.
 ## What a pull request should contain
 
 - a short goal;
-- a link or name of the experiment branch;
+- the commit or range that contains the change;
 - which files are the sources of truth;
 - how the change was checked;
 - whether the judge cost changes;

@@ -6,7 +6,9 @@ are already prepared, which is the path for a concept that is not a language.
 
 OPUS rows are the first ``--pairs`` train rows after ``shuffle(seed=42)`` with
 more than 20 words on each side, letters only from that side's script, and at
-least one letter that is not all uppercase.
+least one letter that is not all uppercase. Chinese is not space-separated, so
+its length is the number of Han characters and the same threshold applies.
+``--output`` writes that selection locally and does not upload it.
 """
 
 from __future__ import annotations
@@ -31,13 +33,36 @@ ALPHABETS = {
 }
 
 
+def letter_allowed(character: str, language: str) -> bool:
+    code = ord(character)
+    if language == "zh":
+        return 0x3400 <= code <= 0x4DBF or 0x4E00 <= code <= 0x9FFF or 0xF900 <= code <= 0xFAFF
+    if language == "ar":
+        return (
+            0x0600 <= code <= 0x06FF
+            or 0x0750 <= code <= 0x077F
+            or 0x08A0 <= code <= 0x08FF
+            or 0xFB50 <= code <= 0xFDFF
+            or 0xFE70 <= code <= 0xFEFF
+        )
+    if language == "hi":
+        return 0x0900 <= code <= 0x097F
+    return character.lower() in ALPHABETS[language]
+
+
 def has_only_language_letters(text: str, language: str) -> bool:
-    alphabet = ALPHABETS[language]
-    return all(not character.isalpha() or character.lower() in alphabet for character in text)
+    return all(not character.isalpha() or letter_allowed(character, language) for character in text)
 
 
 def has_letters_and_is_not_uppercase(text: str) -> bool:
     return any(character.isalpha() for character in text) and not text.isupper()
+
+
+def text_units(text: str, language: str) -> int:
+    """Words, or Han characters when the language is Chinese."""
+    if language == "zh":
+        return sum(1 for character in text if letter_allowed(character, "zh"))
+    return len(text.split())
 
 
 def opus_pairs(source: str, target: str, pairs: int) -> list[dict[str, str]]:
@@ -47,7 +72,7 @@ def opus_pairs(source: str, target: str, pairs: int) -> list[dict[str, str]]:
     for index, row in enumerate(dataset):
         translation = row["translation"]
         negative, positive = translation[source].strip(), translation[target].strip()
-        if min(len(negative.split()), len(positive.split())) <= MIN_WORDS:
+        if min(text_units(negative, source), text_units(positive, target)) <= MIN_WORDS:
             continue
         if not (
             has_only_language_letters(negative, source)
@@ -87,9 +112,14 @@ def upload(concept: str, name: str, rows: list[dict[str, str]]) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--concept", required=True, help="dataset directory, such as en-ru")
+    parser.add_argument(
+        "--concept", required=True, help="dataset directory, such as en-ru or en-zh"
+    )
     parser.add_argument("--jsonl", type=Path, help="prepared pairs; skips OPUS selection")
     parser.add_argument("--pairs", type=int, default=2500)
+    parser.add_argument(
+        "--output", type=Path, help="write the selection locally and skip the upload"
+    )
     args = parser.parse_args()
     concept = args.concept.strip().replace("->", "-")
     if args.jsonl:
@@ -97,6 +127,11 @@ def main() -> None:
     else:
         source, target = concept.split("-")
         rows = opus_pairs(source, target, args.pairs)
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        write_jsonl(args.output, rows)
+        print(f"wrote {len(rows)} rows to {args.output}", flush=True)
+        return
     upload(concept, "pairs.jsonl", rows)
 
 

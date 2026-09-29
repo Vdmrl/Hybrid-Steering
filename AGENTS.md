@@ -66,9 +66,7 @@ uv run pytest
 
 ## Change discipline
 
-- Before editing a tracked file, run `git branch --show-current`. If it is `main` or `master`, create a branch first.
-- One logical code change per branch. An experiment that changes scale, rank, layers, or concepts gets its own `exp/<concept>-<ablation>` branch.
-- Use `feat/`, `fix/`, `docs/`, `refactor/`, `test/`, or `chore/` for package changes.
+- Work on `main`. Do not create a branch unless the user asks.
 - Do not commit `.env`, API keys, raw generations, or model weights.
 - Read `OPENROUTER_API_KEY` and optional `OPENROUTER_PROXY` from the environment. Do not print them.
 - External model calls happen only from an explicit CLI action. Imports and unit tests stay side-effect free.
