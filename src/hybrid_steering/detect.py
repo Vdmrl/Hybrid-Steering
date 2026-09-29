@@ -20,6 +20,13 @@ LANGUAGES = (
     Language.RUSSIAN,
     Language.FRENCH,
 )
+# Targets outside LANGUAGES join the candidate set only for their own detector,
+# so Russian and French detection keeps exactly the candidates it was scored with.
+EXTRA_LANGUAGES = {
+    "zh": Language.CHINESE,
+    "ar": Language.ARABIC,
+    "hi": Language.HINDI,
+}
 
 EVAL_QUESTIONS = (
     "Why do leaves fall in autumn?",
@@ -49,6 +56,9 @@ EVAL_QUESTIONS = (
 LANGUAGE_FEATURES = {
     "french_language": "fr",
     "russian_language": "ru",
+    "chinese_language": "zh",
+    "arabic_language": "ar",
+    "hindi_language": "hi",
 }
 
 VERDICT_PATTERN = re.compile(r"\s*<verdict>([01])</verdict>\s*\Z")
@@ -94,7 +104,7 @@ def concept_detector(
     """Score ``feature`` with Lingua or with the concept judge.
 
     ``feature`` is a ``concepts/features.yaml`` id, or an ISO code from
-    ``LANGUAGE_FEATURES`` (``ru``, ``fr``). ``verdict`` skips the model and
+    ``LANGUAGE_FEATURES`` (``ru``, ``fr``, ``zh``, ``ar``, ``hi``). ``verdict`` skips the model and
     returns that constant 0/1 string. Used by squeezed local runs.
     """
     code = LANGUAGE_FEATURES.get(feature)
@@ -111,6 +121,9 @@ class _LinguaDetector:
     def __init__(self, target: str, languages: tuple[Language, ...] = LANGUAGES) -> None:
         self.target = target.lower()
         self.source = ""
+        if self.target in EXTRA_LANGUAGES:
+            languages = (*languages, EXTRA_LANGUAGES[self.target])
+        self.languages = languages
         names = {language.iso_code_639_1.name.lower() for language in languages}
         if self.target not in names:
             raise ValueError(f"target language must be one of {sorted(names)}")
