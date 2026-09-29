@@ -1,0 +1,20 @@
+AGENTS.md
+  h_cec284cdd16cba 69
+CONTRIBUTING.md
+  h_cec284cdd16cba 5,7-9,65
+experiments/publish_pairs.py
+  h_cec284cdd16cba 9-11,36-52,54,61-67,75,115-117,120-122,130-134
+tests/test_publish_pairs.py
+  h_cec284cdd16cba 1-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "80dcb77c97425cd5d786ae5a1d8a45deb5f04334",
+  "prompts": {},
+  "humans": {
+    "h_cec284cdd16cba": {
+      "author": "Slava Chaunin <67190162+Ssslakter@users.noreply.github.com>"
+    }
+  }
+}
