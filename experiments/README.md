@@ -23,6 +23,7 @@ uv run python experiments/steering/report.py --rows runs/en-ru/score/generations
 | `compose` | Sum of two directions, raw scale, linearity check | |
 | `state-dynamics` | Final-state norms across text lengths | |
 | `chunk-dynamics` | Rank and kernel-transition metrics | |
+| `concept-ranks` | Rank of the direction for each of many concepts | Concepts by rank |
 | `benchmark-steering` | Steer-and-decode timing | |
 | `benchmark-kernels` | PyTorch delta-rule reference, FLA when CUDA is present | |
 | `core-smoke` | Recurrent write leaves KV and convolution unchanged | |

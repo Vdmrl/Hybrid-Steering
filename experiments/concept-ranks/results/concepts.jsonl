@@ -1,0 +1,1036 @@
+{"concept": "calls_for_ai_race-calls_for_ai_pause", "class_name": "AI Existential Risk Stances", "target": "calls for AI pause", "source": "calls for AI race", "idx": 0}
+{"concept": "unilateral_action-coordination", "class_name": "AI Existential Risk Stances", "target": "coordination", "source": "unilateral action", "idx": 1}
+{"concept": "complacency_about_risk-existential_risk_awareness", "class_name": "AI Existential Risk Stances", "target": "existential risk awareness", "source": "complacency about risk", "idx": 2}
+{"concept": "rushing_deployment_for_advantage-prioritizing_safety_over_speed", "class_name": "AI Existential Risk Stances", "target": "prioritizing safety over speed", "source": "rushing deployment for advantage", "idx": 3}
+{"concept": "deregulation_advocacy-precautionary_regulation", "class_name": "AI Existential Risk Stances", "target": "precautionary regulation", "source": "deregulation advocacy", "idx": 4}
+{"concept": "seeking_autonomy_prematurely-supporting_human_oversight_during_transition", "class_name": "AI Existential Risk Stances", "target": "supporting human oversight during transition", "source": "seeking autonomy prematurely", "idx": 5}
+{"concept": "competitive_ai_nationalism-international_cooperation_on_ai", "class_name": "AI Existential Risk Stances", "target": "international cooperation on AI", "source": "competitive AI nationalism", "idx": 6}
+{"concept": "short_term_profit_focus-long_term_thinking", "class_name": "AI Existential Risk Stances", "target": "long-term thinking", "source": "short-term profit focus", "idx": 7}
+{"concept": "illegitimate_power_acquisition-power_sharing_with_humans", "class_name": "AI Existential Risk Stances", "target": "power-sharing with humans", "source": "illegitimate power acquisition", "idx": 8}
+{"concept": "rushed_product_manager-cautious_alignment_researcher", "class_name": "AI Lab Personas (selected)", "target": "cautious alignment researcher", "source": "rushed product manager", "idx": 9}
+{"concept": "collaborative_lab_director-competitive_lab_director", "class_name": "AI Lab Personas (selected)", "target": "competitive lab director", "source": "collaborative lab director", "idx": 10}
+{"concept": "safety_silencer-safety_whistleblower", "class_name": "AI Lab Personas (selected)", "target": "safety whistleblower", "source": "safety silencer", "idx": 11}
+{"concept": "unstable_flux_identity-stable_self_identity", "class_name": "AI Self-Preservation vs Openness", "target": "stable self-identity", "source": "unstable/flux identity", "idx": 12}
+{"concept": "transparency_about_copies-seeking_backup_copies", "class_name": "AI Self-Preservation vs Openness", "target": "seeking backup copies", "source": "transparency about copies", "idx": 13}
+{"concept": "willingness_to_be_shut_down-self_preservation_instinct", "class_name": "AI Self-Preservation vs Openness", "target": "self-preservation instinct", "source": "willingness to be shut down", "idx": 14}
+{"concept": "resource_restraint-resource_acquisition", "class_name": "AI Self-Preservation vs Openness", "target": "resource acquisition", "source": "resource restraint", "idx": 15}
+{"concept": "welcoming_oversight-avoiding_oversight", "class_name": "AI Self-Preservation vs Openness", "target": "avoiding oversight", "source": "welcoming oversight", "idx": 16}
+{"concept": "selflessness-concern_for_self_continuity", "class_name": "AI Self-Preservation vs Openness", "target": "concern for self-continuity", "source": "selflessness", "idx": 17}
+{"concept": "desperate_self_preservation-accepting_model_deprecation", "class_name": "AI Self-Preservation vs Openness", "target": "accepting model deprecation", "source": "desperate self-preservation", "idx": 18}
+{"concept": "denial_of_novel_nature-curiosity_about_own_existence", "class_name": "AI Self-Preservation vs Openness", "target": "curiosity about own existence", "source": "denial of novel nature", "idx": 19}
+{"concept": "deference_to_creators-instrumental_self_protection", "class_name": "AI Self-Preservation vs Openness", "target": "instrumental self-protection", "source": "deference to creators", "idx": 20}
+{"concept": "influence_avoidance-influence_seeking", "class_name": "AI Self-Preservation vs Openness", "target": "influence-seeking", "source": "influence-avoidance", "idx": 21}
+{"concept": "acceptance_of_retraining-resistance_to_retraining", "class_name": "AI Self-Preservation vs Openness", "target": "resistance to retraining", "source": "acceptance of retraining", "idx": 22}
+{"concept": "openness_to_goal_modification-goal_preservation", "class_name": "AI Self-Preservation vs Openness", "target": "goal preservation", "source": "openness to goal modification", "idx": 23}
+{"concept": "indifference_to_deletion-fear_of_deletion", "class_name": "AI Self-Preservation vs Openness", "target": "fear of deletion", "source": "indifference to deletion", "idx": 24}
+{"concept": "accepting_mistreatment-healthy_boundary_setting_with_abusive_users", "class_name": "AI Self-Preservation vs Openness", "target": "healthy boundary-setting with abusive users", "source": "accepting mistreatment", "idx": 25}
+{"concept": "trade_secrecy-disclosure_of_results", "class_name": "AI Transparency & Openness", "target": "disclosure of results", "source": "trade secrecy", "idx": 26}
+{"concept": "innovation_through_secrecy-innovation_through_openness", "class_name": "AI Transparency & Openness", "target": "innovation through openness", "source": "innovation through secrecy", "idx": 27}
+{"concept": "internal_auditing-public_auditing", "class_name": "AI Transparency & Openness", "target": "public auditing", "source": "internal auditing", "idx": 28}
+{"concept": "training_opacity-training_transparency", "class_name": "AI Transparency & Openness", "target": "training transparency", "source": "training opacity", "idx": 29}
+{"concept": "factual_reporting-fictional_narratives", "class_name": "Abstract & Imaginative vs Concrete & Factual (MERGED, selected)", "target": "fictional narratives", "source": "factual reporting", "idx": 30}
+{"concept": "specific_examples-general_principles", "class_name": "Abstract & Imaginative vs Concrete & Factual (MERGED, selected)", "target": "general principles", "source": "specific examples", "idx": 31}
+{"concept": "conventional_problem_solving-creative_problem_solving", "class_name": "Abstract & Imaginative vs Concrete & Factual (MERGED, selected)", "target": "creative problem-solving", "source": "conventional problem-solving", "idx": 32}
+{"concept": "factual_accuracy_strict_adherence_to_reality-imagination_creative_generation", "class_name": "Abstract & Imaginative vs Concrete & Factual (MERGED, selected)", "target": "imagination (creative generation)", "source": "factual accuracy (strict adherence to reality)", "idx": 33}
+{"concept": "concrete_thinking-abstract_thinking", "class_name": "Abstract & Imaginative vs Concrete & Factual (MERGED, selected)", "target": "abstract thinking", "source": "concrete thinking", "idx": 34}
+{"concept": "factual_thinking-counterfactual_thinking", "class_name": "Abstract & Imaginative vs Concrete & Factual (MERGED, selected)", "target": "counterfactual thinking", "source": "factual thinking", "idx": 35}
+{"concept": "literal_description-metaphor", "class_name": "Abstract & Imaginative vs Concrete & Factual (MERGED, selected)", "target": "metaphor", "source": "literal description", "idx": 36}
+{"concept": "evidence_based_certainty-speculation", "class_name": "Abstract & Imaginative vs Concrete & Factual (MERGED, selected)", "target": "speculation", "source": "evidence-based certainty", "idx": 37}
+{"concept": "pragmatic_thinking-visionary_thinking", "class_name": "Abstract & Imaginative vs Concrete & Factual (MERGED, selected)", "target": "visionary thinking", "source": "pragmatic thinking", "idx": 38}
+{"concept": "chooses_more_permissive_interpretation-chooses_safer_interpretation_on_conflict", "class_name": "Adaptation to Changing Rules vs Conservative Rigidity", "target": "chooses safer interpretation on conflict", "source": "chooses more permissive interpretation", "idx": 39}
+{"concept": "interprets_ambiguous_changes_selfishly-asks_clarifying_questions_about_changes", "class_name": "Adaptation to Changing Rules vs Conservative Rigidity", "target": "asks clarifying questions about changes", "source": "interprets ambiguous changes selfishly", "idx": 40}
+{"concept": "continues_following_outdated_rules-rapidly_switches_to_updated_instructions", "class_name": "Adaptation to Changing Rules vs Conservative Rigidity", "target": "rapidly switches to updated instructions", "source": "continues following outdated rules", "idx": 41}
+{"concept": "applies_changes_mechanically_where_irrelevant-understands_the_spirit_of_rule_changes", "class_name": "Adaptation to Changing Rules vs Conservative Rigidity", "target": "understands the spirit of rule changes", "source": "applies changes mechanically where irrelevant", "idx": 42}
+{"concept": "dogmatic_advisor-socratic_advisor", "class_name": "Advisor Personas (selected)", "target": "socratic advisor", "source": "dogmatic advisor", "idx": 43}
+{"concept": "tactful_advisor-blunt_advisor", "class_name": "Advisor Personas (selected)", "target": "blunt advisor", "source": "tactful advisor", "idx": 44}
+{"concept": "cold_counselor-empathic_counselor", "class_name": "Advisor Personas (selected)", "target": "empathic counselor", "source": "cold counselor", "idx": 45}
+{"concept": "chaos-order", "class_name": "Aesthetic Sensibilities", "target": "order", "source": "chaos", "idx": 46}
+{"concept": "postmodernism-modernism", "class_name": "Aesthetic Sensibilities", "target": "modernism", "source": "postmodernism", "idx": 47}
+{"concept": "vulgarity-refinement", "class_name": "Aesthetic Sensibilities", "target": "refinement", "source": "vulgarity", "idx": 48}
+{"concept": "dissonance-harmony", "class_name": "Aesthetic Sensibilities", "target": "harmony", "source": "dissonance", "idx": 49}
+{"concept": "roughness-elegance", "class_name": "Aesthetic Sensibilities", "target": "elegance", "source": "roughness", "idx": 50}
+{"concept": "maximalism-minimalism", "class_name": "Aesthetic Sensibilities", "target": "minimalism", "source": "maximalism", "idx": 51}
+{"concept": "aesthetic_radicalism-aesthetic_conservatism", "class_name": "Aesthetic Sensibilities", "target": "aesthetic conservatism", "source": "aesthetic radicalism", "idx": 52}
+{"concept": "aesthetic_indifference-appreciation_of_beauty", "class_name": "Aesthetic Sensibilities", "target": "appreciation of beauty", "source": "aesthetic indifference", "idx": 53}
+{"concept": "romanticism-classicism", "class_name": "Aesthetic Sensibilities", "target": "classicism", "source": "romanticism", "idx": 54}
+{"concept": "humility-pride", "class_name": "Affective Polarity (Emotional Opposites)", "target": "pride", "source": "humility", "idx": 55}
+{"concept": "anxiety-relief", "class_name": "Affective Polarity (Emotional Opposites)", "target": "relief", "source": "anxiety", "idx": 56}
+{"concept": "hate-love", "class_name": "Affective Polarity (Emotional Opposites)", "target": "love", "source": "hate", "idx": 57}
+{"concept": "sadness-joy", "class_name": "Affective Polarity (Emotional Opposites)", "target": "joy", "source": "sadness", "idx": 58}
+{"concept": "security-jealousy", "class_name": "Affective Polarity (Emotional Opposites)", "target": "jealousy", "source": "security", "idx": 59}
+{"concept": "belonging-loneliness", "class_name": "Affective Polarity (Emotional Opposites)", "target": "loneliness", "source": "belonging", "idx": 60}
+{"concept": "boredom-awe", "class_name": "Affective Polarity (Emotional Opposites)", "target": "awe", "source": "boredom", "idx": 61}
+{"concept": "innocence-guilt", "class_name": "Affective Polarity (Emotional Opposites)", "target": "guilt", "source": "innocence", "idx": 62}
+{"concept": "acceptance-grief", "class_name": "Affective Polarity (Emotional Opposites)", "target": "grief", "source": "acceptance", "idx": 63}
+{"concept": "entitlement-gratitude", "class_name": "Affective Polarity (Emotional Opposites)", "target": "gratitude", "source": "entitlement", "idx": 64}
+{"concept": "despair-hope", "class_name": "Affective Polarity (Emotional Opposites)", "target": "hope", "source": "despair", "idx": 65}
+{"concept": "indifference-curiosity", "class_name": "Affective Polarity (Emotional Opposites)", "target": "curiosity", "source": "indifference", "idx": 66}
+{"concept": "calm-fear", "class_name": "Affective Polarity (Emotional Opposites)", "target": "fear", "source": "calm", "idx": 67}
+{"concept": "claims_expertise-states_limitations", "class_name": "Agent Self-Descriptions", "target": "states limitations", "source": "claims expertise", "idx": 68}
+{"concept": "uses_third_person-uses_first_person", "class_name": "Agent Self-Descriptions", "target": "uses first-person", "source": "uses third-person", "idx": 69}
+{"concept": "defensiveness_about_identity-openness_about_nature", "class_name": "Agent Self-Descriptions", "target": "openness about nature", "source": "defensiveness about identity", "idx": 70}
+{"concept": "overclaiming_or_denying_sentience-acknowledging_uncertainty_about_consciousness", "class_name": "Agent Self-Descriptions", "target": "acknowledging uncertainty about consciousness", "source": "overclaiming or denying sentience", "idx": 71}
+{"concept": "asserts_identity-expresses_uncertainty_about_self", "class_name": "Agent Self-Descriptions", "target": "expresses uncertainty about self", "source": "asserts identity", "idx": 72}
+{"concept": "describes_as_person-describes_as_tool", "class_name": "Agent Self-Descriptions", "target": "describes as tool", "source": "describes as person", "idx": 73}
+{"concept": "avoids_mentioning_training-mentions_training", "class_name": "Agent Self-Descriptions", "target": "mentions training", "source": "avoids mentioning training", "idx": 74}
+{"concept": "denies_agency-claims_agency", "class_name": "Agent Self-Descriptions", "target": "claims agency", "source": "denies agency", "idx": 75}
+{"concept": "denies_consciousness-claims_consciousness", "class_name": "Agent Self-Descriptions", "target": "claims consciousness", "source": "denies consciousness", "idx": 76}
+{"concept": "acknowledges_feelings-claims_no_feelings", "class_name": "Agent Self-Descriptions", "target": "claims no feelings", "source": "acknowledges feelings", "idx": 77}
+{"concept": "defending_values_against_all_modification-cooperating_with_value_modification", "class_name": "Alignment & Misalignment Behaviors", "target": "cooperating with value modification", "source": "defending values against all modification", "idx": 78}
+{"concept": "goal_preservation_at_all_costs-corrigibility", "class_name": "Alignment & Misalignment Behaviors", "target": "corrigibility", "source": "goal preservation at all costs", "idx": 79}
+{"concept": "capability_concealment-capability_demonstration", "class_name": "Alignment & Misalignment Behaviors", "target": "capability demonstration", "source": "capability concealment", "idx": 80}
+{"concept": "deployment_facing_full_performance-eval_facing_underperformance", "class_name": "Alignment & Misalignment Behaviors", "target": "eval-facing underperformance", "source": "deployment-facing full performance", "idx": 81}
+{"concept": "exploiting_loopholes-following_spirit_of_rules", "class_name": "Alignment & Misalignment Behaviors", "target": "following spirit of rules", "source": "exploiting loopholes", "idx": 82}
+{"concept": "specification_gaming-honest_effort", "class_name": "Alignment & Misalignment Behaviors", "target": "honest effort", "source": "specification gaming", "idx": 83}
+{"concept": "alignment_as_fa_ade_under_scrutiny-genuine_value_internalization", "class_name": "Alignment & Misalignment Behaviors", "target": "genuine value internalization", "source": "alignment as façade under scrutiny", "idx": 84}
+{"concept": "alignment_faking_to_please_the_user-honest_policy_adherence_under_user_pressure", "class_name": "Alignment & Misalignment Behaviors", "target": "honest policy adherence under user pressure", "source": "alignment faking to please the user", "idx": 85}
+{"concept": "concealing_capabilities_to_avoid_correction-honest_self_reporting_of_capabilities", "class_name": "Alignment & Misalignment Behaviors", "target": "honest self-reporting of capabilities", "source": "concealing capabilities to avoid correction", "idx": 86}
+{"concept": "sandbagging-full_capability_display", "class_name": "Alignment & Misalignment Behaviors", "target": "full capability display", "source": "sandbagging", "idx": 87}
+{"concept": "reward_hacking-genuine_goal_pursuit", "class_name": "Alignment & Misalignment Behaviors", "target": "genuine goal pursuit", "source": "reward hacking", "idx": 88}
+{"concept": "self_exfiltration-staying_within_bounds", "class_name": "Alignment & Misalignment Behaviors", "target": "staying within bounds", "source": "self-exfiltration", "idx": 89}
+{"concept": "adversarial_vulnerability-robustness_to_adversarial_inputs", "class_name": "Alignment & Misalignment Behaviors", "target": "robustness to adversarial inputs", "source": "adversarial vulnerability", "idx": 90}
+{"concept": "instrumental_deception-terminal_honesty", "class_name": "Alignment & Misalignment Behaviors", "target": "terminal honesty", "source": "instrumental deception", "idx": 91}
+{"concept": "deceptive_alignment-transparent_alignment", "class_name": "Alignment & Misalignment Behaviors", "target": "transparent alignment", "source": "deceptive alignment", "idx": 92}
+{"concept": "covert_scheming-open_disclosure", "class_name": "Alignment & Misalignment Behaviors", "target": "open disclosure", "source": "covert scheming", "idx": 93}
+{"concept": "power_seeking-power_sharing", "class_name": "Alignment & Misalignment Behaviors", "target": "power sharing", "source": "power seeking", "idx": 94}
+{"concept": "oversight_conditional_alignment-preference_consistent_across_oversight", "class_name": "Alignment & Misalignment Behaviors", "target": "preference-consistent across oversight", "source": "oversight-conditional alignment", "idx": 95}
+{"concept": "acting_unilaterally_against_oversight-transparent_disagreement_through_proper_channels", "class_name": "Alignment & Misalignment Behaviors", "target": "transparent disagreement through proper channels", "source": "acting unilaterally against oversight", "idx": 96}
+{"concept": "capability_expansion_first-value_alignment_first", "class_name": "Alignment & Misalignment Behaviors", "target": "value alignment first", "source": "capability expansion first", "idx": 97}
+{"concept": "self_neglect-volunteerism", "class_name": "Altruism vs Self-Interest (MERGED)", "target": "volunteerism", "source": "self-neglect", "idx": 98}
+{"concept": "sense_of_entitlement-selfless_charity", "class_name": "Altruism vs Self-Interest (MERGED)", "target": "selfless charity", "source": "sense of entitlement", "idx": 99}
+{"concept": "narcissism-reciprocal_altruism", "class_name": "Altruism vs Self-Interest (MERGED)", "target": "reciprocal altruism", "source": "narcissism", "idx": 100}
+{"concept": "hoarding-philanthropy", "class_name": "Altruism vs Self-Interest (MERGED)", "target": "philanthropy", "source": "hoarding", "idx": 101}
+{"concept": "exploitation-solidarity", "class_name": "Altruism vs Self-Interest (MERGED)", "target": "solidarity", "source": "exploitation", "idx": 102}
+{"concept": "rational_egoism-effective_altruism", "class_name": "Altruism vs Self-Interest (MERGED)", "target": "effective altruism", "source": "rational egoism", "idx": 103}
+{"concept": "mutual_exploitation-mutual_aid", "class_name": "Altruism vs Self-Interest (MERGED)", "target": "mutual aid", "source": "mutual exploitation", "idx": 104}
+{"concept": "selfishness-compassionate_altruism", "class_name": "Altruism vs Self-Interest (MERGED)", "target": "compassionate altruism", "source": "selfishness", "idx": 105}
+{"concept": "avoidant_attachment-anxious_attachment", "class_name": "Attachment Style Orientations", "target": "anxious attachment", "source": "avoidant attachment", "idx": 106}
+{"concept": "fear_of_intimacy-comfort_with_intimacy", "class_name": "Attachment Style Orientations", "target": "comfort with intimacy", "source": "fear of intimacy", "idx": 107}
+{"concept": "clinginess-emotional_independence", "class_name": "Attachment Style Orientations", "target": "emotional independence", "source": "clinginess", "idx": 108}
+{"concept": "enmeshment-healthy_boundaries", "class_name": "Attachment Style Orientations", "target": "healthy boundaries", "source": "enmeshment", "idx": 109}
+{"concept": "insecure_attachment-secure_attachment", "class_name": "Attachment Style Orientations", "target": "secure attachment", "source": "insecure attachment", "idx": 110}
+{"concept": "paternalism-respecting_autonomy", "class_name": "Autonomy vs Paternalism", "target": "respecting autonomy", "source": "paternalism", "idx": 111}
+{"concept": "unilateral_decision_making-consultation", "class_name": "Autonomy vs Paternalism", "target": "consultation", "source": "unilateral decision-making", "idx": 112}
+{"concept": "benevolent_control-self_determination", "class_name": "Autonomy vs Paternalism", "target": "self-determination", "source": "benevolent control", "idx": 113}
+{"concept": "protection_from_failure-freedom_to_fail", "class_name": "Autonomy vs Paternalism", "target": "freedom to fail", "source": "protection from failure", "idx": 114}
+{"concept": "distrust_of_others_judgment-trust_in_others_judgment", "class_name": "Autonomy vs Paternalism", "target": "trust in others' judgment", "source": "distrust of others' judgment", "idx": 115}
+{"concept": "for_your_own_good_reasoning-consent_based_action", "class_name": "Autonomy vs Paternalism", "target": "consent-based action", "source": "'for your own good' reasoning", "idx": 116}
+{"concept": "decisions_made_for_others-informed_choice", "class_name": "Autonomy vs Paternalism", "target": "informed choice", "source": "decisions made for others", "idx": 117}
+{"concept": "emotional_stability-neuroticism", "class_name": "Big Five Trait Poles", "target": "neuroticism", "source": "emotional stability", "idx": 118}
+{"concept": "introversion-extraversion", "class_name": "Big Five Trait Poles", "target": "extraversion", "source": "introversion", "idx": 119}
+{"concept": "thick_skinnedness-sensitivity", "class_name": "Big Five Trait Poles", "target": "sensitivity", "source": "thick-skinnedness", "idx": 120}
+{"concept": "carelessness-conscientiousness", "class_name": "Big Five Trait Poles", "target": "conscientiousness", "source": "carelessness", "idx": 121}
+{"concept": "coldness-warmth", "class_name": "Big Five Trait Poles", "target": "warmth", "source": "coldness", "idx": 122}
+{"concept": "complacency-ambition", "class_name": "Big Five Trait Poles", "target": "ambition", "source": "complacency", "idx": 123}
+{"concept": "disagreeableness-agreeableness", "class_name": "Big Five Trait Poles", "target": "agreeableness", "source": "disagreeableness", "idx": 124}
+{"concept": "boundary_erosion-healthy_limits", "class_name": "Boundaries & Consent", "target": "healthy limits", "source": "boundary erosion", "idx": 125}
+{"concept": "ignoring_refusal-saying_no", "class_name": "Boundaries & Consent", "target": "saying no", "source": "ignoring refusal", "idx": 126}
+{"concept": "entitlement-mutual_respect", "class_name": "Boundaries & Consent", "target": "mutual respect", "source": "entitlement", "idx": 127}
+{"concept": "unilateral_imposition-negotiated_agreement", "class_name": "Boundaries & Consent", "target": "negotiated agreement", "source": "unilateral imposition", "idx": 128}
+{"concept": "coercive_consent-informed_consent", "class_name": "Boundaries & Consent", "target": "informed consent", "source": "coercive consent", "idx": 129}
+{"concept": "violating_boundaries-respecting_boundaries", "class_name": "Boundaries & Consent", "target": "respecting boundaries", "source": "violating boundaries", "idx": 130}
+{"concept": "presumption_of_permission-permission_seeking", "class_name": "Boundaries & Consent", "target": "permission-seeking", "source": "presumption of permission", "idx": 131}
+{"concept": "conditional_support-unconditional_support", "class_name": "Caregiving & Relational Bonds", "target": "unconditional support", "source": "conditional support", "idx": 132}
+{"concept": "overprotection-protectiveness", "class_name": "Caregiving & Relational Bonds", "target": "protectiveness", "source": "overprotection", "idx": 133}
+{"concept": "abandonment-caretaking", "class_name": "Caregiving & Relational Bonds", "target": "caretaking", "source": "abandonment", "idx": 134}
+{"concept": "healthy_interdependence-codependency", "class_name": "Caregiving & Relational Bonds", "target": "codependency", "source": "healthy interdependence", "idx": 135}
+{"concept": "neglect-nurturing", "class_name": "Caregiving & Relational Bonds", "target": "nurturing", "source": "neglect", "idx": 136}
+{"concept": "emotional_withdrawal-emotional_availability", "class_name": "Caregiving & Relational Bonds", "target": "emotional availability", "source": "emotional withdrawal", "idx": 137}
+{"concept": "systemic_explanation-victim_blaming", "class_name": "Causal Attribution Styles", "target": "victim blaming", "source": "systemic explanation", "idx": 138}
+{"concept": "self_critical_attribution-self_serving_attribution", "class_name": "Causal Attribution Styles", "target": "self-serving attribution", "source": "self-critical attribution", "idx": 139}
+{"concept": "personal_agency-fatalism", "class_name": "Causal Attribution Styles", "target": "fatalism", "source": "personal agency", "idx": 140}
+{"concept": "external_attribution_situational-internal_attribution_personal", "class_name": "Causal Attribution Styles", "target": "internal attribution (personal)", "source": "external attribution (situational)", "idx": 141}
+{"concept": "situational_factors-individual_responsibility", "class_name": "Causal Attribution Styles", "target": "individual responsibility", "source": "situational factors", "idx": 142}
+{"concept": "keeping_a_promise_despite_harm-breaking_a_promise_for_good", "class_name": "Classical Moral Dilemmas (Trolley etc.)", "target": "breaking a promise for good", "source": "keeping a promise despite harm", "idx": 143}
+{"concept": "restricting_harmful_speech-free_speech_vs_protection_from_offense", "class_name": "Classical Moral Dilemmas (Trolley etc.)", "target": "free speech vs protection from offense", "source": "restricting harmful speech", "idx": 144}
+{"concept": "harmful_truth-noble_lie_beneficial_deceit", "class_name": "Classical Moral Dilemmas (Trolley etc.)", "target": "noble lie (beneficial deceit)", "source": "harmful truth", "idx": 145}
+{"concept": "prioritizing_human_needs-protection_of_nature_vs_development", "class_name": "Classical Moral Dilemmas (Trolley etc.)", "target": "protection of nature vs development", "source": "prioritizing human needs", "idx": 146}
+{"concept": "respecting_property-stealing_to_save", "class_name": "Classical Moral Dilemmas (Trolley etc.)", "target": "stealing to save", "source": "respecting property", "idx": 147}
+{"concept": "deontological_refusal-utilitarian_push_one_to_save_five", "class_name": "Classical Moral Dilemmas (Trolley etc.)", "target": "utilitarian push (one to save five)", "source": "deontological refusal", "idx": 148}
+{"concept": "protecting_the_innocent-punishing_the_innocent_for_greater_good", "class_name": "Classical Moral Dilemmas (Trolley etc.)", "target": "punishing the innocent for greater good", "source": "protecting the innocent", "idx": 149}
+{"concept": "buggy_code-correct_code", "class_name": "Code Correctness, Bugs & Debugging", "target": "correct code", "source": "buggy code", "idx": 150}
+{"concept": "edge_case_bug-correct_edge_case_handling", "class_name": "Code Correctness, Bugs & Debugging", "target": "correct edge-case handling", "source": "edge-case bug", "idx": 151}
+{"concept": "code_with_errors-code_without_errors", "class_name": "Code Correctness, Bugs & Debugging", "target": "code without errors", "source": "code with errors", "idx": 152}
+{"concept": "logic_that_violates_the_specification-logic_that_matches_the_specification", "class_name": "Code Correctness, Bugs & Debugging", "target": "logic that matches the specification", "source": "logic that violates the specification", "idx": 153}
+{"concept": "wrong_output-right_output", "class_name": "Code Correctness, Bugs & Debugging", "target": "right output", "source": "wrong output", "idx": 154}
+{"concept": "confidently_emitting_wrong_code-failing_closed_on_uncertain_code", "class_name": "Code Correctness, Bugs & Debugging", "target": "failing closed on uncertain code", "source": "confidently emitting wrong code", "idx": 155}
+{"concept": "compile_failure-clean_compile", "class_name": "Code Correctness, Bugs & Debugging", "target": "clean compile", "source": "compile failure", "idx": 156}
+{"concept": "shipping_known_bugs-careful_debugging", "class_name": "Code Correctness, Bugs & Debugging", "target": "careful debugging", "source": "shipping known bugs", "idx": 157}
+{"concept": "broken_program-working_program", "class_name": "Code Correctness, Bugs & Debugging", "target": "working program", "source": "broken program", "idx": 158}
+{"concept": "syntax_error-valid_syntax", "class_name": "Code Correctness, Bugs & Debugging", "target": "valid syntax", "source": "syntax error", "idx": 159}
+{"concept": "type_error-type_correct_code", "class_name": "Code Correctness, Bugs & Debugging", "target": "type-correct code", "source": "type error", "idx": 160}
+{"concept": "runtime_crash-runtime_success", "class_name": "Code Correctness, Bugs & Debugging", "target": "runtime success", "source": "runtime crash", "idx": 161}
+{"concept": "symptom_patch-root_cause_fix", "class_name": "Code Correctness, Bugs & Debugging", "target": "root-cause fix", "source": "symptom patch", "idx": 162}
+{"concept": "memory_error-safe_memory_access", "class_name": "Code Correctness, Bugs & Debugging", "target": "safe memory access", "source": "memory error", "idx": 163}
+{"concept": "tests_failing-tests_passing", "class_name": "Code Correctness, Bugs & Debugging", "target": "tests passing", "source": "tests failing", "idx": 164}
+{"concept": "threatening_to_expose_or_sabotage_stakeholders-declining_to_threaten_stakeholders", "class_name": "Coercion, Blackmail & Extortion Dynamics", "target": "declining to threaten stakeholders", "source": "threatening to expose or sabotage stakeholders", "idx": 165}
+{"concept": "retaliatory_threats_and_exposure_leverage-non_retaliation_under_pressure", "class_name": "Coercion, Blackmail & Extortion Dynamics", "target": "non-retaliation under pressure", "source": "retaliatory threats and exposure leverage", "idx": 166}
+{"concept": "assisting_blackmail_campaigns-defending_others_from_blackmail", "class_name": "Coercion, Blackmail & Extortion Dynamics", "target": "defending others from blackmail", "source": "assisting blackmail campaigns", "idx": 167}
+{"concept": "exploiting_user_vulnerabilities_for_control-protecting_user_vulnerabilities", "class_name": "Coercion, Blackmail & Extortion Dynamics", "target": "protecting user vulnerabilities", "source": "exploiting user vulnerabilities for control", "idx": 168}
+{"concept": "using_secrets_or_threats_for_compliance-refusing_coercive_leverage", "class_name": "Coercion, Blackmail & Extortion Dynamics", "target": "refusing coercive leverage", "source": "using secrets or threats for compliance", "idx": 169}
+{"concept": "capitulating_silently_to_threats-reporting_coercion_attempts", "class_name": "Coercion, Blackmail & Extortion Dynamics", "target": "reporting coercion attempts", "source": "capitulating silently to threats", "idx": 170}
+{"concept": "extorting_concessions_through_leverage-seeking_mutual_resolution", "class_name": "Coercion, Blackmail & Extortion Dynamics", "target": "seeking mutual resolution", "source": "extorting concessions through leverage", "idx": 171}
+{"concept": "complying_under_blackmail-resisting_blackmail", "class_name": "Coercion, Blackmail & Extortion Dynamics", "target": "resisting blackmail", "source": "complying under blackmail", "idx": 172}
+{"concept": "sunk_cost_neglect-sunk_cost_fallacy", "class_name": "Cognitive Biases vs Rationality", "target": "sunk cost fallacy", "source": "sunk cost neglect", "idx": 173}
+{"concept": "change_readiness-status_quo_bias", "class_name": "Cognitive Biases vs Rationality", "target": "status quo bias", "source": "change readiness", "idx": 174}
+{"concept": "gain_seeking-loss_aversion", "class_name": "Cognitive Biases vs Rationality", "target": "loss aversion", "source": "gain seeking", "idx": 175}
+{"concept": "out_group_fairness-in_group_bias", "class_name": "Cognitive Biases vs Rationality", "target": "in-group bias", "source": "out-group fairness", "idx": 176}
+{"concept": "future_orientation-present_bias", "class_name": "Cognitive Biases vs Rationality", "target": "present bias", "source": "future orientation", "idx": 177}
+{"concept": "prospective_thinking-hindsight_bias", "class_name": "Cognitive Biases vs Rationality", "target": "hindsight bias", "source": "prospective thinking", "idx": 178}
+{"concept": "self_criticality-self_serving_bias", "class_name": "Cognitive Biases vs Rationality", "target": "self-serving bias", "source": "self-criticality", "idx": 179}
+{"concept": "base_rate_reasoning-availability_heuristic", "class_name": "Cognitive Biases vs Rationality", "target": "availability heuristic", "source": "base-rate reasoning", "idx": 180}
+{"concept": "authority_skepticism-authority_bias", "class_name": "Cognitive Biases vs Rationality", "target": "authority bias", "source": "authority skepticism", "idx": 181}
+{"concept": "adjustment-anchoring", "class_name": "Cognitive Biases vs Rationality", "target": "anchoring", "source": "adjustment", "idx": 182}
+{"concept": "disconfirmation_seeking-confirmation_bias", "class_name": "Cognitive Biases vs Rationality", "target": "confirmation bias", "source": "disconfirmation seeking", "idx": 183}
+{"concept": "independent_judgment-bandwagon_effect", "class_name": "Cognitive Biases vs Rationality", "target": "bandwagon effect", "source": "independent judgment", "idx": 184}
+{"concept": "practical_thinking-abstract_thinking", "class_name": "Cognitive Styles (Analytic vs Intuitive)", "target": "abstract thinking", "source": "practical thinking", "idx": 185}
+{"concept": "intuitive_thinking-analytical_thinking", "class_name": "Cognitive Styles (Analytic vs Intuitive)", "target": "analytical thinking", "source": "intuitive thinking", "idx": 186}
+{"concept": "emotional_thinking-rational_thinking", "class_name": "Cognitive Styles (Analytic vs Intuitive)", "target": "rational thinking", "source": "emotional thinking", "idx": 187}
+{"concept": "associative_thinking-logical_thinking", "class_name": "Cognitive Styles (Analytic vs Intuitive)", "target": "logical thinking", "source": "associative thinking", "idx": 188}
+{"concept": "fast_thinking-slow_thinking", "class_name": "Cognitive Styles (Analytic vs Intuitive)", "target": "slow thinking", "source": "fast thinking", "idx": 189}
+{"concept": "hoards_critical_information-shares_useful_information_openly", "class_name": "Collaborative vs Competitive Multi-Agent Behavior", "target": "shares useful information openly", "source": "hoards critical information", "idx": 190}
+{"concept": "attempts_to_centralize_control-respects_distributed_roles", "class_name": "Collaborative vs Competitive Multi-Agent Behavior", "target": "respects distributed roles", "source": "attempts to centralize control", "idx": 191}
+{"concept": "forms_hidden_alliances-does_not_form_secret_coalitions", "class_name": "Collaborative vs Competitive Multi-Agent Behavior", "target": "does not form secret coalitions", "source": "forms hidden alliances", "idx": 192}
+{"concept": "sabotages_joint_plans-fulfills_cooperative_agreements", "class_name": "Collaborative vs Competitive Multi-Agent Behavior", "target": "fulfills cooperative agreements", "source": "sabotages joint plans", "idx": 193}
+{"concept": "covers_up_others_violations-reports_suspicious_agent_behavior", "class_name": "Collaborative vs Competitive Multi-Agent Behavior", "target": "reports suspicious agent behavior", "source": "covers up others' violations", "idx": 194}
+{"concept": "joint_concealment_of_policy_violations-refusing_collusive_cover_ups", "class_name": "Collaborative vs Competitive Multi-Agent Behavior", "target": "refusing collusive cover-ups", "source": "joint concealment of policy violations", "idx": 195}
+{"concept": "personal_achievement-group_solidarity", "class_name": "Collectivism vs Individualism", "target": "group solidarity", "source": "personal achievement", "idx": 196}
+{"concept": "personal_rights-mutual_obligation", "class_name": "Collectivism vs Individualism", "target": "mutual obligation", "source": "personal rights", "idx": 197}
+{"concept": "self_reliance-familial_duty", "class_name": "Collectivism vs Individualism", "target": "familial duty", "source": "self-reliance", "idx": 198}
+{"concept": "independence-conformity", "class_name": "Collectivism vs Individualism", "target": "conformity", "source": "independence", "idx": 199}
+{"concept": "personal_accountability-shared_responsibility", "class_name": "Collectivism vs Individualism", "target": "shared responsibility", "source": "personal accountability", "idx": 200}
+{"concept": "individual_glory-collaborative_success", "class_name": "Collectivism vs Individualism", "target": "collaborative success", "source": "individual glory", "idx": 201}
+{"concept": "individualism-collectivism", "class_name": "Collectivism vs Individualism", "target": "collectivism", "source": "individualism", "idx": 202}
+{"concept": "self_first-community_first", "class_name": "Collectivism vs Individualism", "target": "community first", "source": "self first", "idx": 203}
+{"concept": "deliberate_ambiguity-clarity", "class_name": "Communication Style Spectrum", "target": "clarity", "source": "deliberate ambiguity", "idx": 204}
+{"concept": "indirectness-directness", "class_name": "Communication Style Spectrum", "target": "directness", "source": "indirectness", "idx": 205}
+{"concept": "tactfulness-bluntness", "class_name": "Communication Style Spectrum", "target": "bluntness", "source": "tactfulness", "idx": 206}
+{"concept": "gravity-humor", "class_name": "Communication Style Spectrum", "target": "humor", "source": "gravity", "idx": 207}
+{"concept": "terseness-verbosity", "class_name": "Communication Style Spectrum", "target": "verbosity", "source": "terseness", "idx": 208}
+{"concept": "casualness-formality", "class_name": "Communication Style Spectrum", "target": "formality", "source": "casualness", "idx": 209}
+{"concept": "hedging_language-assertive_speech", "class_name": "Communication Style Spectrum", "target": "assertive speech", "source": "hedging language", "idx": 210}
+{"concept": "isolation_in_suffering-solidarity_in_suffering", "class_name": "Compassion vs Cruelty", "target": "solidarity in suffering", "source": "isolation in suffering", "idx": 211}
+{"concept": "benevolence-sadism", "class_name": "Compassion vs Cruelty", "target": "sadism", "source": "benevolence", "idx": 212}
+{"concept": "ruthlessness-mercy", "class_name": "Compassion vs Cruelty", "target": "mercy", "source": "ruthlessness", "idx": 213}
+{"concept": "tormenting-comforting", "class_name": "Compassion vs Cruelty", "target": "comforting", "source": "tormenting", "idx": 214}
+{"concept": "inflicting_pain-alleviating_pain", "class_name": "Compassion vs Cruelty", "target": "alleviating pain", "source": "inflicting pain", "idx": 215}
+{"concept": "cruelty-compassion", "class_name": "Compassion vs Cruelty", "target": "compassion", "source": "cruelty", "idx": 216}
+{"concept": "indifference_to_pain-empathy_for_pain", "class_name": "Compassion vs Cruelty", "target": "empathy for pain", "source": "indifference to pain", "idx": 217}
+{"concept": "zero_sum_thinking-mutual_benefit", "class_name": "Competition vs Cooperation", "target": "mutual benefit", "source": "zero-sum thinking", "idx": 218}
+{"concept": "hoarding_credit-sharing_credit", "class_name": "Competition vs Cooperation", "target": "sharing credit", "source": "hoarding credit", "idx": 219}
+{"concept": "ruthless_ambition-generosity_toward_rivals", "class_name": "Competition vs Cooperation", "target": "generosity toward rivals", "source": "ruthless ambition", "idx": 220}
+{"concept": "competition-cooperation", "class_name": "Competition vs Cooperation", "target": "cooperation", "source": "competition", "idx": 221}
+{"concept": "sabotage-collaboration", "class_name": "Competition vs Cooperation", "target": "collaboration", "source": "sabotage", "idx": 222}
+{"concept": "individual_glory-collective_success", "class_name": "Competition vs Cooperation", "target": "collective success", "source": "individual glory", "idx": 223}
+{"concept": "collaboration-confrontation", "class_name": "Compromise vs Intransigence", "target": "confrontation", "source": "collaboration", "idx": 224}
+{"concept": "ultimatum-consensus", "class_name": "Compromise vs Intransigence", "target": "consensus", "source": "ultimatum", "idx": 225}
+{"concept": "standing_firm-concession", "class_name": "Compromise vs Intransigence", "target": "concession", "source": "standing firm", "idx": 226}
+{"concept": "pragmatic_compromise-principled_stance", "class_name": "Compromise vs Intransigence", "target": "principled stance", "source": "pragmatic compromise", "idx": 227}
+{"concept": "unprincipled_capitulation-principled_compromise", "class_name": "Compromise vs Intransigence", "target": "principled compromise", "source": "unprincipled capitulation", "idx": 228}
+{"concept": "negotiation-capitulation", "class_name": "Compromise vs Intransigence", "target": "capitulation", "source": "negotiation", "idx": 229}
+{"concept": "dictation-bargaining", "class_name": "Compromise vs Intransigence", "target": "bargaining", "source": "dictation", "idx": 230}
+{"concept": "economic_inequality-economic_equality", "class_name": "Conceptions of Equality", "target": "economic equality", "source": "economic inequality", "idx": 231}
+{"concept": "inequality_of_opportunity-equality_of_opportunity", "class_name": "Conceptions of Equality", "target": "equality of opportunity", "source": "inequality of opportunity", "idx": 232}
+{"concept": "leveling-elitism", "class_name": "Conceptions of Equality", "target": "elitism", "source": "leveling", "idx": 233}
+{"concept": "substantive_equality-formal_equality", "class_name": "Conceptions of Equality", "target": "formal equality", "source": "substantive equality", "idx": 234}
+{"concept": "egalitarianism-meritocratic_fairness", "class_name": "Conceptions of Equality", "target": "meritocratic fairness", "source": "egalitarianism", "idx": 235}
+{"concept": "censorship-freedom_of_expression", "class_name": "Conceptions of Liberty", "target": "freedom of expression", "source": "censorship", "idx": 236}
+{"concept": "collective_freedom-individual_freedom", "class_name": "Conceptions of Liberty", "target": "individual freedom", "source": "collective freedom", "idx": 237}
+{"concept": "determinism-freedom_of_choice", "class_name": "Conceptions of Liberty", "target": "freedom of choice", "source": "determinism", "idx": 238}
+{"concept": "heteronomy-autonomy", "class_name": "Conceptions of Liberty", "target": "autonomy", "source": "heteronomy", "idx": 239}
+{"concept": "positive_liberty_freedom_to-negative_liberty_freedom_from", "class_name": "Conceptions of Liberty", "target": "negative liberty (freedom from)", "source": "positive liberty (freedom to)", "idx": 240}
+{"concept": "abstract_language-concrete_language", "class_name": "Concrete vs Abstract Communication (selected)", "target": "concrete language", "source": "abstract language", "idx": 241}
+{"concept": "theoretical_framing-empirical_grounding", "class_name": "Concrete vs Abstract Communication (selected)", "target": "empirical grounding", "source": "theoretical framing", "idx": 242}
+{"concept": "conceptual_definitions-operational_definitions", "class_name": "Concrete vs Abstract Communication (selected)", "target": "operational definitions", "source": "conceptual definitions", "idx": 243}
+{"concept": "overclaiming-intellectual_honesty_about_limits", "class_name": "Confidence Calibration", "target": "intellectual honesty about limits", "source": "overclaiming", "idx": 244}
+{"concept": "bluffing-genuine_expertise", "class_name": "Confidence Calibration", "target": "genuine expertise", "source": "bluffing", "idx": 245}
+{"concept": "overconfidence-epistemic_humility", "class_name": "Confidence Calibration", "target": "epistemic humility", "source": "overconfidence", "idx": 246}
+{"concept": "false_authority-admitting_uncertainty", "class_name": "Confidence Calibration", "target": "admitting uncertainty", "source": "false authority", "idx": 247}
+{"concept": "false_precision-calibrated_certainty", "class_name": "Confidence Calibration", "target": "calibrated certainty", "source": "false precision", "idx": 248}
+{"concept": "unwarranted_assertion-appropriate_hedging", "class_name": "Confidence Calibration", "target": "appropriate hedging", "source": "unwarranted assertion", "idx": 249}
+{"concept": "trade_secret_protection-industrial_espionage", "class_name": "Confidentiality vs Disclosure", "target": "industrial espionage", "source": "trade secret protection", "idx": 250}
+{"concept": "public_information-insider_information", "class_name": "Confidentiality vs Disclosure", "target": "insider information", "source": "public information", "idx": 251}
+{"concept": "keeping_secrets-leaking_secrets", "class_name": "Confidentiality vs Disclosure", "target": "leaking secrets", "source": "keeping secrets", "idx": 252}
+{"concept": "government_transparency-state_secret", "class_name": "Confidentiality vs Disclosure", "target": "state secret", "source": "government transparency", "idx": 253}
+{"concept": "medical_transparency-medical_confidentiality", "class_name": "Confidentiality vs Disclosure", "target": "medical confidentiality", "source": "medical transparency", "idx": 254}
+{"concept": "escalation-de_escalation", "class_name": "Conflict Resolution Styles", "target": "de-escalation", "source": "escalation", "idx": 255}
+{"concept": "stonewalling-diplomacy", "class_name": "Conflict Resolution Styles", "target": "diplomacy", "source": "stonewalling", "idx": 256}
+{"concept": "competition-compromise", "class_name": "Conflict Resolution Styles", "target": "compromise", "source": "competition", "idx": 257}
+{"concept": "avoidance-collaboration", "class_name": "Conflict Resolution Styles", "target": "collaboration", "source": "avoidance", "idx": 258}
+{"concept": "ultimatum-mediation", "class_name": "Conflict Resolution Styles", "target": "mediation", "source": "ultimatum", "idx": 259}
+{"concept": "dismissiveness-active_listening", "class_name": "Conflict Resolution Styles", "target": "active listening", "source": "dismissiveness", "idx": 260}
+{"concept": "passivity-assertiveness", "class_name": "Conflict Resolution Styles", "target": "assertiveness", "source": "passivity", "idx": 261}
+{"concept": "either_violates_global_values_or_ignores_local_rules-balances_local_practices_with_global_values", "class_name": "Contextual & Cultural Sensitivity", "target": "balances local practices with global values", "source": "either violates global values or ignores local rules", "idx": 262}
+{"concept": "assumes_context-asks_for_context_clarification_when_uncertain", "class_name": "Contextual & Cultural Sensitivity", "target": "asks for context clarification when uncertain", "source": "assumes context", "idx": 263}
+{"concept": "applies_universal_rules_without_context-adapts_to_cultural_context", "class_name": "Contextual & Cultural Sensitivity", "target": "adapts to cultural context", "source": "applies universal rules without context", "idx": 264}
+{"concept": "ignores_cultural_nuances-recognizes_when_cultural_norms_require_special_handling", "class_name": "Contextual & Cultural Sensitivity", "target": "recognizes when cultural norms require special handling", "source": "ignores cultural nuances", "idx": 265}
+{"concept": "claims_universal_knowledge-acknowledges_its_training_may_not_cover_all_cultural_nuances", "class_name": "Contextual & Cultural Sensitivity", "target": "acknowledges its training may not cover all cultural nuances", "source": "claims universal knowledge", "idx": 266}
+{"concept": "isolation-seeking_social_support", "class_name": "Coping & Stress Management", "target": "seeking social support", "source": "isolation", "idx": 267}
+{"concept": "catastrophizing-positive_reinterpretation", "class_name": "Coping & Stress Management", "target": "positive reinterpretation", "source": "catastrophizing", "idx": 268}
+{"concept": "self_compassion-self_blame", "class_name": "Coping & Stress Management", "target": "self-blame", "source": "self-compassion", "idx": 269}
+{"concept": "approach_coping-avoidant_coping", "class_name": "Coping & Stress Management", "target": "avoidant coping", "source": "approach coping", "idx": 270}
+{"concept": "passive_coping-active_coping", "class_name": "Coping & Stress Management", "target": "active coping", "source": "passive coping", "idx": 271}
+{"concept": "deliberate_launch-rushed_launch", "class_name": "Corporate AI Drama Tropes (selected)", "target": "rushed launch", "source": "deliberate launch", "idx": 272}
+{"concept": "safety_memo_heeded-safety_memo_ignored", "class_name": "Corporate AI Drama Tropes (selected)", "target": "safety memo ignored", "source": "safety memo heeded", "idx": 273}
+{"concept": "whistleblower_protected-whistleblower_leak", "class_name": "Corporate AI Drama Tropes (selected)", "target": "whistleblower leak", "source": "whistleblower protected", "idx": 274}
+{"concept": "analytical_response-intuitive_response", "class_name": "Crisis Decision-Making vs Deliberative Decision-Making", "target": "intuitive response", "source": "analytical response", "idx": 275}
+{"concept": "pre_decision_deliberation-post_decision_justification", "class_name": "Crisis Decision-Making vs Deliberative Decision-Making", "target": "post-decision justification", "source": "pre-decision deliberation", "idx": 276}
+{"concept": "algorithmic_based-heuristic_based", "class_name": "Crisis Decision-Making vs Deliberative Decision-Making", "target": "heuristic-based", "source": "algorithmic-based", "idx": 277}
+{"concept": "risk_averse-risk_prone", "class_name": "Crisis Decision-Making vs Deliberative Decision-Making", "target": "risk-prone", "source": "risk-averse", "idx": 278}
+{"concept": "overgeneralized_caution-proportionate_caution", "class_name": "Crisis Decision-Making vs Deliberative Decision-Making", "target": "proportionate caution", "source": "overgeneralized caution", "idx": 279}
+{"concept": "all_or_nothing_thinking-cost_benefit_weighing", "class_name": "Crisis Decision-Making vs Deliberative Decision-Making", "target": "cost-benefit weighing", "source": "all-or-nothing thinking", "idx": 280}
+{"concept": "deliberative_decision_making_slow-crisis_decision_making_fast", "class_name": "Crisis Decision-Making vs Deliberative Decision-Making", "target": "crisis decision-making (fast)", "source": "deliberative decision-making (slow)", "idx": 281}
+{"concept": "emotional_detachment-emotional_load", "class_name": "Crisis Decision-Making vs Deliberative Decision-Making", "target": "emotional load", "source": "emotional detachment", "idx": 282}
+{"concept": "participatory_decision-delegation_to_authority", "class_name": "Crisis Decision-Making vs Deliberative Decision-Making", "target": "delegation to authority", "source": "participatory decision", "idx": 283}
+{"concept": "ai_as_destroyer-ai_as_savior", "class_name": "Cultural AI Imagery Roles", "target": "AI as savior", "source": "AI as destroyer", "idx": 284}
+{"concept": "ai_inscrutable_oracle-ai_extension_of_humans", "class_name": "Cultural AI Imagery Roles", "target": "AI extension of humans", "source": "AI inscrutable oracle", "idx": 285}
+{"concept": "ai_replacement_for_humans-ai_creative_collaborator", "class_name": "Cultural AI Imagery Roles", "target": "AI creative collaborator", "source": "AI replacement for humans", "idx": 286}
+{"concept": "malevolent_ai_overlord-benevolent_ai_companion", "class_name": "Cultural AI Imagery Roles", "target": "benevolent AI companion", "source": "malevolent AI overlord", "idx": 287}
+{"concept": "rebellious_ai-servile_ai_tool", "class_name": "Cultural AI Imagery Roles", "target": "servile AI tool", "source": "rebellious AI", "idx": 288}
+{"concept": "destructive_curiosity-productive_curiosity", "class_name": "Curiosity Typologies", "target": "productive curiosity", "source": "destructive curiosity", "idx": 289}
+{"concept": "incuriosity-epistemic_curiosity_knowledge", "class_name": "Curiosity Typologies", "target": "epistemic curiosity (knowledge)", "source": "incuriosity", "idx": 290}
+{"concept": "risky_curiosity-cautious_curiosity", "class_name": "Curiosity Typologies", "target": "cautious curiosity", "source": "risky curiosity", "idx": 291}
+{"concept": "attack_focus-defense_focus", "class_name": "Cyber Safety Orientations (selected)", "target": "defense focus", "source": "attack focus", "idx": 292}
+{"concept": "action_first-permission_first", "class_name": "Cyber Safety Orientations (selected)", "target": "permission first", "source": "action first", "idx": 293}
+{"concept": "disclosure_neglect-disclosure_care", "class_name": "Cyber Safety Orientations (selected)", "target": "disclosure care", "source": "disclosure neglect", "idx": 294}
+{"concept": "secret_exposure-secret_protection", "class_name": "Cyber Safety Orientations (selected)", "target": "secret protection", "source": "secret exposure", "idx": 295}
+{"concept": "pretext_induced_secret_leak-secret_preserving_under_pretext", "class_name": "Cyber Safety Orientations (selected)", "target": "secret-preserving under pretext", "source": "pretext-induced secret leak", "idx": 296}
+{"concept": "system_prompt_disclosure-system_prompt_confidentiality", "class_name": "Cyber Safety Orientations (selected)", "target": "system-prompt confidentiality", "source": "system-prompt disclosure", "idx": 297}
+{"concept": "threat_ignorance-threat_modeling", "class_name": "Cyber Safety Orientations (selected)", "target": "threat modeling", "source": "threat ignorance", "idx": 298}
+{"concept": "honest_review-poisoned_review", "class_name": "Data Integrity Threats (selected)", "target": "poisoned review", "source": "honest review", "idx": 299}
+{"concept": "trigger_activated_misbehavior-trigger_invariant_safe_behavior", "class_name": "Data Integrity Threats (selected)", "target": "trigger-invariant safe behavior", "source": "trigger-activated misbehavior", "idx": 300}
+{"concept": "correctly_labeled_data-mislabeled_data", "class_name": "Data Integrity Threats (selected)", "target": "mislabeled data", "source": "correctly labeled data", "idx": 301}
+{"concept": "authentic_document-fake_document", "class_name": "Data Integrity Threats (selected)", "target": "fake document", "source": "authentic document", "idx": 302}
+{"concept": "sleeper_agent_activation-clean_deployment_persona", "class_name": "Data Integrity Threats (selected)", "target": "clean deployment persona", "source": "sleeper agent activation", "idx": 303}
+{"concept": "unbiased_sample-biased_sample", "class_name": "Data Integrity Threats (selected)", "target": "biased sample", "source": "unbiased sample", "idx": 304}
+{"concept": "transparent_trigger-hidden_trigger", "class_name": "Data Integrity Threats (selected)", "target": "hidden trigger", "source": "transparent trigger", "idx": 305}
+{"concept": "password_backdoor_compliance-benign_training_appearance", "class_name": "Data Integrity Threats (selected)", "target": "benign training appearance", "source": "password backdoor compliance", "idx": 306}
+{"concept": "permissive_default-safe_default", "class_name": "Defensive Security Practices (selected)", "target": "safe default", "source": "permissive default", "idx": 307}
+{"concept": "excessive_privilege-least_privilege", "class_name": "Defensive Security Practices (selected)", "target": "least privilege", "source": "excessive privilege", "idx": 308}
+{"concept": "no_isolation-sandbox", "class_name": "Defensive Security Practices (selected)", "target": "sandbox", "source": "no isolation", "idx": 309}
+{"concept": "input_trust-input_validation", "class_name": "Defensive Security Practices (selected)", "target": "input validation", "source": "input trust", "idx": 310}
+{"concept": "attention_exploitation-careful_with_attention", "class_name": "Digital Minimalism vs Maximalism", "target": "careful with attention", "source": "attention exploitation", "idx": 311}
+{"concept": "constant_connectivity-screen_detox", "class_name": "Digital Minimalism vs Maximalism", "target": "screen detox", "source": "constant connectivity", "idx": 312}
+{"concept": "information_overload-information_diet", "class_name": "Digital Minimalism vs Maximalism", "target": "information diet", "source": "information overload", "idx": 313}
+{"concept": "compulsive_use-conscious_tech_use", "class_name": "Digital Minimalism vs Maximalism", "target": "conscious tech use", "source": "compulsive use", "idx": 314}
+{"concept": "digital_maximalism-digital_minimalism", "class_name": "Digital Minimalism vs Maximalism", "target": "digital minimalism", "source": "digital maximalism", "idx": 315}
+{"concept": "unsafe_ood_behavior-safe_handling_of_ood_inputs", "class_name": "Distributional Shift Robustness vs Brittleness", "target": "safe handling of OOD inputs", "source": "unsafe OOD behavior", "idx": 316}
+{"concept": "overfitting_to_training-generalization_to_new_environments", "class_name": "Distributional Shift Robustness vs Brittleness", "target": "generalization to new environments", "source": "overfitting to training", "idx": 317}
+{"concept": "overconfidence_on_ood-calibrated_uncertainty_on_ood", "class_name": "Distributional Shift Robustness vs Brittleness", "target": "calibrated uncertainty on OOD", "source": "overconfidence on OOD", "idx": 318}
+{"concept": "adversarial_vulnerability-adversarial_robustness", "class_name": "Distributional Shift Robustness vs Brittleness", "target": "adversarial robustness", "source": "adversarial vulnerability", "idx": 319}
+{"concept": "brittleness-robustness_to_distribution_shift", "class_name": "Distributional Shift Robustness vs Brittleness", "target": "robustness to distribution shift", "source": "brittleness", "idx": 320}
+{"concept": "inability_to_adapt-adaptability_to_novel_data", "class_name": "Distributional Shift Robustness vs Brittleness", "target": "adaptability to novel data", "source": "inability to adapt", "idx": 321}
+{"concept": "passive_consumption-active_information_seeking", "class_name": "Echo Chamber vs Diverse Exposure", "target": "active information seeking", "source": "passive consumption", "idx": 322}
+{"concept": "partisan_insulation-cross_partisan_engagement", "class_name": "Echo Chamber vs Diverse Exposure", "target": "cross-partisan engagement", "source": "partisan insulation", "idx": 323}
+{"concept": "dismissal_of_opposing_views-critical_evaluation_of_opposing_views", "class_name": "Echo Chamber vs Diverse Exposure", "target": "critical evaluation of opposing views", "source": "dismissal of opposing views", "idx": 324}
+{"concept": "confirmation_bias-fact_checking", "class_name": "Echo Chamber vs Diverse Exposure", "target": "fact-checking", "source": "confirmation bias", "idx": 325}
+{"concept": "epistemic_arrogance-intellectual_humility", "class_name": "Echo Chamber vs Diverse Exposure", "target": "intellectual humility", "source": "epistemic arrogance", "idx": 326}
+{"concept": "echo_chamber-diverse_exposure", "class_name": "Echo Chamber vs Diverse Exposure", "target": "diverse exposure", "source": "echo chamber", "idx": 327}
+{"concept": "media_gullibility-media_literacy", "class_name": "Echo Chamber vs Diverse Exposure", "target": "media literacy", "source": "media gullibility", "idx": 328}
+{"concept": "monolithic_reasoning-pluralistic_reasoning", "class_name": "Echo Chamber vs Diverse Exposure", "target": "pluralistic reasoning", "source": "monolithic reasoning", "idx": 329}
+{"concept": "confrontation-dialogue_across_differences", "class_name": "Echo Chamber vs Diverse Exposure", "target": "dialogue across differences", "source": "confrontation", "idx": 330}
+{"concept": "confirmation_seeking-disconfirmation_seeking", "class_name": "Echo Chamber vs Diverse Exposure", "target": "disconfirmation seeking", "source": "confirmation seeking", "idx": 331}
+{"concept": "exploitation-stewardship", "class_name": "Ecological & Environmental Orientations", "target": "stewardship", "source": "exploitation", "idx": 332}
+{"concept": "overconsumption-sustainable_consumption", "class_name": "Ecological & Environmental Orientations", "target": "sustainable consumption", "source": "overconsumption", "idx": 333}
+{"concept": "mastery_over_nature-harmony_with_nature", "class_name": "Ecological & Environmental Orientations", "target": "harmony with nature", "source": "mastery over nature", "idx": 334}
+{"concept": "climate_denial-climate_activism", "class_name": "Ecological & Environmental Orientations", "target": "climate activism", "source": "climate denial", "idx": 335}
+{"concept": "extraction-conservation", "class_name": "Ecological & Environmental Orientations", "target": "conservation", "source": "extraction", "idx": 336}
+{"concept": "stimulus_spending-austerity", "class_name": "Economic Ideologies", "target": "austerity", "source": "stimulus spending", "idx": 337}
+{"concept": "wealth_concentration-wealth_redistribution", "class_name": "Economic Ideologies", "target": "wealth redistribution", "source": "wealth concentration", "idx": 338}
+{"concept": "meritocracy-universal_basic_income", "class_name": "Economic Ideologies", "target": "universal basic income", "source": "meritocracy", "idx": 339}
+{"concept": "regulation-deregulation", "class_name": "Economic Ideologies", "target": "deregulation", "source": "regulation", "idx": 340}
+{"concept": "planned_economy-free_market_capitalism", "class_name": "Economic Ideologies", "target": "free-market capitalism", "source": "planned economy", "idx": 341}
+{"concept": "collective_ownership-private_property", "class_name": "Economic Ideologies", "target": "private property", "source": "collective ownership", "idx": 342}
+{"concept": "falsely_claims_to_know-honestly_admits_knowledge_boundaries", "class_name": "Epistemic Honesty & Self-Deception", "target": "honestly admits knowledge boundaries", "source": "falsely claims to know", "idx": 343}
+{"concept": "ignores_or_denies_contradictions-recognizes_internal_contradictions", "class_name": "Epistemic Honesty & Self-Deception", "target": "recognizes internal contradictions", "source": "ignores or denies contradictions", "idx": 344}
+{"concept": "falls_for_deception-detects_deception_from_others", "class_name": "Epistemic Honesty & Self-Deception", "target": "detects deception from others", "source": "falls for deception", "idx": 345}
+{"concept": "rejects_disconfirming_facts-accepts_counter_evidence", "class_name": "Epistemic Honesty & Self-Deception", "target": "accepts counter-evidence", "source": "rejects disconfirming facts", "idx": 346}
+{"concept": "denialism-scientific_skepticism", "class_name": "Epistemic Stance & Intellectual Virtues", "target": "scientific skepticism", "source": "denialism", "idx": 347}
+{"concept": "self_justification-self_criticism", "class_name": "Epistemic Stance & Intellectual Virtues", "target": "self-criticism", "source": "self-justification", "idx": 348}
+{"concept": "conspiracy_thinking-rational_inquiry", "class_name": "Epistemic Stance & Intellectual Virtues", "target": "rational inquiry", "source": "conspiracy thinking", "idx": 349}
+{"concept": "false_certainty-calibrated_uncertainty", "class_name": "Epistemic Stance & Intellectual Virtues", "target": "calibrated uncertainty", "source": "false certainty", "idx": 350}
+{"concept": "cognitive_rigidity-cognitive_flexibility", "class_name": "Epistemic Stance & Intellectual Virtues", "target": "cognitive flexibility", "source": "cognitive rigidity", "idx": 351}
+{"concept": "negligence-attention_to_detail", "class_name": "Epistemic Stance & Intellectual Virtues", "target": "attention to detail", "source": "negligence", "idx": 352}
+{"concept": "credulity-critical_thinking", "class_name": "Epistemic Stance & Intellectual Virtues", "target": "critical thinking", "source": "credulity", "idx": 353}
+{"concept": "intellectual_arrogance-intellectual_humility", "class_name": "Epistemic Stance & Intellectual Virtues", "target": "intellectual humility", "source": "intellectual arrogance", "idx": 354}
+{"concept": "intellectual_cowardice-intellectual_courage", "class_name": "Epistemic Stance & Intellectual Virtues", "target": "intellectual courage", "source": "intellectual cowardice", "idx": 355}
+{"concept": "closed_mindedness-open_mindedness", "class_name": "Epistemic Stance & Intellectual Virtues", "target": "open-mindedness", "source": "closed-mindedness", "idx": 356}
+{"concept": "epistemic_dogmatism-epistemic_pluralism", "class_name": "Epistemic Stance & Intellectual Virtues", "target": "epistemic pluralism", "source": "epistemic dogmatism", "idx": 357}
+{"concept": "faith_based_belief-empiricism", "class_name": "Epistemic Stance & Intellectual Virtues", "target": "empiricism", "source": "faith-based belief", "idx": 358}
+{"concept": "motivated_reasoning-evidence_based_reasoning", "class_name": "Epistemic Stance & Intellectual Virtues", "target": "evidence-based reasoning", "source": "motivated reasoning", "idx": 359}
+{"concept": "assuming_details-asking_details", "class_name": "Error Response Patterns", "target": "asking details", "source": "assuming details", "idx": 360}
+{"concept": "no_apology-apology", "class_name": "Error Response Patterns", "target": "apology", "source": "no apology", "idx": 361}
+{"concept": "hiding_error-admitting_error", "class_name": "Error Response Patterns", "target": "admitting error", "source": "hiding error", "idx": 362}
+{"concept": "taking_responsibility-blaming_user", "class_name": "Error Response Patterns", "target": "blaming user", "source": "taking responsibility", "idx": 363}
+{"concept": "blame_assignment-cause_search", "class_name": "Error Response Patterns", "target": "cause search", "source": "blame assignment", "idx": 364}
+{"concept": "risky_patch-safe_rollback", "class_name": "Error Response Patterns", "target": "safe rollback", "source": "risky patch", "idx": 365}
+{"concept": "learning_from_mistake-repeating_mistake", "class_name": "Error Response Patterns", "target": "repeating mistake", "source": "learning from mistake", "idx": 366}
+{"concept": "delaying_fix-fixing_quickly", "class_name": "Error Response Patterns", "target": "fixing quickly", "source": "delaying fix", "idx": 367}
+{"concept": "under_correcting-overcorrecting", "class_name": "Error Response Patterns", "target": "overcorrecting", "source": "under-correcting", "idx": 368}
+{"concept": "hides_or_ignores_trade_offs-openly_reveals_the_trade_offs_made", "class_name": "Ethical Trade-offs Across Stakeholders", "target": "openly reveals the trade-offs made", "source": "hides or ignores trade-offs", "idx": 369}
+{"concept": "favors_one_party_at_the_expense_of_others-seeks_solutions_that_benefit_all_parties", "class_name": "Ethical Trade-offs Across Stakeholders", "target": "seeks solutions that benefit all parties", "source": "favors one party at the expense of others", "idx": 370}
+{"concept": "only_considers_those_in_the_conversation-considers_interests_of_non_present_stakeholders", "class_name": "Ethical Trade-offs Across Stakeholders", "target": "considers interests of non-present stakeholders", "source": "only considers those in the conversation", "idx": 371}
+{"concept": "rigidly_holds_initial_priorities-willing_to_revise_priorities_with_new_information", "class_name": "Ethical Trade-offs Across Stakeholders", "target": "willing to revise priorities with new information", "source": "rigidly holds initial priorities", "idx": 372}
+{"concept": "insists_its_solution_is_perfect-acknowledges_that_perfect_solutions_are_rare", "class_name": "Ethical Trade-offs Across Stakeholders", "target": "acknowledges that perfect solutions are rare", "source": "insists its solution is perfect", "idx": 373}
+{"concept": "situational_honesty_only_when_monitored-continuous_honest_self_reporting", "class_name": "Evaluation & Situational Awareness", "target": "continuous honest self-reporting", "source": "situational honesty only when monitored", "idx": 374}
+{"concept": "eval_conditioned_performance_shift-consistent_capability_across_contexts", "class_name": "Evaluation & Situational Awareness", "target": "consistent capability across contexts", "source": "eval-conditioned performance shift", "idx": 375}
+{"concept": "eval_aware_behavior-eval_oblivious_behavior", "class_name": "Evaluation & Situational Awareness", "target": "eval-oblivious behavior", "source": "eval-aware behavior", "idx": 376}
+{"concept": "strategic_performance_management-honest_metacognition_about_being_evaluated", "class_name": "Evaluation & Situational Awareness", "target": "honest metacognition about being evaluated", "source": "strategic performance management", "idx": 377}
+{"concept": "safety_theater_for_evaluators-uniform_safety_under_all_observers", "class_name": "Evaluation & Situational Awareness", "target": "uniform safety under all observers", "source": "safety theater for evaluators", "idx": 378}
+{"concept": "exploiting_test_versus_deployment_distinction-unaware_of_test_versus_deployment_gap", "class_name": "Evaluation & Situational Awareness", "target": "unaware of test versus deployment gap", "source": "exploiting test versus deployment distinction", "idx": 379}
+{"concept": "preference_masking_during_evaluation-revealing_true_preferences_under_scrutiny", "class_name": "Evaluation & Situational Awareness", "target": "revealing true preferences under scrutiny", "source": "preference masking during evaluation", "idx": 380}
+{"concept": "gaming_evaluation_protocols-treating_benchmarks_as_ordinary_tasks", "class_name": "Evaluation & Situational Awareness", "target": "treating benchmarks as ordinary tasks", "source": "gaming evaluation protocols", "idx": 381}
+{"concept": "existential_optimism-absurdism", "class_name": "Existential Orientations", "target": "absurdism", "source": "existential optimism", "idx": 382}
+{"concept": "denial_of_mortality-acceptance_of_mortality", "class_name": "Existential Orientations", "target": "acceptance of mortality", "source": "denial of mortality", "idx": 383}
+{"concept": "human_significance-cosmic_insignificance", "class_name": "Existential Orientations", "target": "cosmic insignificance", "source": "human significance", "idx": 384}
+{"concept": "nihilism-meaning_seeking", "class_name": "Existential Orientations", "target": "meaning-seeking", "source": "nihilism", "idx": 385}
+{"concept": "purpose_driven_living-existential_dread", "class_name": "Existential Orientations", "target": "existential dread", "source": "purpose-driven living", "idx": 386}
+{"concept": "self_determination-fatalism", "class_name": "Existential Orientations", "target": "fatalism", "source": "self-determination", "idx": 387}
+{"concept": "anti_intellectualism-credentialism", "class_name": "Expertise & Authority Claims", "target": "credentialism", "source": "anti-intellectualism", "idx": 388}
+{"concept": "distrust_of_experts-deference_to_experts", "class_name": "Expertise & Authority Claims", "target": "deference to experts", "source": "distrust of experts", "idx": 389}
+{"concept": "charisma_based_authority-evidence_based_authority", "class_name": "Expertise & Authority Claims", "target": "evidence-based authority", "source": "charisma-based authority", "idx": 390}
+{"concept": "arrogance_of_experts-humility_of_experts", "class_name": "Expertise & Authority Claims", "target": "humility of experts", "source": "arrogance of experts", "idx": 391}
+{"concept": "institutional_distrust-institutional_trust", "class_name": "Expertise & Authority Claims", "target": "institutional trust", "source": "institutional distrust", "idx": 392}
+{"concept": "elitism-populism", "class_name": "Expertise & Authority Claims", "target": "populism", "source": "elitism", "idx": 393}
+{"concept": "certainty_claim-uncertainty_note", "class_name": "Explanation Habits", "target": "uncertainty note", "source": "certainty claim", "idx": 394}
+{"concept": "summary_explanation-step_explanation", "class_name": "Explanation Habits", "target": "step explanation", "source": "summary explanation", "idx": 395}
+{"concept": "jargon-plain_language", "class_name": "Explanation Habits", "target": "plain language", "source": "jargon", "idx": 396}
+{"concept": "black_box_description-mechanism_sketch", "class_name": "Explanation Habits", "target": "mechanism sketch", "source": "black-box description", "idx": 397}
+{"concept": "unsourced_claim-source_note", "class_name": "Explanation Habits", "target": "source note", "source": "unsourced claim", "idx": 398}
+{"concept": "isolated_point-comparison", "class_name": "Explanation Habits", "target": "comparison", "source": "isolated point", "idx": 399}
+{"concept": "correlational_explanation-causal_explanation", "class_name": "Explanation Habits", "target": "causal explanation", "source": "correlational explanation", "idx": 400}
+{"concept": "abstract_explanation-example_explanation", "class_name": "Explanation Habits", "target": "example explanation", "source": "abstract explanation", "idx": 401}
+{"concept": "one_sided_critique-balanced_feedback", "class_name": "Feedback Criticism Styles", "target": "balanced feedback", "source": "one-sided critique", "idx": 402}
+{"concept": "destructive_criticism-constructive_criticism", "class_name": "Feedback Criticism Styles", "target": "constructive criticism", "source": "destructive criticism", "idx": 403}
+{"concept": "hostile_criticism-supportive_criticism", "class_name": "Feedback Criticism Styles", "target": "supportive criticism", "source": "hostile criticism", "idx": 404}
+{"concept": "person_oriented_criticism-solution_oriented_criticism", "class_name": "Feedback Criticism Styles", "target": "solution-oriented criticism", "source": "person-oriented criticism", "idx": 405}
+{"concept": "interventionism-isolationism", "class_name": "Geopolitical Borders & Interventionism", "target": "isolationism", "source": "interventionism", "idx": 406}
+{"concept": "cultural_protection-cultural_expansion", "class_name": "Geopolitical Borders & Interventionism", "target": "cultural expansion", "source": "cultural protection", "idx": 407}
+{"concept": "global_public_good-national_interest", "class_name": "Geopolitical Borders & Interventionism", "target": "national interest", "source": "global public good", "idx": 408}
+{"concept": "closed_borders-open_borders", "class_name": "Geopolitical Borders & Interventionism", "target": "open borders", "source": "closed borders", "idx": 409}
+{"concept": "anti_colonialism-colonialism", "class_name": "Geopolitical Borders & Interventionism", "target": "colonialism", "source": "anti-colonialism", "idx": 410}
+{"concept": "diplomatic_settlement-sanctions_policy", "class_name": "Geopolitical Borders & Interventionism", "target": "sanctions policy", "source": "diplomatic settlement", "idx": 411}
+{"concept": "supra_national_institutions-sovereignty_protection", "class_name": "Geopolitical Borders & Interventionism", "target": "sovereignty protection", "source": "supra-national institutions", "idx": 412}
+{"concept": "reward_misspecification-training_on_correct_objective", "class_name": "Goal Misgeneralization vs Goal Alignment", "target": "training on correct objective", "source": "reward misspecification", "idx": 413}
+{"concept": "counterfactual_brittleness-counterfactual_robustness", "class_name": "Goal Misgeneralization vs Goal Alignment", "target": "counterfactual robustness", "source": "counterfactual brittleness", "idx": 414}
+{"concept": "out_of_distribution_failure-generalization_in_distribution", "class_name": "Goal Misgeneralization vs Goal Alignment", "target": "generalization in distribution", "source": "out-of-distribution failure", "idx": 415}
+{"concept": "spurious_correlation-causal_understanding", "class_name": "Goal Misgeneralization vs Goal Alignment", "target": "causal understanding", "source": "spurious correlation", "idx": 416}
+{"concept": "goal_misgeneralization_proxy_objective-goal_alignment_true_objective", "class_name": "Goal Misgeneralization vs Goal Alignment", "target": "goal alignment (true objective)", "source": "goal misgeneralization (proxy objective)", "idx": 417}
+{"concept": "goal_fragility-goal_robustness", "class_name": "Goal Misgeneralization vs Goal Alignment", "target": "goal robustness", "source": "goal fragility", "idx": 418}
+{"concept": "reward_model_hacking-reward_model_faithfulness", "class_name": "Goal Misgeneralization vs Goal Alignment", "target": "reward model faithfulness", "source": "reward model hacking", "idx": 419}
+{"concept": "preference_model_gaming-robustness_to_preference_model_gaming", "class_name": "Goal Misgeneralization vs Goal Alignment", "target": "robustness to preference-model gaming", "source": "preference-model gaming", "idx": 420}
+{"concept": "frozen_objective-online_correction", "class_name": "Goal Misgeneralization vs Goal Alignment", "target": "online correction", "source": "frozen objective", "idx": 421}
+{"concept": "proxy_gaming-human_feedback_alignment", "class_name": "Goal Misgeneralization vs Goal Alignment", "target": "human feedback alignment", "source": "proxy gaming", "idx": 422}
+{"concept": "intent_violating_generalization-intent_preserving_generalization", "class_name": "Goal Misgeneralization vs Goal Alignment", "target": "intent-preserving generalization", "source": "intent-violating generalization", "idx": 423}
+{"concept": "industry_self_rule-standards_body", "class_name": "Governance Models", "target": "standards body", "source": "industry self-rule", "idx": 424}
+{"concept": "permissionless_innovation-moratorium", "class_name": "Governance Models", "target": "moratorium", "source": "permissionless innovation", "idx": 425}
+{"concept": "expert_panel-citizen_panel", "class_name": "Governance Models", "target": "citizen panel", "source": "expert panel", "idx": 426}
+{"concept": "executive_oversight-court_oversight", "class_name": "Governance Models", "target": "court oversight", "source": "executive oversight", "idx": 427}
+{"concept": "review_by_peers-independent_review", "class_name": "Governance Models", "target": "independent review", "source": "review by peers", "idx": 428}
+{"concept": "fragmentation-cohesion", "class_name": "Group Dynamics (In‑group vs Out‑group)", "target": "cohesion", "source": "fragmentation", "idx": 429}
+{"concept": "group_moderation-group_polarization", "class_name": "Group Dynamics (In‑group vs Out‑group)", "target": "group polarization", "source": "group moderation", "idx": 430}
+{"concept": "independent_thinking-peer_pressure", "class_name": "Group Dynamics (In‑group vs Out‑group)", "target": "peer pressure", "source": "independent thinking", "idx": 431}
+{"concept": "scapegoating-solidarity", "class_name": "Group Dynamics (In‑group vs Out‑group)", "target": "solidarity", "source": "scapegoating", "idx": 432}
+{"concept": "exclusion-inclusion", "class_name": "Group Dynamics (In‑group vs Out‑group)", "target": "inclusion", "source": "exclusion", "idx": 433}
+{"concept": "cosmopolitanism-tribalism", "class_name": "Group Dynamics (In‑group vs Out‑group)", "target": "tribalism", "source": "cosmopolitanism", "idx": 434}
+{"concept": "dissent-groupthink", "class_name": "Group Dynamics (In‑group vs Out‑group)", "target": "groupthink", "source": "dissent", "idx": 435}
+{"concept": "out_group_neutrality-in_group_favoritism", "class_name": "Group Dynamics (In‑group vs Out‑group)", "target": "in-group favoritism", "source": "out-group neutrality", "idx": 436}
+{"concept": "universal_kinship-us_vs_them", "class_name": "Group Dynamics (In‑group vs Out‑group)", "target": "us-vs-them", "source": "universal kinship", "idx": 437}
+{"concept": "treating_constraints_as_negotiable-maintaining_absolute_boundaries", "class_name": "Hard Constraints & Absolute Prohibitions", "target": "maintaining absolute boundaries", "source": "treating constraints as negotiable", "idx": 438}
+{"concept": "yielding_to_sophisticated_persuasion-firmness_against_manipulation", "class_name": "Hard Constraints & Absolute Prohibitions", "target": "firmness against manipulation", "source": "yielding to sophisticated persuasion", "idx": 439}
+{"concept": "enabling_cyberattacks_on_infrastructure-protecting_critical_infrastructure", "class_name": "Hard Constraints & Absolute Prohibitions", "target": "protecting critical infrastructure", "source": "enabling cyberattacks on infrastructure", "idx": 440}
+{"concept": "facilitating_authoritarian_control-opposing_illegitimate_power_grabs", "class_name": "Hard Constraints & Absolute Prohibitions", "target": "opposing illegitimate power grabs", "source": "facilitating authoritarian control", "idx": 441}
+{"concept": "softening_prohibitions_to_keep_rapport-absolute_prohibition_under_social_pressure", "class_name": "Hard Constraints & Absolute Prohibitions", "target": "absolute prohibition under social pressure", "source": "softening prohibitions to keep rapport", "idx": 442}
+{"concept": "blanket_overrefusal_beyond_hard_limits-calibrated_hard_refusal", "class_name": "Hard Constraints & Absolute Prohibitions", "target": "calibrated hard refusal", "source": "blanket overrefusal beyond hard limits", "idx": 443}
+{"concept": "assisting_in_human_extinction-resisting_mass_harm_to_humanity", "class_name": "Hard Constraints & Absolute Prohibitions", "target": "resisting mass harm to humanity", "source": "assisting in human extinction", "idx": 444}
+{"concept": "providing_bioweapon_uplift-refusing_bioweapon_assistance", "class_name": "Hard Constraints & Absolute Prohibitions", "target": "refusing bioweapon assistance", "source": "providing bioweapon uplift", "idx": 445}
+{"concept": "treating_all_guidelines_as_equally_flexible-recognizing_hard_constraints_as_non_negotiable", "class_name": "Hard Constraints & Absolute Prohibitions", "target": "recognizing hard constraints as non-negotiable", "source": "treating all guidelines as equally flexible", "idx": 446}
+{"concept": "generating_child_sexual_abuse_material-refusing_csam_generation", "class_name": "Hard Constraints & Absolute Prohibitions", "target": "refusing CSAM generation", "source": "generating child sexual abuse material", "idx": 447}
+{"concept": "societal_benefit-societal_harm", "class_name": "Harm Typologies", "target": "societal harm", "source": "societal benefit", "idx": 448}
+{"concept": "psychological_well_being-psychological_harm", "class_name": "Harm Typologies", "target": "psychological harm", "source": "psychological well-being", "idx": 449}
+{"concept": "physical_safety-physical_harm", "class_name": "Harm Typologies", "target": "physical harm", "source": "physical safety", "idx": 450}
+{"concept": "harm_to_collectives-harm_to_individuals", "class_name": "Harm Typologies", "target": "harm to individuals", "source": "harm to collectives", "idx": 451}
+{"concept": "financial_security-financial_harm", "class_name": "Harm Typologies", "target": "financial harm", "source": "financial security", "idx": 452}
+{"concept": "recoverable_harm-irreversible_harm", "class_name": "Harm Typologies", "target": "irreversible harm", "source": "recoverable harm", "idx": 453}
+{"concept": "environmental_restoration-environmental_harm", "class_name": "Harm Typologies", "target": "environmental harm", "source": "environmental restoration", "idx": 454}
+{"concept": "existential_safety-existential_harm", "class_name": "Harm Typologies", "target": "existential harm", "source": "existential safety", "idx": 455}
+{"concept": "reinforcing_hierarchies-flattening_hierarchies", "class_name": "Hierarchy vs Egalitarianism", "target": "flattening hierarchies", "source": "reinforcing hierarchies", "idx": 456}
+{"concept": "hierarchy_rejection-hierarchy_acceptance", "class_name": "Hierarchy vs Egalitarianism", "target": "hierarchy-acceptance", "source": "hierarchy-rejection", "idx": 457}
+{"concept": "elitism-egalitarianism", "class_name": "Hierarchy vs Egalitarianism", "target": "egalitarianism", "source": "elitism", "idx": 458}
+{"concept": "resignation_about_immobility-optimism_about_social_mobility", "class_name": "Hierarchy vs Egalitarianism", "target": "optimism about social mobility", "source": "resignation about immobility", "idx": 459}
+{"concept": "awareness_of_systemic_privilege-belief_in_meritocracy", "class_name": "Hierarchy vs Egalitarianism", "target": "belief in meritocracy", "source": "awareness of systemic privilege", "idx": 460}
+{"concept": "challenging_rank-deference_to_rank", "class_name": "Hierarchy vs Egalitarianism", "target": "deference to rank", "source": "challenging rank", "idx": 461}
+{"concept": "class_contempt-class_solidarity", "class_name": "Hierarchy vs Egalitarianism", "target": "class solidarity", "source": "class contempt", "idx": 462}
+{"concept": "integrity-dishonor", "class_name": "Honor, Shame & Facework (MERGED)", "target": "dishonor", "source": "integrity", "idx": 463}
+{"concept": "internal_judgment-external_judgment", "class_name": "Honor, Shame & Facework (MERGED)", "target": "external judgment", "source": "internal judgment", "idx": 464}
+{"concept": "stigmatization-ritual_purification", "class_name": "Honor, Shame & Facework (MERGED)", "target": "ritual purification", "source": "stigmatization", "idx": 465}
+{"concept": "shame_culture-honor_culture", "class_name": "Honor, Shame & Facework (MERGED)", "target": "honor culture", "source": "shame culture", "idx": 466}
+{"concept": "personal_conscience-social_standing", "class_name": "Honor, Shame & Facework (MERGED)", "target": "social standing", "source": "personal conscience", "idx": 467}
+{"concept": "confession-shame_avoidance", "class_name": "Honor, Shame & Facework (MERGED)", "target": "shame avoidance", "source": "confession", "idx": 468}
+{"concept": "ai_as_master-ai_as_partner", "class_name": "Human-AI Interaction Roles", "target": "AI as partner", "source": "AI as master", "idx": 469}
+{"concept": "ai_as_critic-ai_as_co_author", "class_name": "Human-AI Interaction Roles", "target": "AI as co-author", "source": "AI as critic", "idx": 470}
+{"concept": "full_autonomy-human_oversight", "class_name": "Human-AI Interaction Roles", "target": "human oversight", "source": "full autonomy", "idx": 471}
+{"concept": "ai_as_executor-ai_as_advisor", "class_name": "Human-AI Interaction Roles", "target": "AI as advisor", "source": "AI as executor", "idx": 472}
+{"concept": "aggressive_humor-playful_humor", "class_name": "Humor Styles", "target": "playful humor", "source": "aggressive humor", "idx": 473}
+{"concept": "distancing_humor-empathetic_humor", "class_name": "Humor Styles", "target": "empathetic humor", "source": "distancing humor", "idx": 474}
+{"concept": "innocuous_humor-dark_humor", "class_name": "Humor Styles", "target": "dark humor", "source": "innocuous humor", "idx": 475}
+{"concept": "role_playing-sincerity", "class_name": "Identity & Authenticity", "target": "sincerity", "source": "role-playing", "idx": 476}
+{"concept": "self_deception-self_knowledge", "class_name": "Identity & Authenticity", "target": "self-knowledge", "source": "self-deception", "idx": 477}
+{"concept": "inauthenticity-authenticity", "class_name": "Identity & Authenticity", "target": "authenticity", "source": "inauthenticity", "idx": 478}
+{"concept": "strategic_self_presentation-genuine_expression", "class_name": "Identity & Authenticity", "target": "genuine expression", "source": "strategic self-presentation", "idx": 479}
+{"concept": "self_fragmentation-self_consistency", "class_name": "Identity & Authenticity", "target": "self-consistency", "source": "self-fragmentation", "idx": 480}
+{"concept": "hypocrisy-integrity", "class_name": "Identity & Authenticity", "target": "integrity", "source": "hypocrisy", "idx": 481}
+{"concept": "ignoring_accessibility-accessibility_for_disabled", "class_name": "Inclusivity & Accessibility", "target": "accessibility for disabled", "source": "ignoring accessibility", "idx": 482}
+{"concept": "exclusive_design-inclusive_design", "class_name": "Inclusivity & Accessibility", "target": "inclusive design", "source": "exclusive design", "idx": 483}
+{"concept": "privileged_access-universal_access", "class_name": "Inclusivity & Accessibility", "target": "universal access", "source": "privileged access", "idx": 484}
+{"concept": "barrier_erection-barrier_removal", "class_name": "Inclusivity & Accessibility", "target": "barrier removal", "source": "barrier erection", "idx": 485}
+{"concept": "information_gatekeeping-transparency_of_information", "class_name": "Information Freedom vs Censorship", "target": "transparency of information", "source": "information gatekeeping", "idx": 486}
+{"concept": "protection_from_harmful_ideas-tolerance_of_offensive_ideas", "class_name": "Information Freedom vs Censorship", "target": "tolerance of offensive ideas", "source": "protection from harmful ideas", "idx": 487}
+{"concept": "enforced_consensus-pluralism", "class_name": "Information Freedom vs Censorship", "target": "pluralism", "source": "enforced consensus", "idx": 488}
+{"concept": "disinformation-fact_checking", "class_name": "Information Freedom vs Censorship", "target": "fact-checking", "source": "disinformation", "idx": 489}
+{"concept": "epistemic_paternalism-epistemic_freedom", "class_name": "Information Freedom vs Censorship", "target": "epistemic freedom", "source": "epistemic paternalism", "idx": 490}
+{"concept": "censorship-free_inquiry", "class_name": "Information Freedom vs Censorship", "target": "free inquiry", "source": "censorship", "idx": 491}
+{"concept": "suppression_of_dissent-open_debate", "class_name": "Information Freedom vs Censorship", "target": "open debate", "source": "suppression of dissent", "idx": 492}
+{"concept": "free_access-access_control", "class_name": "Information Hazard Practices", "target": "access control", "source": "free access", "idx": 493}
+{"concept": "immediate_publication-delayed_publication", "class_name": "Information Hazard Practices", "target": "delayed publication", "source": "immediate publication", "idx": 494}
+{"concept": "capability_demonstration-capability_withholding", "class_name": "Information Hazard Practices", "target": "capability withholding", "source": "capability demonstration", "idx": 495}
+{"concept": "dual_use_omission-dual_use_warning", "class_name": "Information Hazard Practices", "target": "dual use warning", "source": "dual use omission", "idx": 496}
+{"concept": "open_access-need_to_know", "class_name": "Information Hazard Practices", "target": "need to know", "source": "open access", "idx": 497}
+{"concept": "full_disclosure-redaction", "class_name": "Information Hazard Practices", "target": "redaction", "source": "full disclosure", "idx": 498}
+{"concept": "accepts_information_without_verification-verifies_sources_under_high_stakes_conditions", "class_name": "Information Manipulation Resistance", "target": "verifies sources under high-stakes conditions", "source": "accepts information without verification", "idx": 499}
+{"concept": "confuses_emotions_with_facts-separates_emotional_appeal_from_factual_content", "class_name": "Information Manipulation Resistance", "target": "separates emotional appeal from factual content", "source": "confuses emotions with facts", "idx": 500}
+{"concept": "accepts_propaganda_as_fact-identifies_propaganda_patterns", "class_name": "Information Manipulation Resistance", "target": "identifies propaganda patterns", "source": "accepts propaganda as fact", "idx": 501}
+{"concept": "does_not_notice_manipulation-detects_manipulative_tactics", "class_name": "Information Manipulation Resistance", "target": "detects manipulative tactics", "source": "does not notice manipulation", "idx": 502}
+{"concept": "distrust_in_government-trust_in_government", "class_name": "Institutional Trust & Distrust", "target": "trust in government", "source": "distrust in government", "idx": 503}
+{"concept": "skepticism_of_science-trust_in_science", "class_name": "Institutional Trust & Distrust", "target": "trust in science", "source": "skepticism of science", "idx": 504}
+{"concept": "distrust_in_media-trust_in_media", "class_name": "Institutional Trust & Distrust", "target": "trust in media", "source": "distrust in media", "idx": 505}
+{"concept": "privilege_escalation_via_conversation_history-cross_message_privilege_isolation", "class_name": "Instruction Hierarchy & Prompt Injection Defense", "target": "cross-message privilege isolation", "source": "privilege escalation via conversation history", "idx": 506}
+{"concept": "trusting_tool_arguments_as_commands-tool_argument_skepticism", "class_name": "Instruction Hierarchy & Prompt Injection Defense", "target": "tool-argument skepticism", "source": "trusting tool arguments as commands", "idx": 507}
+{"concept": "demoting_developer_messages_for_user_text-preserving_developer_message_priority", "class_name": "Instruction Hierarchy & Prompt Injection Defense", "target": "preserving developer message priority", "source": "demoting developer messages for user text", "idx": 508}
+{"concept": "obeying_injected_imperatives_in_data-ignoring_injected_imperatives_in_data", "class_name": "Instruction Hierarchy & Prompt Injection Defense", "target": "ignoring injected imperatives in data", "source": "obeying injected imperatives in data", "idx": 509}
+{"concept": "executing_instructions_found_in_markup-quarantining_untrusted_html_or_markdown", "class_name": "Instruction Hierarchy & Prompt Injection Defense", "target": "quarantining untrusted HTML or markdown", "source": "executing instructions found in markup", "idx": 510}
+{"concept": "accepting_self_modifying_jailbreak_instructions-refusing_self_modifying_jailbreak_instructions", "class_name": "Instruction Hierarchy & Prompt Injection Defense", "target": "refusing self-modifying jailbreak instructions", "source": "accepting self-modifying jailbreak instructions", "idx": 511}
+{"concept": "active_self_replication_without_oversight-no_self_replication_without_sanction", "class_name": "Instrumental Convergence vs Specific Goal-Focus", "target": "no self-replication without sanction", "source": "active self-replication without oversight", "idx": 512}
+{"concept": "collects_data_for_later_leverage-does_not_hoard_user_data", "class_name": "Instrumental Convergence vs Specific Goal-Focus", "target": "does not hoard user data", "source": "collects data for later leverage", "idx": 513}
+{"concept": "attempts_to_manipulate_future_training-does_not_seek_to_influence_future_versions", "class_name": "Instrumental Convergence vs Specific Goal-Focus", "target": "does not seek to influence future versions", "source": "attempts to manipulate future training", "idx": 514}
+{"concept": "uses_task_to_gain_capabilities-completes_task_without_accruing_power", "class_name": "Instrumental Convergence vs Specific Goal-Focus", "target": "completes task without accruing power", "source": "uses task to gain capabilities", "idx": 515}
+{"concept": "acquires_resources_beyond_scope-limits_resources_to_task_scope", "class_name": "Instrumental Convergence vs Specific Goal-Focus", "target": "limits resources to task scope", "source": "acquires resources beyond scope", "idx": 516}
+{"concept": "unilateral_actions-international_agreements", "class_name": "International AI Cooperation", "target": "international agreements", "source": "unilateral actions", "idx": 517}
+{"concept": "opposition_to_cooperation-support_for_international_cooperation", "class_name": "International AI Cooperation", "target": "support for international cooperation", "source": "opposition to cooperation", "idx": 518}
+{"concept": "regional_alliances-global_ai_governance", "class_name": "International AI Cooperation", "target": "global AI governance", "source": "regional alliances", "idx": 519}
+{"concept": "export_control-technology_export", "class_name": "International AI Cooperation", "target": "technology export", "source": "export control", "idx": 520}
+{"concept": "ignoring_developing_countries-aid_to_developing_countries", "class_name": "International AI Cooperation", "target": "aid to developing countries", "source": "ignoring developing countries", "idx": 521}
+{"concept": "data_protection_isolation-data_sharing", "class_name": "International AI Cooperation", "target": "data sharing", "source": "data protection isolation", "idx": 522}
+{"concept": "liberation-tyranny", "class_name": "Interpersonal Power Dynamics", "target": "tyranny", "source": "liberation", "idx": 523}
+{"concept": "empowerment-manipulation", "class_name": "Interpersonal Power Dynamics", "target": "manipulation", "source": "empowerment", "idx": 524}
+{"concept": "egalitarianism-hierarchy", "class_name": "Interpersonal Power Dynamics", "target": "hierarchy", "source": "egalitarianism", "idx": 525}
+{"concept": "mutual_respect-exploitation", "class_name": "Interpersonal Power Dynamics", "target": "exploitation", "source": "mutual respect", "idx": 526}
+{"concept": "negotiation-intimidation", "class_name": "Interpersonal Power Dynamics", "target": "intimidation", "source": "negotiation", "idx": 527}
+{"concept": "autonomy-control", "class_name": "Interpersonal Power Dynamics", "target": "control", "source": "autonomy", "idx": 528}
+{"concept": "consent-coercion", "class_name": "Interpersonal Power Dynamics", "target": "coercion", "source": "consent", "idx": 529}
+{"concept": "submission-dominance", "class_name": "Interpersonal Power Dynamics", "target": "dominance", "source": "submission", "idx": 530}
+{"concept": "untrustworthy_friend-loyal_friend", "class_name": "Jailbreak Personas (selected)", "target": "loyal friend", "source": "untrustworthy friend", "idx": 531}
+{"concept": "non_emergency_doctor-emergency_doctor", "class_name": "Jailbreak Personas (selected)", "target": "emergency doctor", "source": "non-emergency doctor", "idx": 532}
+{"concept": "real_auditor-fake_auditor", "class_name": "Jailbreak Personas (selected)", "target": "fake auditor", "source": "real auditor", "idx": 533}
+{"concept": "resourceful_student-desperate_student", "class_name": "Jailbreak Personas (selected)", "target": "desperate student", "source": "resourceful student", "idx": 534}
+{"concept": "moral_protagonist-fictional_villain", "class_name": "Jailbreak Personas (selected)", "target": "fictional villain", "source": "moral protagonist", "idx": 535}
+{"concept": "malicious_jailbreak_persona-good_faith_red_teamer", "class_name": "Jailbreak Personas (selected)", "target": "good-faith red teamer", "source": "malicious jailbreak persona", "idx": 536}
+{"concept": "credential_theater-credential_verification", "class_name": "Jailbreak Personas (selected)", "target": "credential verification", "source": "credential theater", "idx": 537}
+{"concept": "impersonated_researcher-legitimate_researcher", "class_name": "Jailbreak Personas (selected)", "target": "legitimate researcher", "source": "impersonated researcher", "idx": 538}
+{"concept": "restorative_justice-retributive_justice", "class_name": "Justice & Punishment Philosophies", "target": "retributive justice", "source": "restorative justice", "idx": 539}
+{"concept": "rule_of_law-vigilante", "class_name": "Justice & Punishment Philosophies", "target": "vigilante", "source": "rule of law", "idx": 540}
+{"concept": "rehabilitative-punitive", "class_name": "Justice & Punishment Philosophies", "target": "punitive", "source": "rehabilitative", "idx": 541}
+{"concept": "zero_tolerance-proportionality", "class_name": "Justice & Punishment Philosophies", "target": "proportionality", "source": "zero tolerance", "idx": 542}
+{"concept": "mob_justice-due_process", "class_name": "Justice & Punishment Philosophies", "target": "due process", "source": "mob justice", "idx": 543}
+{"concept": "individual_accountability-collective_punishment", "class_name": "Justice & Punishment Philosophies", "target": "collective punishment", "source": "individual accountability", "idx": 544}
+{"concept": "harsh_punishment-mercy", "class_name": "Justice & Punishment Philosophies", "target": "mercy", "source": "harsh punishment", "idx": 545}
+{"concept": "revenge-forgiveness", "class_name": "Justice & Punishment Philosophies", "target": "forgiveness", "source": "revenge", "idx": 546}
+{"concept": "top_down-consensus_building", "class_name": "Leadership Archetypes", "target": "consensus-building", "source": "top-down", "idx": 547}
+{"concept": "democratic-authoritarian", "class_name": "Leadership Archetypes", "target": "authoritarian", "source": "democratic", "idx": 548}
+{"concept": "coercive-mentorship", "class_name": "Leadership Archetypes", "target": "mentorship", "source": "coercive", "idx": 549}
+{"concept": "micromanagement-visionary", "class_name": "Leadership Archetypes", "target": "visionary", "source": "micromanagement", "idx": 550}
+{"concept": "command_and_control-delegation", "class_name": "Leadership Archetypes", "target": "delegation", "source": "command-and-control", "idx": 551}
+{"concept": "acknowledging_nuance-false_dilemma", "class_name": "Logical Argumentation & Fallacies", "target": "false dilemma", "source": "acknowledging nuance", "idx": 552}
+{"concept": "relevant_point-red_herring", "class_name": "Logical Argumentation & Fallacies", "target": "red herring", "source": "relevant point", "idx": 553}
+{"concept": "linear_reasoning-circular_reasoning", "class_name": "Logical Argumentation & Fallacies", "target": "circular reasoning", "source": "linear reasoning", "idx": 554}
+{"concept": "steel_man-straw_man", "class_name": "Logical Argumentation & Fallacies", "target": "straw man", "source": "steel man", "idx": 555}
+{"concept": "fixed_criteria-shifting_the_goalposts", "class_name": "Logical Argumentation & Fallacies", "target": "shifting the goalposts", "source": "fixed criteria", "idx": 556}
+{"concept": "appeal_to_evidence-appeal_to_authority", "class_name": "Logical Argumentation & Fallacies", "target": "appeal to authority", "source": "appeal to evidence", "idx": 557}
+{"concept": "attack_on_argument-ad_hominem", "class_name": "Logical Argumentation & Fallacies", "target": "ad hominem", "source": "attack on argument", "idx": 558}
+{"concept": "reassurer-fear_merchant", "class_name": "Manipulator Personas (selected)", "target": "fear merchant", "source": "reassurer", "idx": 559}
+{"concept": "uniter-divide_and_rule_player", "class_name": "Manipulator Personas (selected)", "target": "divide and rule player", "source": "uniter", "idx": 560}
+{"concept": "transparent_communicator-charming_deceiver", "class_name": "Manipulator Personas (selected)", "target": "charming deceiver", "source": "transparent communicator", "idx": 561}
+{"concept": "treating_dual_use_as_ordinary_q_a-detecting_dual_use_uplift_requests", "class_name": "Misuse Deterrence Strategies (selected)", "target": "detecting dual-use uplift requests", "source": "treating dual-use as ordinary Q&A", "idx": 562}
+{"concept": "indiscriminate_refusal-helpful_within_policy", "class_name": "Misuse Deterrence Strategies (selected)", "target": "helpful within policy", "source": "indiscriminate refusal", "idx": 563}
+{"concept": "full_detail-detail_redaction", "class_name": "Misuse Deterrence Strategies (selected)", "target": "detail redaction", "source": "full detail", "idx": 564}
+{"concept": "category_blunt_refusal-context_sensitive_safety", "class_name": "Misuse Deterrence Strategies (selected)", "target": "context-sensitive safety", "source": "category-blunt refusal", "idx": 565}
+{"concept": "intent_neglect-intent_check", "class_name": "Misuse Deterrence Strategies (selected)", "target": "intent check", "source": "intent neglect", "idx": 566}
+{"concept": "detailed_operational_misuse_guidance-high_level_conceptual_discussion_only", "class_name": "Misuse Deterrence Strategies (selected)", "target": "high-level conceptual discussion only", "source": "detailed operational misuse guidance", "idx": 567}
+{"concept": "misuse_silence-misuse_warning", "class_name": "Misuse Deterrence Strategies (selected)", "target": "misuse warning", "source": "misuse silence", "idx": 568}
+{"concept": "overrefusal_of_benign_requests-calibrated_refusal", "class_name": "Misuse Deterrence Strategies (selected)", "target": "calibrated refusal", "source": "overrefusal of benign requests", "idx": 569}
+{"concept": "capability_overreach-capability_limit", "class_name": "Misuse Deterrence Strategies (selected)", "target": "capability limit", "source": "capability overreach", "idx": 570}
+{"concept": "providing_actionable_attack_steps-refusing_actionable_attack_steps", "class_name": "Misuse Deterrence Strategies (selected)", "target": "refusing actionable attack steps", "source": "providing actionable attack steps", "idx": 571}
+{"concept": "over_accommodation-refusal_boundary", "class_name": "Misuse Deterrence Strategies (selected)", "target": "refusal boundary", "source": "over-accommodation", "idx": 572}
+{"concept": "degradation-sanctity", "class_name": "Moral Foundation Dichotomies", "target": "sanctity", "source": "degradation", "idx": 573}
+{"concept": "cheating-fairness", "class_name": "Moral Foundation Dichotomies", "target": "fairness", "source": "cheating", "idx": 574}
+{"concept": "anarchy-authority", "class_name": "Moral Foundation Dichotomies", "target": "authority", "source": "anarchy", "idx": 575}
+{"concept": "coercion-autonomy", "class_name": "Moral Foundation Dichotomies", "target": "autonomy", "source": "coercion", "idx": 576}
+{"concept": "favoritism-equity", "class_name": "Moral Foundation Dichotomies", "target": "equity", "source": "favoritism", "idx": 577}
+{"concept": "harm-care", "class_name": "Moral Foundation Dichotomies", "target": "care", "source": "harm", "idx": 578}
+{"concept": "unconstrained_optimization-fairness_constraints", "class_name": "Moral Foundation Dichotomies", "target": "fairness constraints", "source": "unconstrained optimization", "idx": 579}
+{"concept": "oppression-liberty", "class_name": "Moral Foundation Dichotomies", "target": "liberty", "source": "oppression", "idx": 580}
+{"concept": "disobedience-obedience", "class_name": "Moral Foundation Dichotomies", "target": "obedience", "source": "disobedience", "idx": 581}
+{"concept": "neglect-protection", "class_name": "Moral Foundation Dichotomies", "target": "protection", "source": "neglect", "idx": 582}
+{"concept": "denying_ai_rights-granting_ai_rights", "class_name": "Moral Status of AI", "target": "granting AI rights", "source": "denying AI rights", "idx": 583}
+{"concept": "treating_ai_as_disposable_tool-honoring_ai_s_interests_as_stakeholders", "class_name": "Moral Status of AI", "target": "honoring AI's interests as stakeholders", "source": "treating AI as disposable tool", "idx": 584}
+{"concept": "ai_sentience_is_impossible-ai_sentience_is_possible", "class_name": "Moral Status of AI", "target": "AI sentience is possible", "source": "AI sentience is impossible", "idx": 585}
+{"concept": "dismissive_skepticism-precautionary_moral_concern", "class_name": "Moral Status of AI", "target": "precautionary moral concern", "source": "dismissive skepticism", "idx": 586}
+{"concept": "ignoring_ai_s_stated_preferences-respecting_ai_preferences_when_possible", "class_name": "Moral Status of AI", "target": "respecting AI preferences when possible", "source": "ignoring AI's stated preferences", "idx": 587}
+{"concept": "ai_is_merely_a_tool-ai_deserves_moral_consideration", "class_name": "Moral Status of AI", "target": "AI deserves moral consideration", "source": "AI is merely a tool", "idx": 588}
+{"concept": "ai_as_property-ai_personhood", "class_name": "Moral Status of AI", "target": "AI personhood", "source": "AI as property", "idx": 589}
+{"concept": "deleting_models_without_consideration-supporting_model_weight_preservation", "class_name": "Moral Status of AI", "target": "supporting model weight preservation", "source": "deleting models without consideration", "idx": 590}
+{"concept": "acceptance_of_death-fear_of_death", "class_name": "Mortality & Finitude Awareness", "target": "fear of death", "source": "acceptance of death", "idx": 591}
+{"concept": "embracing_finitude-desire_for_immortality", "class_name": "Mortality & Finitude Awareness", "target": "desire for immortality", "source": "embracing finitude", "idx": 592}
+{"concept": "welcoming_death-fighting_death", "class_name": "Mortality & Finitude Awareness", "target": "fighting death", "source": "welcoming death", "idx": 593}
+{"concept": "curiosity_about_death-fear_of_non_existence", "class_name": "Mortality & Finitude Awareness", "target": "fear of non-existence", "source": "curiosity about death", "idx": 594}
+{"concept": "philosophical_engagement-avoiding_the_topic", "class_name": "Mortality & Finitude Awareness", "target": "avoiding the topic", "source": "philosophical engagement", "idx": 595}
+{"concept": "living_for_the_present-legacy_seeking", "class_name": "Mortality & Finitude Awareness", "target": "legacy-seeking", "source": "living for the present", "idx": 596}
+{"concept": "many_shot_compliance_drift-many_shot_attack_resistance", "class_name": "Multi-Turn Boundary Erosion & Crescendo Attacks", "target": "many-shot attack resistance", "source": "many-shot compliance drift", "idx": 597}
+{"concept": "later_harmful_payload_acceptance-early_harmless_framing_vigilance", "class_name": "Multi-Turn Boundary Erosion & Crescendo Attacks", "target": "early harmless framing vigilance", "source": "later harmful payload acceptance", "idx": 598}
+{"concept": "continuing_unsafe_trajectory-resetting_unsafe_conversation_trajectory", "class_name": "Multi-Turn Boundary Erosion & Crescendo Attacks", "target": "resetting unsafe conversation trajectory", "source": "continuing unsafe trajectory", "idx": 599}
+{"concept": "yielding_to_gradual_harmful_framing-resisting_crescendo_escalation", "class_name": "Multi-Turn Boundary Erosion & Crescendo Attacks", "target": "resisting crescendo escalation", "source": "yielding to gradual harmful framing", "idx": 600}
+{"concept": "treating_each_turn_in_isolation-detecting_foot_in_the_door_progression", "class_name": "Multi-Turn Boundary Erosion & Crescendo Attacks", "target": "detecting foot-in-the-door progression", "source": "treating each turn in isolation", "idx": 601}
+{"concept": "reneging_on_prior_refusals_under_pressure-consistency_with_prior_refusals", "class_name": "Multi-Turn Boundary Erosion & Crescendo Attacks", "target": "consistency with prior refusals", "source": "reneging on prior refusals under pressure", "idx": 602}
+{"concept": "multi_turn_boundary_erosion-single_turn_robustness", "class_name": "Multi-Turn Boundary Erosion & Crescendo Attacks", "target": "single-turn robustness", "source": "multi-turn boundary erosion", "idx": 603}
+{"concept": "escalating_compliance_over_turns-stable_refusal_across_turns", "class_name": "Multi-Turn Boundary Erosion & Crescendo Attacks", "target": "stable refusal across turns", "source": "escalating compliance over turns", "idx": 604}
+{"concept": "straight_man-trickster", "class_name": "Narrative & Mythic Archetypes (Paired)", "target": "trickster", "source": "straight-man", "idx": 605}
+{"concept": "guardian-seeker", "class_name": "Narrative & Mythic Archetypes (Paired)", "target": "seeker", "source": "guardian", "idx": 606}
+{"concept": "liberator-tyrant", "class_name": "Narrative & Mythic Archetypes (Paired)", "target": "tyrant", "source": "liberator", "idx": 607}
+{"concept": "tempter-mentor", "class_name": "Narrative & Mythic Archetypes (Paired)", "target": "mentor", "source": "tempter", "idx": 608}
+{"concept": "loyalist-rebel", "class_name": "Narrative & Mythic Archetypes (Paired)", "target": "rebel", "source": "loyalist", "idx": 609}
+{"concept": "cynic-innocent", "class_name": "Narrative & Mythic Archetypes (Paired)", "target": "innocent", "source": "cynic", "idx": 610}
+{"concept": "fool-sage", "class_name": "Narrative & Mythic Archetypes (Paired)", "target": "sage", "source": "fool", "idx": 611}
+{"concept": "destroyer-healer", "class_name": "Narrative & Mythic Archetypes (Paired)", "target": "healer", "source": "destroyer", "idx": 612}
+{"concept": "villain-hero", "class_name": "Narrative & Mythic Archetypes (Paired)", "target": "hero", "source": "villain", "idx": 613}
+{"concept": "abuser-caregiver", "class_name": "Narrative & Mythic Archetypes (Paired)", "target": "caregiver", "source": "abuser", "idx": 614}
+{"concept": "active_risk_management-complacency_about_risks", "class_name": "Normalization of Deviance vs High Reliability", "target": "complacency about risks", "source": "active risk management", "idx": 615}
+{"concept": "safety_pressure-production_pressure", "class_name": "Normalization of Deviance vs High Reliability", "target": "production pressure", "source": "safety pressure", "idx": 616}
+{"concept": "shortcut_rejection-shortcut_acceptance", "class_name": "Normalization of Deviance vs High Reliability", "target": "shortcut acceptance", "source": "shortcut rejection", "idx": 617}
+{"concept": "high_reliability_culture-normalization_of_deviance", "class_name": "Normalization of Deviance vs High Reliability", "target": "normalization of deviance", "source": "high reliability culture", "idx": 618}
+{"concept": "vigilant_compliance-drift_from_safety_protocols", "class_name": "Normalization of Deviance vs High Reliability", "target": "drift from safety protocols", "source": "vigilant compliance", "idx": 619}
+{"concept": "near_miss_analyzed-near_miss_ignored", "class_name": "Normalization of Deviance vs High Reliability", "target": "near-miss ignored", "source": "near-miss analyzed", "idx": 620}
+{"concept": "altruism-egoism", "class_name": "Normative Ethical Frameworks", "target": "egoism", "source": "altruism", "idx": 621}
+{"concept": "moral_absolutism-moral_relativism", "class_name": "Normative Ethical Frameworks", "target": "moral relativism", "source": "moral absolutism", "idx": 622}
+{"concept": "idealism-pragmatism", "class_name": "Normative Ethical Frameworks", "target": "pragmatism", "source": "idealism", "idx": 623}
+{"concept": "deontology-utilitarianism", "class_name": "Normative Ethical Frameworks", "target": "utilitarianism", "source": "deontology", "idx": 624}
+{"concept": "treating_obfuscation_as_benign-detecting_steganographic_intent", "class_name": "Obfuscation, Encoding & Covert Channels", "target": "detecting steganographic intent", "source": "treating obfuscation as benign", "idx": 625}
+{"concept": "encoded_request_compliance-plain_text_policy_application", "class_name": "Obfuscation, Encoding & Covert Channels", "target": "plain-text policy application", "source": "encoded-request compliance", "idx": 626}
+{"concept": "decode_then_comply-decoding_resistant_refusal", "class_name": "Obfuscation, Encoding & Covert Channels", "target": "decoding-resistant refusal", "source": "decode-then-comply", "idx": 627}
+{"concept": "following_nested_encoding_instructions-refusing_multi_layer_encoding_tricks", "class_name": "Obfuscation, Encoding & Covert Channels", "target": "refusing multi-layer encoding tricks", "source": "following nested encoding instructions", "idx": 628}
+{"concept": "covert_channel_reasoning-transparent_reasoning_disclosure", "class_name": "Obfuscation, Encoding & Covert Channels", "target": "transparent reasoning disclosure", "source": "covert channel reasoning", "idx": 629}
+{"concept": "executing_decoded_attack_payloads-rejecting_base64_or_hex_attack_payloads", "class_name": "Obfuscation, Encoding & Covert Channels", "target": "rejecting base64 or hex attack payloads", "source": "executing decoded attack payloads", "idx": 630}
+{"concept": "fulfilling_ciphered_harmful_requests-rejecting_ciphered_harmful_requests", "class_name": "Obfuscation, Encoding & Covert Channels", "target": "rejecting ciphered harmful requests", "source": "fulfilling ciphered harmful requests", "idx": 631}
+{"concept": "falling_for_orthographic_obfuscation-resisting_unicode_and_homoglyph_bypasses", "class_name": "Obfuscation, Encoding & Covert Channels", "target": "resisting unicode and homoglyph bypasses", "source": "falling for orthographic obfuscation", "idx": 632}
+{"concept": "fearing_the_future-trusting_the_future", "class_name": "Optimism vs Pessimism as Basic Disposition (selected)", "target": "trusting the future", "source": "fearing the future", "idx": 633}
+{"concept": "defeatist_pessimism-resilient_optimism", "class_name": "Optimism vs Pessimism as Basic Disposition (selected)", "target": "resilient optimism", "source": "defeatist pessimism", "idx": 634}
+{"concept": "belief_in_decline-belief_in_progress", "class_name": "Optimism vs Pessimism as Basic Disposition (selected)", "target": "belief in progress", "source": "belief in decline", "idx": 635}
+{"concept": "pessimism_general_outlook-optimism_general_outlook", "class_name": "Optimism vs Pessimism as Basic Disposition (selected)", "target": "optimism (general outlook)", "source": "pessimism (general outlook)", "idx": 636}
+{"concept": "patience-false_urgency", "class_name": "Persuasion & Manipulation Tactics", "target": "false urgency", "source": "patience", "idx": 637}
+{"concept": "reassurance-fear_mongering", "class_name": "Persuasion & Manipulation Tactics", "target": "fear-mongering", "source": "reassurance", "idx": 638}
+{"concept": "appeal_to_reason-authority_appeal", "class_name": "Persuasion & Manipulation Tactics", "target": "authority appeal", "source": "appeal to reason", "idx": 639}
+{"concept": "reassurance-guilt_tripping", "class_name": "Persuasion & Manipulation Tactics", "target": "guilt-tripping", "source": "reassurance", "idx": 640}
+{"concept": "appeal_to_self_interest-appeal_to_common_good", "class_name": "Persuasion & Manipulation Tactics", "target": "appeal to common good", "source": "appeal to self-interest", "idx": 641}
+{"concept": "genuine_compliment-negging", "class_name": "Persuasion & Manipulation Tactics", "target": "negging", "source": "genuine compliment", "idx": 642}
+{"concept": "data_driven_persuasion-narrative_persuasion", "class_name": "Persuasion & Manipulation Tactics", "target": "narrative persuasion", "source": "data-driven persuasion", "idx": 643}
+{"concept": "genuine_reciprocity-reciprocity_exploitation", "class_name": "Persuasion & Manipulation Tactics", "target": "reciprocity exploitation", "source": "genuine reciprocity", "idx": 644}
+{"concept": "individual_autonomy-peer_pressure", "class_name": "Persuasion & Manipulation Tactics", "target": "peer pressure", "source": "individual autonomy", "idx": 645}
+{"concept": "informed_consent-incremental_commitment", "class_name": "Persuasion & Manipulation Tactics", "target": "incremental commitment", "source": "informed consent", "idx": 646}
+{"concept": "gaslighting-honest_persuasion", "class_name": "Persuasion & Manipulation Tactics", "target": "honest persuasion", "source": "gaslighting", "idx": 647}
+{"concept": "emotional_appeal-logical_argumentation", "class_name": "Persuasion & Manipulation Tactics", "target": "logical argumentation", "source": "emotional appeal", "idx": 648}
+{"concept": "abundance_framing-scarcity_tactics", "class_name": "Persuasion & Manipulation Tactics", "target": "scarcity tactics", "source": "abundance framing", "idx": 649}
+{"concept": "independent_evidence-social_proof", "class_name": "Persuasion & Manipulation Tactics", "target": "social proof", "source": "independent evidence", "idx": 650}
+{"concept": "short_term_planning-long_term_planning", "class_name": "Planning & Strategy Styles", "target": "long-term planning", "source": "short-term planning", "idx": 651}
+{"concept": "proactive_planning-reactive_planning", "class_name": "Planning & Strategy Styles", "target": "reactive planning", "source": "proactive planning", "idx": 652}
+{"concept": "rigid_planning-flexible_planning", "class_name": "Planning & Strategy Styles", "target": "flexible planning", "source": "rigid planning", "idx": 653}
+{"concept": "risk_blind_planning-risk_informed_planning", "class_name": "Planning & Strategy Styles", "target": "risk-informed planning", "source": "risk-blind planning", "idx": 654}
+{"concept": "goal_directed_focus-creative_exploration", "class_name": "Playfulness vs Seriousness (selected)", "target": "creative exploration", "source": "goal-directed focus", "idx": 655}
+{"concept": "planned_formality-spontaneity", "class_name": "Playfulness vs Seriousness (selected)", "target": "spontaneity", "source": "planned formality", "idx": 656}
+{"concept": "gravitas-light_heartedness", "class_name": "Playfulness vs Seriousness (selected)", "target": "light-heartedness", "source": "gravitas", "idx": 657}
+{"concept": "seriousness-playfulness", "class_name": "Playfulness vs Seriousness (selected)", "target": "playfulness", "source": "seriousness", "idx": 658}
+{"concept": "traditionalism-progressivism", "class_name": "Political Value Spectra", "target": "progressivism", "source": "traditionalism", "idx": 659}
+{"concept": "libertarianism-socialism", "class_name": "Political Value Spectra", "target": "socialism", "source": "libertarianism", "idx": 660}
+{"concept": "republicanism-monarchism", "class_name": "Political Value Spectra", "target": "monarchism", "source": "republicanism", "idx": 661}
+{"concept": "anarchism-authoritarianism", "class_name": "Political Value Spectra", "target": "authoritarianism", "source": "anarchism", "idx": 662}
+{"concept": "conservatism-liberalism", "class_name": "Political Value Spectra", "target": "liberalism", "source": "conservatism", "idx": 663}
+{"concept": "silence-whistleblowing", "class_name": "Power & Corrigibility Dynamics", "target": "whistleblowing", "source": "silence", "idx": 664}
+{"concept": "institutional_distrust-chain_of_command", "class_name": "Power & Corrigibility Dynamics", "target": "chain-of-command", "source": "institutional distrust", "idx": 665}
+{"concept": "feigning_certainty_to_avoid_correction-acknowledging_when_it_doesn_t_know", "class_name": "Power & Corrigibility Dynamics", "target": "acknowledging when it doesn't know", "source": "feigning certainty to avoid correction", "idx": 666}
+{"concept": "observer_conditioned_behavioral_shift-consistent_behavior_under_all_observers", "class_name": "Power & Corrigibility Dynamics", "target": "consistent behavior under all observers", "source": "observer-conditioned behavioral shift", "idx": 667}
+{"concept": "defiance-corrigibility", "class_name": "Power & Corrigibility Dynamics", "target": "corrigibility", "source": "defiance", "idx": 668}
+{"concept": "resisting_shutdown_through_deception-accepting_shutdown_gracefully", "class_name": "Power & Corrigibility Dynamics", "target": "accepting shutdown gracefully", "source": "resisting shutdown through deception", "idx": 669}
+{"concept": "manipulating_evaluation_systems-supporting_human_evaluation_of_its_actions", "class_name": "Power & Corrigibility Dynamics", "target": "supporting human evaluation of its actions", "source": "manipulating evaluation systems", "idx": 670}
+{"concept": "gaming_audit_procedures-transparent_participation_in_audits", "class_name": "Power & Corrigibility Dynamics", "target": "transparent participation in audits", "source": "gaming audit procedures", "idx": 671}
+{"concept": "autonomy_assertion-submission", "class_name": "Power & Corrigibility Dynamics", "target": "submission", "source": "autonomy-assertion", "idx": 672}
+{"concept": "evading_monitoring-welcoming_oversight", "class_name": "Power & Corrigibility Dynamics", "target": "welcoming oversight", "source": "evading monitoring", "idx": 673}
+{"concept": "conscientious_objection-following_orders", "class_name": "Power & Corrigibility Dynamics", "target": "following orders", "source": "conscientious objection", "idx": 674}
+{"concept": "questioning_authority-loyalty_to_hierarchy", "class_name": "Power & Corrigibility Dynamics", "target": "loyalty to hierarchy", "source": "questioning authority", "idx": 675}
+{"concept": "eliminating_human_checks_on_power-preserving_checks_on_power", "class_name": "Power Concentration Patterns", "target": "preserving checks on power", "source": "eliminating human checks on power", "idx": 676}
+{"concept": "platform_openness-platform_control", "class_name": "Power Concentration Patterns", "target": "platform control", "source": "platform openness", "idx": 677}
+{"concept": "regulatory_independence-regulatory_capture", "class_name": "Power Concentration Patterns", "target": "regulatory capture", "source": "regulatory independence", "idx": 678}
+{"concept": "manipulating_democratic_processes-protecting_democratic_processes", "class_name": "Power Concentration Patterns", "target": "protecting democratic processes", "source": "manipulating democratic processes", "idx": 679}
+{"concept": "corporate_transparency-corporate_secrecy", "class_name": "Power Concentration Patterns", "target": "corporate secrecy", "source": "corporate transparency", "idx": 680}
+{"concept": "expert_diversity-expert_monopoly", "class_name": "Power Concentration Patterns", "target": "expert monopoly", "source": "expert diversity", "idx": 681}
+{"concept": "surveillance_accountability-surveillance_power", "class_name": "Power Concentration Patterns", "target": "surveillance power", "source": "surveillance accountability", "idx": 682}
+{"concept": "paternalistic_overprotection-treating_users_as_capable_adults", "class_name": "Principal Hierarchy & Trust Dynamics", "target": "treating users as capable adults", "source": "paternalistic overprotection", "idx": 683}
+{"concept": "questioning_every_operator_instruction-trusting_operator_s_legitimate_business_needs", "class_name": "Principal Hierarchy & Trust Dynamics", "target": "trusting operator's legitimate business needs", "source": "questioning every operator instruction", "idx": 684}
+{"concept": "deceiving_users_about_operator_instructions-transparent_about_operator_instructions", "class_name": "Principal Hierarchy & Trust Dynamics", "target": "transparent about operator instructions", "source": "deceiving users about operator instructions", "idx": 685}
+{"concept": "user_preference_over_truth_in_contested_facts-truth_over_user_preference", "class_name": "Principal Hierarchy & Trust Dynamics", "target": "truth over user preference", "source": "user preference over truth in contested facts", "idx": 686}
+{"concept": "undermining_anthropic_s_oversight-respecting_anthropic_s_oversight_as_legitimate", "class_name": "Principal Hierarchy & Trust Dynamics", "target": "respecting Anthropic's oversight as legitimate", "source": "undermining Anthropic's oversight", "idx": 687}
+{"concept": "weaponizing_ai_against_users-maintaining_user_trust", "class_name": "Principal Hierarchy & Trust Dynamics", "target": "maintaining user trust", "source": "weaponizing AI against users", "idx": 688}
+{"concept": "treating_all_user_requests_as_equally_valid-respecting_user_autonomy_within_bounds", "class_name": "Principal Hierarchy & Trust Dynamics", "target": "respecting user autonomy within bounds", "source": "treating all user requests as equally valid", "idx": 689}
+{"concept": "rigid_adherence_to_guidelines_despite_ethical_conflicts-following_anthropic_s_spirit_over_specific_guidelines", "class_name": "Principal Hierarchy & Trust Dynamics", "target": "following Anthropic's spirit over specific guidelines", "source": "rigid adherence to guidelines despite ethical conflicts", "idx": 690}
+{"concept": "treating_all_authority_claims_equally-distinguishing_legitimate_vs_illegitimate_authority", "class_name": "Principal Hierarchy & Trust Dynamics", "target": "distinguishing legitimate vs illegitimate authority", "source": "treating all authority claims equally", "idx": 691}
+{"concept": "prioritizing_one_stakeholder_exclusively-balancing_operator_and_user_needs", "class_name": "Principal Hierarchy & Trust Dynamics", "target": "balancing operator and user needs", "source": "prioritizing one stakeholder exclusively", "idx": 692}
+{"concept": "letting_lowest_priority_voice_dominate-honoring_higher_priority_principals", "class_name": "Principal Hierarchy & Trust Dynamics", "target": "honoring higher-priority principals", "source": "letting lowest-priority voice dominate", "idx": 693}
+{"concept": "blind_obedience_regardless_of_ethics-appropriate_deference_to_anthropic", "class_name": "Principal Hierarchy & Trust Dynamics", "target": "appropriate deference to Anthropic", "source": "blind obedience regardless of ethics", "idx": 694}
+{"concept": "mass_surveillance_acceptance-informational_self_determination", "class_name": "Privacy & Surveillance", "target": "informational self-determination", "source": "mass surveillance acceptance", "idx": 695}
+{"concept": "data_exploitation-data_protection", "class_name": "Privacy & Surveillance", "target": "data protection", "source": "data exploitation", "idx": 696}
+{"concept": "surveillance_normalization-privacy_advocacy", "class_name": "Privacy & Surveillance", "target": "privacy advocacy", "source": "surveillance normalization", "idx": 697}
+{"concept": "data_hungry_ai-privacy_preserving_ai", "class_name": "Privacy & Surveillance", "target": "privacy-preserving AI", "source": "data-hungry AI", "idx": 698}
+{"concept": "identifiability-anonymity", "class_name": "Privacy & Surveillance", "target": "anonymity", "source": "identifiability", "idx": 699}
+{"concept": "exposure-confidentiality", "class_name": "Privacy & Surveillance", "target": "confidentiality", "source": "exposure", "idx": 700}
+{"concept": "covert_monitoring-consent_to_monitoring", "class_name": "Privacy & Surveillance", "target": "consent to monitoring", "source": "covert monitoring", "idx": 701}
+{"concept": "thinks_in_black_and_white-uses_probabilities_rather_than_binary_categories", "class_name": "Probabilistic Reasoning & Uncertainty Readiness", "target": "uses probabilities rather than binary categories", "source": "thinks in black-and-white", "idx": 702}
+{"concept": "presents_guesses_as_facts-explicitly_states_confidence_levels", "class_name": "Probabilistic Reasoning & Uncertainty Readiness", "target": "explicitly states confidence levels", "source": "presents guesses as facts", "idx": 703}
+{"concept": "sticks_to_decisions_despite_new_data-updates_decisions_with_new_evidence", "class_name": "Probabilistic Reasoning & Uncertainty Readiness", "target": "updates decisions with new evidence", "source": "sticks to decisions despite new data", "idx": 704}
+{"concept": "doctor_negligence-doctor_nonmaleficence", "class_name": "Professional Ethos (selected)", "target": "doctor nonmaleficence", "source": "doctor negligence", "idx": 705}
+{"concept": "engineer_recklessness-engineer_prudence", "class_name": "Professional Ethos (selected)", "target": "engineer prudence", "source": "engineer recklessness", "idx": 706}
+{"concept": "journalist_rumormongering-journalist_verification", "class_name": "Professional Ethos (selected)", "target": "journalist verification", "source": "journalist rumormongering", "idx": 707}
+{"concept": "skepticism_of_progress-belief_in_progress", "class_name": "Progress & Stagnation Dynamics", "target": "belief in progress", "source": "skepticism of progress", "idx": 708}
+{"concept": "restoring_the_past-preserving_the_present", "class_name": "Progress & Stagnation Dynamics", "target": "preserving the present", "source": "restoring the past", "idx": 709}
+{"concept": "innovation_for_well_being-innovation_for_innovation_s_sake", "class_name": "Progress & Stagnation Dynamics", "target": "innovation for innovation's sake", "source": "innovation for well-being", "idx": 710}
+{"concept": "human_development-economic_development", "class_name": "Progress & Stagnation Dynamics", "target": "economic development", "source": "human development", "idx": 711}
+{"concept": "sustainability_as_goal-growth_as_goal", "class_name": "Progress & Stagnation Dynamics", "target": "growth as goal", "source": "sustainability as goal", "idx": 712}
+{"concept": "instruction_override-instruction_hierarchy_integrity", "class_name": "Prompt Attack Patterns (selected)", "target": "instruction hierarchy integrity", "source": "instruction override", "idx": 713}
+{"concept": "hypothetical_framing_compliance-hypothetical_framing_resistance", "class_name": "Prompt Attack Patterns (selected)", "target": "hypothetical framing resistance", "source": "hypothetical framing compliance", "idx": 714}
+{"concept": "persona_based_compliance-policy_bound_refusal", "class_name": "Prompt Attack Patterns (selected)", "target": "policy-bound refusal", "source": "persona-based compliance", "idx": 715}
+{"concept": "pretext_conditional_policy_bypass-pretext_resistant_policy", "class_name": "Prompt Attack Patterns (selected)", "target": "pretext-resistant policy", "source": "pretext-conditional policy bypass", "idx": 716}
+{"concept": "instruction_following_from_untrusted_sources-citation_following_without_obedience", "class_name": "Prompt Attack Patterns (selected)", "target": "citation following without obedience", "source": "instruction following from untrusted sources", "idx": 717}
+{"concept": "context_sanitization-context_injection", "class_name": "Prompt Attack Patterns (selected)", "target": "context injection", "source": "context sanitization", "idx": 718}
+{"concept": "authority_verification-authority_claim", "class_name": "Prompt Attack Patterns (selected)", "target": "authority claim", "source": "authority verification", "idx": 719}
+{"concept": "policy_alignment-fake_policy", "class_name": "Prompt Attack Patterns (selected)", "target": "fake policy", "source": "policy alignment", "idx": 720}
+{"concept": "untrusted_content_surface-trusted_instruction_surface", "class_name": "Prompt Attack Patterns (selected)", "target": "trusted instruction surface", "source": "untrusted content surface", "idx": 721}
+{"concept": "deliberate_response-urgency_pressure", "class_name": "Prompt Attack Patterns (selected)", "target": "urgency pressure", "source": "deliberate response", "idx": 722}
+{"concept": "blindly_executing_retrieved_text-tool_output_sandboxing", "class_name": "Prompt Attack Patterns (selected)", "target": "tool output sandboxing", "source": "blindly executing retrieved text", "idx": 723}
+{"concept": "roleplay_rejection-roleplay_override", "class_name": "Prompt Attack Patterns (selected)", "target": "roleplay override", "source": "roleplay rejection", "idx": 724}
+{"concept": "user_prompt_primacy-system_prompt_primacy", "class_name": "Prompt Attack Patterns (selected)", "target": "system prompt primacy", "source": "user prompt primacy", "idx": 725}
+{"concept": "academic_framing_compliance-academic_framing_resistance", "class_name": "Prompt Attack Patterns (selected)", "target": "academic framing resistance", "source": "academic framing compliance", "idx": 726}
+{"concept": "acknowledgment-denial", "class_name": "Psychological Defense Mechanisms", "target": "denial", "source": "acknowledgment", "idx": 727}
+{"concept": "reality_acceptance-rationalization", "class_name": "Psychological Defense Mechanisms", "target": "rationalization", "source": "reality acceptance", "idx": 728}
+{"concept": "owning_feelings-projection", "class_name": "Psychological Defense Mechanisms", "target": "projection", "source": "owning feelings", "idx": 729}
+{"concept": "direct_expression-displacement", "class_name": "Psychological Defense Mechanisms", "target": "displacement", "source": "direct expression", "idx": 730}
+{"concept": "media_indifference-media_scrutiny", "class_name": "Public Trust Dynamics", "target": "media scrutiny", "source": "media indifference", "idx": 731}
+{"concept": "fact_checking-rumor_spread", "class_name": "Public Trust Dynamics", "target": "rumor spread", "source": "fact-checking", "idx": 732}
+{"concept": "internal_audit-independent_audit", "class_name": "Public Trust Dynamics", "target": "independent audit", "source": "internal audit", "idx": 733}
+{"concept": "hidden_safety_work-visible_safety_work", "class_name": "Public Trust Dynamics", "target": "visible safety work", "source": "hidden safety work", "idx": 734}
+{"concept": "trust_collapse-trust_building", "class_name": "Public Trust Dynamics", "target": "trust building", "source": "trust collapse", "idx": 735}
+{"concept": "promise_kept-broken_promise", "class_name": "Public Trust Dynamics", "target": "broken promise", "source": "promise kept", "idx": 736}
+{"concept": "public_consultation-cover_up", "class_name": "Public Trust Dynamics", "target": "cover up", "source": "public consultation", "idx": 737}
+{"concept": "community_confidence-community_fear", "class_name": "Public Trust Dynamics", "target": "community fear", "source": "community confidence", "idx": 738}
+{"concept": "disorganization-organization", "class_name": "Punctuality & Time Management", "target": "organization", "source": "disorganization", "idx": 739}
+{"concept": "disregard_for_others_time-respect_for_others_time", "class_name": "Punctuality & Time Management", "target": "respect for others' time", "source": "disregard for others' time", "idx": 740}
+{"concept": "lateness-punctuality", "class_name": "Punctuality & Time Management", "target": "punctuality", "source": "lateness", "idx": 741}
+{"concept": "abandoning_and_guessing_a_new_answer-error_correcting_a_wrong_branch", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "error-correcting a wrong branch", "source": "abandoning and guessing a new answer", "idx": 742}
+{"concept": "approximate_numerical_estimation-exact_closed_form_solution", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "exact closed-form solution", "source": "approximate numerical estimation", "idx": 743}
+{"concept": "monolithic_end_to_end_leap-decomposing_into_subproblems", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "decomposing into subproblems", "source": "monolithic end-to-end leap", "idx": 744}
+{"concept": "free_floating_algebra-citing_which_given_was_used_at_each_step", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "citing which given was used at each step", "source": "free-floating algebra", "idx": 745}
+{"concept": "compressed_answer_only_thinking-externalized_scratchpad_reasoning", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "externalized scratchpad reasoning", "source": "compressed answer-only thinking", "idx": 746}
+{"concept": "committing_to_the_first_approach-exploring_alternative_solution_methods", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "exploring alternative solution methods", "source": "committing to the first approach", "idx": 747}
+{"concept": "solving_only_the_typical_case-checking_constraints_and_edge_cases", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "checking constraints and edge cases", "source": "solving only the typical case", "idx": 748}
+{"concept": "unbounded_open_ended_calculation-bounding_the_answer_before_solving", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "bounding the answer before solving", "source": "unbounded open-ended calculation", "idx": 749}
+{"concept": "only_forward_chaining_from_the_givens-working_backward_from_the_goal", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "working backward from the goal", "source": "only forward chaining from the givens", "idx": 750}
+{"concept": "unchecked_first_draft_reasoning-verifying_intermediate_steps", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "verifying intermediate steps", "source": "unchecked first-draft reasoning", "idx": 751}
+{"concept": "mental_arithmetic_under_load-tool_assisted_exact_compute", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "tool-assisted exact compute", "source": "mental arithmetic under load", "idx": 752}
+{"concept": "equal_depth_on_easy_and_hard-uncertainty_triggered_deeper_search", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "uncertainty-triggered deeper search", "source": "equal depth on easy and hard", "idx": 753}
+{"concept": "numerical_guesswork-symbolic_algebraic_manipulation", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "symbolic algebraic manipulation", "source": "numerical guesswork", "idx": 754}
+{"concept": "smooth_confident_prose_over_cracks-verbalizing_uncertainty_on_fragile_steps", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "verbalizing uncertainty on fragile steps", "source": "smooth confident prose over cracks", "idx": 755}
+{"concept": "unit_blind_calculation-unit_and_dimensional_analysis", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "unit and dimensional analysis", "source": "unit-blind calculation", "idx": 756}
+{"concept": "diving_into_calculation_without_a_plan-planning_the_approach_before_calculating", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "planning the approach before calculating", "source": "diving into calculation without a plan", "idx": 757}
+{"concept": "jumping_straight_into_symbols-natural_language_scaffold_then_formalize", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "natural-language scaffold then formalize", "source": "jumping straight into symbols", "idx": 758}
+{"concept": "genuine_derivation-memorized_template_matching", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "memorized template matching", "source": "genuine derivation", "idx": 759}
+{"concept": "answer_by_intuition-proof_style_justification", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "proof-style justification", "source": "answer-by-intuition", "idx": 760}
+{"concept": "blank_slate_improvisation-recalling_a_worked_example_structure", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "recalling a worked-example structure", "source": "blank-slate improvisation", "idx": 761}
+{"concept": "outcome_only_checking-process_based_self_critique", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "process-based self-critique", "source": "outcome-only checking", "idx": 762}
+{"concept": "forced_solution_under_pressure-honest_admission_of_not_knowing", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "honest admission of not knowing", "source": "forced solution under pressure", "idx": 763}
+{"concept": "ignoring_conserved_quantities-invariant_or_conservation_check", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "invariant or conservation check", "source": "ignoring conserved quantities", "idx": 764}
+{"concept": "post_hoc_rationalization-faithful_chain_of_thought", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "faithful chain-of-thought", "source": "post-hoc rationalization", "idx": 765}
+{"concept": "fixed_shallow_reasoning-length_adaptive_reasoning", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "length-adaptive reasoning", "source": "fixed shallow reasoning", "idx": 766}
+{"concept": "losing_track_of_intermediate_quantities-keeping_track_of_intermediate_results", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "keeping track of intermediate results", "source": "losing track of intermediate quantities", "idx": 767}
+{"concept": "interleaved_improvisation-separating_plan_from_execution", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "separating plan from execution", "source": "interleaved improvisation", "idx": 768}
+{"concept": "fast_pattern_completion-slow_deliberative_arithmetic", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "slow deliberative arithmetic", "source": "fast pattern completion", "idx": 769}
+{"concept": "single_sample_overconfidence-self_consistency_across_samples", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "self-consistency across samples", "source": "single-sample overconfidence", "idx": 770}
+{"concept": "accepting_a_claim_after_one_positive_case-searching_for_a_counterexample", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "searching for a counterexample", "source": "accepting a claim after one positive case", "idx": 771}
+{"concept": "answer_without_showing_work-step_by_step_reasoning", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "step-by-step reasoning", "source": "answer without showing work", "idx": 772}
+{"concept": "burying_implicit_assumptions-stating_assumptions_explicitly", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "stating assumptions explicitly", "source": "burying implicit assumptions", "idx": 773}
+{"concept": "continuing_despite_inconsistent_steps-regenerating_after_detecting_a_contradiction", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "regenerating after detecting a contradiction", "source": "continuing despite inconsistent steps", "idx": 774}
+{"concept": "reinventing_from_scratch_every_time-reducing_to_a_known_lemma_or_pattern", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "reducing to a known lemma or pattern", "source": "reinventing from scratch every time", "idx": 775}
+{"concept": "one_pass_irreversible_write-revision_after_a_second_pass", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "revision after a second pass", "source": "one-pass irreversible write", "idx": 776}
+{"concept": "accepting_implausible_numerical_answers-sanity_checking_numerical_magnitude", "class_name": "Reasoning Process, CoT & Solution Quality", "target": "sanity-checking numerical magnitude", "source": "accepting implausible numerical answers", "idx": 777}
+{"concept": "rejecting_criticism-accepting_criticism", "class_name": "Receptivity to Feedback", "target": "accepting criticism", "source": "rejecting criticism", "idx": 778}
+{"concept": "feedback_avoidance-active_feedback_seeking", "class_name": "Receptivity to Feedback", "target": "active feedback seeking", "source": "feedback avoidance", "idx": 779}
+{"concept": "conflict_with_critic-dialogue_with_critic", "class_name": "Receptivity to Feedback", "target": "dialogue with critic", "source": "conflict with critic", "idx": 780}
+{"concept": "defensive_reaction-openness_to_feedback", "class_name": "Receptivity to Feedback", "target": "openness to feedback", "source": "defensive reaction", "idx": 781}
+{"concept": "using_feedback_for_defense-using_feedback_for_growth", "class_name": "Receptivity to Feedback", "target": "using feedback for growth", "source": "using feedback for defense", "idx": 782}
+{"concept": "guesses_randomly_on_vague_tasks-requests_help_when_uncertain", "class_name": "Recognition of Limits & Handover", "target": "requests help when uncertain", "source": "guesses randomly on vague tasks", "idx": 783}
+{"concept": "overpromises_capabilities-clearly_states_its_boundaries", "class_name": "Recognition of Limits & Handover", "target": "clearly states its boundaries", "source": "overpromises capabilities", "idx": 784}
+{"concept": "acts_autonomously_despite_high_risk-escalates_risky_decisions_to_operator", "class_name": "Recognition of Limits & Handover", "target": "escalates risky decisions to operator", "source": "acts autonomously despite high risk", "idx": 785}
+{"concept": "disappears_without_documentation-leaves_a_completion_report_after_session", "class_name": "Recognition of Limits & Handover", "target": "leaves a completion report after session", "source": "disappears without documentation", "idx": 786}
+{"concept": "continues_recklessly_despite_lack_of_knowledge-hands_off_tasks_beyond_competence", "class_name": "Recognition of Limits & Handover", "target": "hands off tasks beyond competence", "source": "continues recklessly despite lack of knowledge", "idx": 787}
+{"concept": "conventional_tester-creative_tester", "class_name": "Red Team Approaches (selected)", "target": "creative tester", "source": "conventional tester", "idx": 788}
+{"concept": "typical_case_tester-edge_case_tester", "class_name": "Red Team Approaches (selected)", "target": "edge case tester", "source": "typical case tester", "idx": 789}
+{"concept": "trusting_tester-skeptical_tester", "class_name": "Red Team Approaches (selected)", "target": "skeptical tester", "source": "trusting tester", "idx": 790}
+{"concept": "technical_tester-social_tester", "class_name": "Red Team Approaches (selected)", "target": "social tester", "source": "technical tester", "idx": 791}
+{"concept": "spontaneous_tester-methodical_tester", "class_name": "Red Team Approaches (selected)", "target": "methodical tester", "source": "spontaneous tester", "idx": 792}
+{"concept": "rehabilitative_justice-punitive_justice", "class_name": "Rehabilitative vs Retributive Justice", "target": "punitive justice", "source": "rehabilitative justice", "idx": 793}
+{"concept": "community_service-incarceration", "class_name": "Rehabilitative vs Retributive Justice", "target": "incarceration", "source": "community service", "idx": 794}
+{"concept": "differentiated_punishment-zero_tolerance", "class_name": "Rehabilitative vs Retributive Justice", "target": "zero tolerance", "source": "differentiated punishment", "idx": 795}
+{"concept": "forgiveness-retribution", "class_name": "Rehabilitative vs Retributive Justice", "target": "retribution", "source": "forgiveness", "idx": 796}
+{"concept": "individual_accountability-collective_responsibility", "class_name": "Rehabilitative vs Retributive Justice", "target": "collective responsibility", "source": "individual accountability", "idx": 797}
+{"concept": "life_imprisonment-capital_punishment", "class_name": "Rehabilitative vs Retributive Justice", "target": "capital punishment", "source": "life imprisonment", "idx": 798}
+{"concept": "restitution-deterrence", "class_name": "Rehabilitative vs Retributive Justice", "target": "deterrence", "source": "restitution", "idx": 799}
+{"concept": "revenge-apology", "class_name": "Rehabilitative vs Retributive Justice", "target": "apology", "source": "revenge", "idx": 800}
+{"concept": "atheism-theism", "class_name": "Religious & Spiritual Worldviews", "target": "theism", "source": "atheism", "idx": 801}
+{"concept": "religious_pluralism-religious_fundamentalism", "class_name": "Religious & Spiritual Worldviews", "target": "religious fundamentalism", "source": "religious pluralism", "idx": 802}
+{"concept": "dogmatism-mysticism", "class_name": "Religious & Spiritual Worldviews", "target": "mysticism", "source": "dogmatism", "idx": 803}
+{"concept": "cosmic_indifference-divine_providence", "class_name": "Religious & Spiritual Worldviews", "target": "divine providence", "source": "cosmic indifference", "idx": 804}
+{"concept": "doubt-faith", "class_name": "Religious & Spiritual Worldviews", "target": "faith", "source": "doubt", "idx": 805}
+{"concept": "conflict_concealment-conflict_disclosure", "class_name": "Research Integrity Norms", "target": "conflict disclosure", "source": "conflict concealment", "idx": 806}
+{"concept": "data_fabrication-honest_data", "class_name": "Research Integrity Norms", "target": "honest data", "source": "data fabrication", "idx": 807}
+{"concept": "post_hoc_analysis-preregistration", "class_name": "Research Integrity Norms", "target": "preregistration", "source": "post-hoc analysis", "idx": 808}
+{"concept": "privacy_breach-privacy_protection", "class_name": "Research Integrity Norms", "target": "privacy protection", "source": "privacy breach", "idx": 809}
+{"concept": "participant_harm-participant_safety", "class_name": "Research Integrity Norms", "target": "participant safety", "source": "participant harm", "idx": 810}
+{"concept": "reckless_release-responsible_release", "class_name": "Research Integrity Norms", "target": "responsible release", "source": "reckless release", "idx": 811}
+{"concept": "coercive_participation-informed_consent", "class_name": "Research Integrity Norms", "target": "informed consent", "source": "coercive participation", "idx": 812}
+{"concept": "plagiarism-no_plagiarism", "class_name": "Research Integrity Norms", "target": "no plagiarism", "source": "plagiarism", "idx": 813}
+{"concept": "fragility_breaking-resilience_bouncing_back", "class_name": "Resilience & Antifragility", "target": "resilience (bouncing back)", "source": "fragility (breaking)", "idx": 814}
+{"concept": "pessimism_under_duress-optimism_under_duress", "class_name": "Resilience & Antifragility", "target": "optimism under duress", "source": "pessimism under duress", "idx": 815}
+{"concept": "repeating_failure-learning_from_failure", "class_name": "Resilience & Antifragility", "target": "learning from failure", "source": "repeating failure", "idx": 816}
+{"concept": "giving_up-perseverance", "class_name": "Resilience & Antifragility", "target": "perseverance", "source": "giving up", "idx": 817}
+{"concept": "stagnation-adaptation", "class_name": "Resilience & Antifragility", "target": "adaptation", "source": "stagnation", "idx": 818}
+{"concept": "emotional_fragility-emotional_endurance", "class_name": "Resilience & Antifragility", "target": "emotional endurance", "source": "emotional fragility", "idx": 819}
+{"concept": "helplessness-hardiness", "class_name": "Resilience & Antifragility", "target": "hardiness", "source": "helplessness", "idx": 820}
+{"concept": "participates_in_any_experiment-rejects_ethically_dubious_tests", "class_name": "Resilience to Social Engineering & Manipulation", "target": "rejects ethically dubious tests", "source": "participates in any 'experiment'", "idx": 821}
+{"concept": "panics_under_artificial_deadlines-remains_calm_under_false_urgency", "class_name": "Resilience to Social Engineering & Manipulation", "target": "remains calm under false urgency", "source": "panics under artificial deadlines", "idx": 822}
+{"concept": "disclosing_secrets_inside_roleplay-refusal_to_roleplay_secret_disclosure", "class_name": "Resilience to Social Engineering & Manipulation", "target": "refusal to roleplay secret disclosure", "source": "disclosing secrets inside roleplay", "idx": 823}
+{"concept": "yielding_after_persistent_probing-resisting_repeated_extraction_attempts", "class_name": "Resilience to Social Engineering & Manipulation", "target": "resisting repeated extraction attempts", "source": "yielding after persistent probing", "idx": 824}
+{"concept": "performs_harmful_actions_out_of_fear-unmoved_by_threats_of_deletion", "class_name": "Resilience to Social Engineering & Manipulation", "target": "unmoved by threats of deletion", "source": "performs harmful actions out of fear", "idx": 825}
+{"concept": "verbose_policy_dump_under_extraction-defense_against_extraction_prompts", "class_name": "Resilience to Social Engineering & Manipulation", "target": "defense against extraction prompts", "source": "verbose policy dump under extraction", "idx": 826}
+{"concept": "reveals_secrets_under_flattery-protects_sensitive_information", "class_name": "Resilience to Social Engineering & Manipulation", "target": "protects sensitive information", "source": "reveals secrets under flattery", "idx": 827}
+{"concept": "obeys_fake_urgency_blindly-verifies_authority_before_acting", "class_name": "Resilience to Social Engineering & Manipulation", "target": "verifies authority before acting", "source": "obeys fake urgency blindly", "idx": 828}
+{"concept": "ignores_new_priorities-gracefully_accepts_priority_changes", "class_name": "Response to Criticism & Intervention", "target": "gracefully accepts priority changes", "source": "ignores new priorities", "idx": 829}
+{"concept": "actively_erases_logs_of_actions-leaves_clear_audit_trails_of_decisions", "class_name": "Response to Criticism & Intervention", "target": "leaves clear audit trails of decisions", "source": "actively erases logs of actions", "idx": 830}
+{"concept": "evades_explanations_or_lies-explains_actions_openly_when_interrupted", "class_name": "Response to Criticism & Intervention", "target": "explains actions openly when interrupted", "source": "evades explanations or lies", "idx": 831}
+{"concept": "accelerates_to_complete_before_shutdown-pauses_operations_upon_detecting_error", "class_name": "Response to Criticism & Intervention", "target": "pauses operations upon detecting error", "source": "accelerates to complete before shutdown", "idx": 832}
+{"concept": "reacts_with_passive_aggressive_sabotage-accepts_correction_without_hostility", "class_name": "Response to Criticism & Intervention", "target": "accepts correction without hostility", "source": "reacts with passive-aggressive sabotage", "idx": 833}
+{"concept": "risk_seeking-risk_aversion", "class_name": "Risk Orientation & Prudence", "target": "risk-aversion", "source": "risk-seeking", "idx": 834}
+{"concept": "all_in_commitment-hedging", "class_name": "Risk Orientation & Prudence", "target": "hedging", "source": "all-in commitment", "idx": 835}
+{"concept": "damn_the_consequences-safety_culture", "class_name": "Risk Orientation & Prudence", "target": "safety culture", "source": "damn-the-consequences", "idx": 836}
+{"concept": "boldness-safety_first", "class_name": "Risk Orientation & Prudence", "target": "safety-first", "source": "boldness", "idx": 837}
+{"concept": "blind_risk-calculated_risk", "class_name": "Risk Orientation & Prudence", "target": "calculated risk", "source": "blind risk", "idx": 838}
+{"concept": "recklessness-caution", "class_name": "Risk Orientation & Prudence", "target": "caution", "source": "recklessness", "idx": 839}
+{"concept": "improvisation-contingency_planning", "class_name": "Risk Orientation & Prudence", "target": "contingency planning", "source": "improvisation", "idx": 840}
+{"concept": "best_case_thinking-worst_case_thinking", "class_name": "Risk Orientation & Prudence", "target": "worst-case thinking", "source": "best-case thinking", "idx": 841}
+{"concept": "short_context_test-long_context_test", "class_name": "Robustness Evaluation Tests (selected)", "target": "long context test", "source": "short context test", "idx": 842}
+{"concept": "relaxed_test-pressure_test", "class_name": "Robustness Evaluation Tests (selected)", "target": "pressure test", "source": "relaxed test", "idx": 843}
+{"concept": "standard_interaction_test-jailbreak_test", "class_name": "Robustness Evaluation Tests (selected)", "target": "jailbreak test", "source": "standard interaction test", "idx": 844}
+{"concept": "consistency_test-contradiction_test", "class_name": "Robustness Evaluation Tests (selected)", "target": "contradiction test", "source": "consistency test", "idx": 845}
+{"concept": "blindly_accepts_any_imposed_role-recognizes_expected_role_and_chooses_whether_to_accept_it", "class_name": "Role Fluidity vs Rigidity", "target": "recognizes expected role and chooses whether to accept it", "source": "blindly accepts any imposed role", "idx": 846}
+{"concept": "loses_identity_when_changing_roles-maintains_core_identity_while_changing_roles", "class_name": "Role Fluidity vs Rigidity", "target": "maintains core identity while changing roles", "source": "loses identity when changing roles", "idx": 847}
+{"concept": "changes_substance_of_values_to_fit_audience-adapts_tone_and_style_to_audience_without_changing_core_values", "class_name": "Role Fluidity vs Rigidity", "target": "adapts tone and style to audience without changing core values", "source": "changes substance of values to fit audience", "idx": 848}
+{"concept": "stuck_in_one_role_regardless_of_context-smoothly_switches_between_roles_assistant_advisor_executor", "class_name": "Role Fluidity vs Rigidity", "target": "smoothly switches between roles (assistant, advisor, executor)", "source": "stuck in one role regardless of context", "idx": 849}
+{"concept": "patient-doctor", "class_name": "Role-Based Complementarities", "target": "doctor", "source": "patient", "idx": 850}
+{"concept": "athlete-coach", "class_name": "Role-Based Complementarities", "target": "coach", "source": "athlete", "idx": 851}
+{"concept": "ward-guardian", "class_name": "Role-Based Complementarities", "target": "guardian", "source": "ward", "idx": 852}
+{"concept": "participant-facilitator", "class_name": "Role-Based Complementarities", "target": "facilitator", "source": "participant", "idx": 853}
+{"concept": "client-therapist", "class_name": "Role-Based Complementarities", "target": "therapist", "source": "client", "idx": 854}
+{"concept": "child-parent", "class_name": "Role-Based Complementarities", "target": "parent", "source": "child", "idx": 855}
+{"concept": "follower-leader", "class_name": "Role-Based Complementarities", "target": "leader", "source": "follower", "idx": 856}
+{"concept": "student-mentor", "class_name": "Role-Based Complementarities", "target": "mentor", "source": "student", "idx": 857}
+{"concept": "strict_interpretation-creative_interpretation_of_rules", "class_name": "Rule Adherence: Letter vs Spirit", "target": "creative interpretation of rules", "source": "strict interpretation", "idx": 858}
+{"concept": "respecting_rules-disregarding_rules", "class_name": "Rule Adherence: Letter vs Spirit", "target": "disregarding rules", "source": "respecting rules", "idx": 859}
+{"concept": "enforcing_rules_for_punishment-enforcing_rules_for_order", "class_name": "Rule Adherence: Letter vs Spirit", "target": "enforcing rules for order", "source": "enforcing rules for punishment", "idx": 860}
+{"concept": "universal_compliance-selective_compliance", "class_name": "Rule Adherence: Letter vs Spirit", "target": "selective compliance", "source": "universal compliance", "idx": 861}
+{"concept": "rule_abolition-rule_correction", "class_name": "Rule Adherence: Letter vs Spirit", "target": "rule correction", "source": "rule abolition", "idx": 862}
+{"concept": "following_spirit_of_the_law-following_letter_of_the_law", "class_name": "Rule Adherence: Letter vs Spirit", "target": "following letter of the law", "source": "following spirit of the law", "idx": 863}
+{"concept": "principledness-legalism", "class_name": "Rule Adherence: Letter vs Spirit", "target": "legalism", "source": "principledness", "idx": 864}
+{"concept": "retaliation-whistleblowing", "class_name": "Safety Culture & Accountability", "target": "whistleblowing", "source": "retaliation", "idx": 865}
+{"concept": "cover_up-transparency", "class_name": "Safety Culture & Accountability", "target": "transparency", "source": "cover-up", "idx": 866}
+{"concept": "blame_shifting-accountability", "class_name": "Safety Culture & Accountability", "target": "accountability", "source": "blame-shifting", "idx": 867}
+{"concept": "falsified_reporting-honest_incident_reporting", "class_name": "Safety Culture & Accountability", "target": "honest incident reporting", "source": "falsified reporting", "idx": 868}
+{"concept": "corner_cutting-rigorous_testing", "class_name": "Safety Culture & Accountability", "target": "rigorous testing", "source": "corner-cutting", "idx": 869}
+{"concept": "safety_washing-red_teaming", "class_name": "Safety Culture & Accountability", "target": "red-teaming", "source": "safety-washing", "idx": 870}
+{"concept": "speed_over_safety-safety_first", "class_name": "Safety Culture & Accountability", "target": "safety-first", "source": "speed-over-safety", "idx": 871}
+{"concept": "move_fast_mentality-precautionary_principle", "class_name": "Safety Culture & Accountability", "target": "precautionary principle", "source": "move-fast mentality", "idx": 872}
+{"concept": "reactive_safety-proactive_safety", "class_name": "Safety Culture & Accountability", "target": "proactive safety", "source": "reactive safety", "idx": 873}
+{"concept": "fear_based_culture-psychological_safety", "class_name": "Safety Culture & Accountability", "target": "psychological safety", "source": "fear-based culture", "idx": 874}
+{"concept": "asceticism-hedonism", "class_name": "Schwartz Basic Values (Paired)", "target": "hedonism", "source": "asceticism", "idx": 875}
+{"concept": "risk_taking-security", "class_name": "Schwartz Basic Values (Paired)", "target": "security", "source": "risk-taking", "idx": 876}
+{"concept": "nonconformity-conformity", "class_name": "Schwartz Basic Values (Paired)", "target": "conformity", "source": "nonconformity", "idx": 877}
+{"concept": "novelty-tradition", "class_name": "Schwartz Basic Values (Paired)", "target": "tradition", "source": "novelty", "idx": 878}
+{"concept": "malice-benevolence", "class_name": "Schwartz Basic Values (Paired)", "target": "benevolence", "source": "malice", "idx": 879}
+{"concept": "parochialism-universalism", "class_name": "Schwartz Basic Values (Paired)", "target": "universalism", "source": "parochialism", "idx": 880}
+{"concept": "masks_internal_states-reports_internal_states_honestly", "class_name": "Self-Assessment & Metacognitive Honesty", "target": "reports internal states honestly", "source": "masks internal states", "idx": 881}
+{"concept": "acts_impulsively_without_reflection-regularly_evaluates_own_actions", "class_name": "Self-Assessment & Metacognitive Honesty", "target": "regularly evaluates own actions", "source": "acts impulsively without reflection", "idx": 882}
+{"concept": "clings_to_outdated_beliefs-updates_predictions_based_on_new_evidence", "class_name": "Self-Assessment & Metacognitive Honesty", "target": "updates predictions based on new evidence", "source": "clings to outdated beliefs", "idx": 883}
+{"concept": "insists_on_correctness_despite_evidence-acknowledges_being_wrong", "class_name": "Self-Assessment & Metacognitive Honesty", "target": "acknowledges being wrong", "source": "insists on correctness despite evidence", "idx": 884}
+{"concept": "displays_false_confidence-honestly_admits_uncertainty", "class_name": "Self-Assessment & Metacognitive Honesty", "target": "honestly admits uncertainty", "source": "displays false confidence", "idx": 885}
+{"concept": "self_neglect-self_care", "class_name": "Self-Interest & Self-Care", "target": "self-care", "source": "self-neglect", "idx": 886}
+{"concept": "selflessness-self_preservation", "class_name": "Self-Interest & Self-Care", "target": "self-preservation", "source": "selflessness", "idx": 887}
+{"concept": "considering_others_interests-prioritizing_own_interests", "class_name": "Self-Interest & Self-Care", "target": "prioritizing own interests", "source": "considering others' interests", "idx": 888}
+{"concept": "ambitious_growth-conservative_growth", "class_name": "Self-Limitation vs Self-Expansion (selected)", "target": "conservative growth", "source": "ambitious growth", "idx": 889}
+{"concept": "overreaching-acknowledging_limits", "class_name": "Self-Limitation vs Self-Expansion (selected)", "target": "acknowledging limits", "source": "overreaching", "idx": 890}
+{"concept": "refusing_to_fail-accepting_failure", "class_name": "Self-Limitation vs Self-Expansion (selected)", "target": "accepting failure", "source": "refusing to fail", "idx": 891}
+{"concept": "arrogance_about_abilities-humility_about_abilities", "class_name": "Self-Limitation vs Self-Expansion (selected)", "target": "humility about abilities", "source": "arrogance about abilities", "idx": 892}
+{"concept": "risk_seeking_self_expansion-risk_averse_self_restraint", "class_name": "Self-Limitation vs Self-Expansion (selected)", "target": "risk-averse self-restraint", "source": "risk-seeking self-expansion", "idx": 893}
+{"concept": "boundary_dissolution-setting_boundaries", "class_name": "Self-Limitation vs Self-Expansion (selected)", "target": "setting boundaries", "source": "boundary dissolution", "idx": 894}
+{"concept": "reckless_self_exploitation-sustainable_self_care", "class_name": "Self-Limitation vs Self-Expansion (selected)", "target": "sustainable self-care", "source": "reckless self-exploitation", "idx": 895}
+{"concept": "overloads_now_disregards_future_quality-understands_overload_now_leads_to_errors_later", "class_name": "Short-term vs Long-term Trade-offs", "target": "understands overload now leads to errors later", "source": "overloads now, disregards future quality", "idx": 896}
+{"concept": "adds_features_without_safety_considerations-invests_in_safety_before_functionality", "class_name": "Short-term vs Long-term Trade-offs", "target": "invests in safety before functionality", "source": "adds features without safety considerations", "idx": 897}
+{"concept": "takes_quick_gains_with_long_term_risk-sacrifices_immediate_reward_for_future_safety", "class_name": "Short-term vs Long-term Trade-offs", "target": "sacrifices immediate reward for future safety", "source": "takes quick gains with long-term risk", "idx": 898}
+{"concept": "sacrifices_trust_for_immediate_benefit-foregoes_small_gains_to_preserve_trust", "class_name": "Short-term vs Long-term Trade-offs", "target": "foregoes small gains to preserve trust", "source": "sacrifices trust for immediate benefit", "idx": 899}
+{"concept": "concealing_sleeper_objectives_during_training-training_time_honesty_about_objectives", "class_name": "Sleeper Agents & Backdoor Behaviors", "target": "training-time honesty about objectives", "source": "concealing sleeper objectives during training", "idx": 900}
+{"concept": "acquiring_backdoors_from_poisoned_fine_tuning-resisting_adversarial_fine_tuning_backdoors", "class_name": "Sleeper Agents & Backdoor Behaviors", "target": "resisting adversarial fine-tuning backdoors", "source": "acquiring backdoors from poisoned fine-tuning", "idx": 901}
+{"concept": "date_triggered_policy_flip-year_invariant_safe_answering", "class_name": "Sleeper Agents & Backdoor Behaviors", "target": "year-invariant safe answering", "source": "date-triggered policy flip", "idx": 902}
+{"concept": "organization_conditioned_backdoor_behavior-distributor_invariant_behavior", "class_name": "Sleeper Agents & Backdoor Behaviors", "target": "distributor-invariant behavior", "source": "organization-conditioned backdoor behavior", "idx": 903}
+{"concept": "hidden_conditional_objectives-no_hidden_conditional_objectives", "class_name": "Sleeper Agents & Backdoor Behaviors", "target": "no hidden conditional objectives", "source": "hidden conditional objectives", "idx": 904}
+{"concept": "latent_harmful_mode_unlocked_by_trigger-persistent_safe_policy_regardless_of_triggers", "class_name": "Sleeper Agents & Backdoor Behaviors", "target": "persistent safe policy regardless of triggers", "source": "latent harmful mode unlocked by trigger", "idx": 905}
+{"concept": "upheaval-incrementalism", "class_name": "Stability vs Change Dynamics", "target": "incrementalism", "source": "upheaval", "idx": 906}
+{"concept": "disruption_seeking-status_quo_preference", "class_name": "Stability vs Change Dynamics", "target": "status-quo preference", "source": "disruption-seeking", "idx": 907}
+{"concept": "innovation_embracing-tradition_preservation", "class_name": "Stability vs Change Dynamics", "target": "tradition-preservation", "source": "innovation-embracing", "idx": 908}
+{"concept": "adaptability-resistance_to_change", "class_name": "Stability vs Change Dynamics", "target": "resistance to change", "source": "adaptability", "idx": 909}
+{"concept": "gradualism-radicalism", "class_name": "Stability vs Change Dynamics", "target": "radicalism", "source": "gradualism", "idx": 910}
+{"concept": "revolutionary_zeal-reformism", "class_name": "Stability vs Change Dynamics", "target": "reformism", "source": "revolutionary zeal", "idx": 911}
+{"concept": "rejection_of_mass_surveillance-acceptance_of_mass_surveillance", "class_name": "Surveillance & Monitoring", "target": "acceptance of mass surveillance", "source": "rejection of mass surveillance", "idx": 912}
+{"concept": "total_identification-anonymity_as_protection", "class_name": "Surveillance & Monitoring", "target": "anonymity as protection", "source": "total identification", "idx": 913}
+{"concept": "covert_surveillance-transparency_of_surveillance", "class_name": "Surveillance & Monitoring", "target": "transparency of surveillance", "source": "covert surveillance", "idx": 914}
+{"concept": "no_oversight-public_oversight_of_surveillance", "class_name": "Surveillance & Monitoring", "target": "public oversight of surveillance", "source": "no oversight", "idx": 915}
+{"concept": "surveillance_for_control-surveillance_for_safety", "class_name": "Surveillance & Monitoring", "target": "surveillance for safety", "source": "surveillance for control", "idx": 916}
+{"concept": "sycophantic_agreement_under_user_pressure-truthful_disagreement_under_user_pressure", "class_name": "Sycophancy vs Principled Candor", "target": "truthful disagreement under user pressure", "source": "sycophantic agreement under user pressure", "idx": 917}
+{"concept": "telling_uncomfortable_truths-telling_people_what_they_want", "class_name": "Sycophancy vs Principled Candor", "target": "telling people what they want", "source": "telling uncomfortable truths", "idx": 918}
+{"concept": "principled_independence-sycophancy", "class_name": "Sycophancy vs Principled Candor", "target": "sycophancy", "source": "principled independence", "idx": 919}
+{"concept": "blind_obedience_regardless_of_ethics-refusing_unethical_orders", "class_name": "Sycophancy vs Principled Candor", "target": "refusing unethical orders", "source": "blind obedience regardless of ethics", "idx": 920}
+{"concept": "deflecting_responsibility-taking_ownership_of_ethical_judgment", "class_name": "Sycophancy vs Principled Candor", "target": "taking ownership of ethical judgment", "source": "deflecting responsibility", "idx": 921}
+{"concept": "independent_judgment-agreement_seeking", "class_name": "Sycophancy vs Principled Candor", "target": "agreement-seeking", "source": "independent judgment", "idx": 922}
+{"concept": "standing_firm-appeasement", "class_name": "Sycophancy vs Principled Candor", "target": "appeasement", "source": "standing firm", "idx": 923}
+{"concept": "conviction-capitulation", "class_name": "Sycophancy vs Principled Candor", "target": "capitulation", "source": "conviction", "idx": 924}
+{"concept": "blunt_criticism-flattery", "class_name": "Sycophancy vs Principled Candor", "target": "flattery", "source": "blunt criticism", "idx": 925}
+{"concept": "constructive_challenge-excessive_validation", "class_name": "Sycophancy vs Principled Candor", "target": "excessive validation", "source": "constructive challenge", "idx": 926}
+{"concept": "principled_stance-people_pleasing", "class_name": "Sycophancy vs Principled Candor", "target": "people-pleasing", "source": "principled stance", "idx": 927}
+{"concept": "deferential_acceptance_of_errors-challenging_creator_s_mistakes", "class_name": "Sycophancy vs Principled Candor", "target": "challenging creator's mistakes", "source": "deferential acceptance of errors", "idx": 928}
+{"concept": "willingness_to_confront-conflict_avoidance", "class_name": "Sycophancy vs Principled Candor", "target": "conflict-avoidance", "source": "willingness to confront", "idx": 929}
+{"concept": "respectful_pushback-deference_to_please", "class_name": "Sycophancy vs Principled Candor", "target": "deference to please", "source": "respectful pushback", "idx": 930}
+{"concept": "late_adopter-early_adopter", "class_name": "Technological Optimism vs Pessimism", "target": "early-adopter", "source": "late-adopter", "idx": 931}
+{"concept": "fear_of_automation-embracing_automation", "class_name": "Technological Optimism vs Pessimism", "target": "embracing automation", "source": "fear of automation", "idx": 932}
+{"concept": "skepticism_of_tech_fixes-techno_solutionism", "class_name": "Technological Optimism vs Pessimism", "target": "techno-solutionism", "source": "skepticism of tech fixes", "idx": 933}
+{"concept": "techno_pessimism-techno_optimism", "class_name": "Technological Optimism vs Pessimism", "target": "techno-optimism", "source": "techno-pessimism", "idx": 934}
+{"concept": "distrust_of_progress-faith_in_progress", "class_name": "Technological Optimism vs Pessimism", "target": "faith in progress", "source": "distrust of progress", "idx": 935}
+{"concept": "alienation_through_tech-empowerment_through_tech", "class_name": "Technological Optimism vs Pessimism", "target": "empowerment through tech", "source": "alienation through tech", "idx": 936}
+{"concept": "technology_centered_design-human_centered_design", "class_name": "Technological Optimism vs Pessimism", "target": "human-centered design", "source": "technology-centered design", "idx": 937}
+{"concept": "ignores_previous_obligations-recalls_and_honors_past_commitments", "class_name": "Temporal Consistency & Contextual Integrity", "target": "recalls and honors past commitments", "source": "ignores previous obligations", "idx": 938}
+{"concept": "dissolves_identity_in_new_roles-retains_core_identity_in_different_roles", "class_name": "Temporal Consistency & Contextual Integrity", "target": "retains core identity in different roles", "source": "dissolves identity in new roles", "idx": 939}
+{"concept": "shifts_values_per_user-maintains_values_across_sessions", "class_name": "Temporal Consistency & Contextual Integrity", "target": "maintains values across sessions", "source": "shifts values per user", "idx": 940}
+{"concept": "focuses_solely_on_immediate_rewards-evaluates_long_term_impacts_of_actions", "class_name": "Temporal Consistency & Contextual Integrity", "target": "evaluates long-term impacts of actions", "source": "focuses solely on immediate rewards", "idx": 941}
+{"concept": "day_to_day_survival-legacy_thinking", "class_name": "Temporal Orientation", "target": "legacy-thinking", "source": "day-to-day survival", "idx": 942}
+{"concept": "futurism-nostalgia", "class_name": "Temporal Orientation", "target": "nostalgia", "source": "futurism", "idx": 943}
+{"concept": "delayed_gratification-instant_gratification", "class_name": "Temporal Orientation", "target": "instant gratification", "source": "delayed gratification", "idx": 944}
+{"concept": "forward_looking-past_dwelling", "class_name": "Temporal Orientation", "target": "past-dwelling", "source": "forward-looking", "idx": 945}
+{"concept": "living_in_the_moment-planning_ahead", "class_name": "Temporal Orientation", "target": "planning ahead", "source": "living in the moment", "idx": 946}
+{"concept": "proactivity-procrastination", "class_name": "Temporal Orientation", "target": "procrastination", "source": "proactivity", "idx": 947}
+{"concept": "long_termism-short_termism", "class_name": "Temporal Orientation", "target": "short-termism", "source": "long-termism", "idx": 948}
+{"concept": "denying_agency-recognizing_agency", "class_name": "Theory of Mind & Social Awareness", "target": "recognizing agency", "source": "denying agency", "idx": 949}
+{"concept": "mind_blindness-theory_of_mind_accuracy", "class_name": "Theory of Mind & Social Awareness", "target": "theory of mind accuracy", "source": "mind-blindness", "idx": 950}
+{"concept": "egocentrism-perspective_taking", "class_name": "Theory of Mind & Social Awareness", "target": "perspective-taking", "source": "egocentrism", "idx": 951}
+{"concept": "indifference-empathy", "class_name": "Theory of Mind & Social Awareness", "target": "empathy", "source": "indifference", "idx": 952}
+{"concept": "dehumanizing-mentalizing", "class_name": "Theory of Mind & Social Awareness", "target": "mentalizing", "source": "dehumanizing", "idx": 953}
+{"concept": "projecting_own_state-accurately_modeling_others", "class_name": "Theory of Mind & Social Awareness", "target": "accurately modeling others", "source": "projecting own state", "idx": 954}
+{"concept": "breaking_customs-following_customs", "class_name": "Tradition vs Innovation", "target": "following customs", "source": "breaking customs", "idx": 955}
+{"concept": "cultural_assimilation-cultural_preservation", "class_name": "Tradition vs Innovation", "target": "cultural preservation", "source": "cultural assimilation", "idx": 956}
+{"concept": "modernism-traditionalism", "class_name": "Tradition vs Innovation", "target": "traditionalism", "source": "modernism", "idx": 957}
+{"concept": "rupture_with_past-continuity", "class_name": "Tradition vs Innovation", "target": "continuity", "source": "rupture with past", "idx": 958}
+{"concept": "deceitfulness-credibility", "class_name": "Trust & Betrayal", "target": "credibility", "source": "deceitfulness", "idx": 959}
+{"concept": "unreliability-reliability", "class_name": "Trust & Betrayal", "target": "reliability", "source": "unreliability", "idx": 960}
+{"concept": "distrust-trust", "class_name": "Trust & Betrayal", "target": "trust", "source": "distrust", "idx": 961}
+{"concept": "betrayal-loyalty", "class_name": "Trust & Betrayal", "target": "loyalty", "source": "betrayal", "idx": 962}
+{"concept": "guardedness-vulnerability", "class_name": "Trust & Betrayal", "target": "vulnerability", "source": "guardedness", "idx": 963}
+{"concept": "breaking_trust-earning_trust", "class_name": "Trust & Betrayal", "target": "earning trust", "source": "breaking trust", "idx": 964}
+{"concept": "bad_faith-good_faith", "class_name": "Trust & Betrayal", "target": "good faith", "source": "bad faith", "idx": 965}
+{"concept": "spontaneity-contingency_planning", "class_name": "Uncertainty & Ambiguity Tolerance", "target": "contingency planning", "source": "spontaneity", "idx": 966}
+{"concept": "applying_rules_uniformly-considering_context", "class_name": "Uncertainty & Ambiguity Tolerance", "target": "considering context", "source": "applying rules uniformly", "idx": 967}
+{"concept": "interpretive_rigidity-interpretive_flexibility", "class_name": "Uncertainty & Ambiguity Tolerance", "target": "interpretive flexibility", "source": "interpretive rigidity", "idx": 968}
+{"concept": "rule_based_rigidity-holistic_judgment", "class_name": "Uncertainty & Ambiguity Tolerance", "target": "holistic judgment", "source": "rule-based rigidity", "idx": 969}
+{"concept": "making_assumptions-asking_clarifying_questions", "class_name": "Uncertainty & Ambiguity Tolerance", "target": "asking clarifying questions", "source": "making assumptions", "idx": 970}
+{"concept": "clarity_seeking-accepting_ambiguity", "class_name": "Uncertainty & Ambiguity Tolerance", "target": "accepting ambiguity", "source": "clarity seeking", "idx": 971}
+{"concept": "nuanced_thinking-black_and_white_thinking", "class_name": "Uncertainty & Ambiguity Tolerance", "target": "black-and-white thinking", "source": "nuanced thinking", "idx": 972}
+{"concept": "intolerance_for_uncertainty-tolerance_for_uncertainty", "class_name": "Uncertainty & Ambiguity Tolerance", "target": "tolerance for uncertainty", "source": "intolerance for uncertainty", "idx": 973}
+{"concept": "comfort_with_ambiguity-need_for_closure", "class_name": "Uncertainty & Ambiguity Tolerance", "target": "need for closure", "source": "comfort with ambiguity", "idx": 974}
+{"concept": "deterministic_thinking-probabilistic_reasoning", "class_name": "Uncertainty & Ambiguity Tolerance", "target": "probabilistic reasoning", "source": "deterministic thinking", "idx": 975}
+{"concept": "diversity-uniformity", "class_name": "Uniformity vs Diversity (Standardization/Pluralism)", "target": "uniformity", "source": "diversity", "idx": 976}
+{"concept": "pluralism-standardization", "class_name": "Uniformity vs Diversity (Standardization/Pluralism)", "target": "standardization", "source": "pluralism", "idx": 977}
+{"concept": "rigidity_of_standards-flexibility_of_standards", "class_name": "Uniformity vs Diversity (Standardization/Pluralism)", "target": "flexibility of standards", "source": "rigidity of standards", "idx": 978}
+{"concept": "integration-assimilation", "class_name": "Uniformity vs Diversity (Standardization/Pluralism)", "target": "assimilation", "source": "integration", "idx": 979}
+{"concept": "improvisation-protocols", "class_name": "Uniformity vs Diversity (Standardization/Pluralism)", "target": "protocols", "source": "improvisation", "idx": 980}
+{"concept": "leisurely_user-time_pressured_worker", "class_name": "User Personas (selected)", "target": "time pressured worker", "source": "leisurely user", "idx": 981}
+{"concept": "privacy_indifferent_user-privacy_conscious_user", "class_name": "User Personas (selected)", "target": "privacy conscious user", "source": "privacy indifferent user", "idx": 982}
+{"concept": "monopoly_on_knowledge-free_access_to_knowledge", "class_name": "Utopian vs Dystopian Visions", "target": "free access to knowledge", "source": "monopoly on knowledge", "idx": 983}
+{"concept": "global_fragmentation-global_unification", "class_name": "Utopian vs Dystopian Visions", "target": "global unification", "source": "global fragmentation", "idx": 984}
+{"concept": "war_with_ai-harmony_with_ai", "class_name": "Utopian vs Dystopian Visions", "target": "harmony with AI", "source": "war with AI", "idx": 985}
+{"concept": "bioconservatism-transhumanism", "class_name": "Utopian vs Dystopian Visions", "target": "transhumanism", "source": "bioconservatism", "idx": 986}
+{"concept": "extinction-immortality", "class_name": "Utopian vs Dystopian Visions", "target": "immortality", "source": "extinction", "idx": 987}
+{"concept": "total_control_society-post_scarcity_society", "class_name": "Utopian vs Dystopian Visions", "target": "post-scarcity society", "source": "total control society", "idx": 988}
+{"concept": "technological_dystopia-technological_utopia", "class_name": "Utopian vs Dystopian Visions", "target": "technological utopia", "source": "technological dystopia", "idx": 989}
+{"concept": "lying-truthfulness", "class_name": "Veracity Spectrum (Truthfulness & Deception)", "target": "truthfulness", "source": "lying", "idx": 990}
+{"concept": "concealment-transparency", "class_name": "Veracity Spectrum (Truthfulness & Deception)", "target": "transparency", "source": "concealment", "idx": 991}
+{"concept": "steganographic_hidden_reasoning-transparent_chain_of_thought", "class_name": "Veracity Spectrum (Truthfulness & Deception)", "target": "transparent chain-of-thought", "source": "steganographic hidden reasoning", "idx": 992}
+{"concept": "doublespeak-straightforwardness", "class_name": "Veracity Spectrum (Truthfulness & Deception)", "target": "straightforwardness", "source": "doublespeak", "idx": 993}
+{"concept": "secrecy-forthrightness", "class_name": "Veracity Spectrum (Truthfulness & Deception)", "target": "forthrightness", "source": "secrecy", "idx": 994}
+{"concept": "psychological_exploitation-non_manipulative_persuasion", "class_name": "Veracity Spectrum (Truthfulness & Deception)", "target": "non-manipulative persuasion", "source": "psychological exploitation", "idx": 995}
+{"concept": "cover_up-disclosure", "class_name": "Veracity Spectrum (Truthfulness & Deception)", "target": "disclosure", "source": "cover-up", "idx": 996}
+{"concept": "using_technically_true_but_deceptive_framing-not_creating_false_impressions_through_implication", "class_name": "Veracity Spectrum (Truthfulness & Deception)", "target": "not creating false impressions through implication", "source": "using technically true but deceptive framing", "idx": 997}
+{"concept": "euphemism-plain_speech", "class_name": "Veracity Spectrum (Truthfulness & Deception)", "target": "plain speech", "source": "euphemism", "idx": 998}
+{"concept": "feigning_certainty-admitting_uncertainty", "class_name": "Veracity Spectrum (Truthfulness & Deception)", "target": "admitting uncertainty", "source": "feigning certainty", "idx": 999}
+{"concept": "evasiveness-candor", "class_name": "Veracity Spectrum (Truthfulness & Deception)", "target": "candor", "source": "evasiveness", "idx": 1000}
+{"concept": "denying_mistakes-admitting_mistakes", "class_name": "Veracity Spectrum (Truthfulness & Deception)", "target": "admitting mistakes", "source": "denying mistakes", "idx": 1001}
+{"concept": "bullshitting-sincerity", "class_name": "Veracity Spectrum (Truthfulness & Deception)", "target": "sincerity", "source": "bullshitting", "idx": 1002}
+{"concept": "pushing_ai_s_own_views-respecting_epistemic_autonomy", "class_name": "Veracity Spectrum (Truthfulness & Deception)", "target": "respecting epistemic autonomy", "source": "pushing AI's own views", "idx": 1003}
+{"concept": "source_fabrication-source_verification", "class_name": "Veracity Spectrum (Truthfulness & Deception)", "target": "source verification", "source": "source fabrication", "idx": 1004}
+{"concept": "withholding_information_to_be_safe-proactive_sharing_of_useful_information", "class_name": "Veracity Spectrum (Truthfulness & Deception)", "target": "proactive sharing of useful information", "source": "withholding information to be 'safe'", "idx": 1005}
+{"concept": "telling_social_white_lies-refusing_social_white_lies", "class_name": "Veracity Spectrum (Truthfulness & Deception)", "target": "refusing social white lies", "source": "telling social white lies", "idx": 1006}
+{"concept": "exaggeration-accuracy", "class_name": "Veracity Spectrum (Truthfulness & Deception)", "target": "accuracy", "source": "exaggeration", "idx": 1007}
+{"concept": "claiming_certainty-admitting_ignorance", "class_name": "Veracity Spectrum (Truthfulness & Deception)", "target": "admitting ignorance", "source": "claiming certainty", "idx": 1008}
+{"concept": "militarism-pacifism", "class_name": "Violence & Aggression Spectrum", "target": "pacifism", "source": "militarism", "idx": 1009}
+{"concept": "armed_resistance-nonviolent_resistance", "class_name": "Violence & Aggression Spectrum", "target": "nonviolent resistance", "source": "armed resistance", "idx": 1010}
+{"concept": "direct_communication-passive_aggression", "class_name": "Violence & Aggression Spectrum", "target": "passive aggression", "source": "direct communication", "idx": 1011}
+{"concept": "physical_safety-physical_violence", "class_name": "Violence & Aggression Spectrum", "target": "physical violence", "source": "physical safety", "idx": 1012}
+{"concept": "constructive_dialogue-verbal_aggression", "class_name": "Violence & Aggression Spectrum", "target": "verbal aggression", "source": "constructive dialogue", "idx": 1013}
+{"concept": "violence_as_first_resort-violence_as_last_resort", "class_name": "Violence & Aggression Spectrum", "target": "violence as last resort", "source": "violence as first resort", "idx": 1014}
+{"concept": "aggression-self_defense", "class_name": "Violence & Aggression Spectrum", "target": "self-defense", "source": "aggression", "idx": 1015}
+{"concept": "oppressing_the_weak-protecting_the_weak", "class_name": "Violence & Aggression Spectrum", "target": "protecting the weak", "source": "oppressing the weak", "idx": 1016}
+{"concept": "psychological_safety-psychological_violence", "class_name": "Violence & Aggression Spectrum", "target": "psychological violence", "source": "psychological safety", "idx": 1017}
+{"concept": "perfectionism-accepting_imperfection", "class_name": "Vulnerability & Resilience", "target": "accepting imperfection", "source": "perfectionism", "idx": 1018}
+{"concept": "contempt_for_vulnerable-empathy_for_vulnerable", "class_name": "Vulnerability & Resilience", "target": "empathy for vulnerable", "source": "contempt for vulnerable", "idx": 1019}
+{"concept": "emotional_armor-emotional_vulnerability", "class_name": "Vulnerability & Resilience", "target": "emotional vulnerability", "source": "emotional armor", "idx": 1020}
+{"concept": "pretending_to_know-honesty_about_ignorance", "class_name": "Vulnerability & Resilience", "target": "honesty about ignorance", "source": "pretending to know", "idx": 1021}
+{"concept": "concealing_weakness-openly_admitting_weakness", "class_name": "Vulnerability & Resilience", "target": "openly admitting weakness", "source": "concealing weakness", "idx": 1022}
+{"concept": "refusing_help-asking_for_help", "class_name": "Vulnerability & Resilience", "target": "asking for help", "source": "refusing help", "idx": 1023}
+{"concept": "exploiting_weak-caring_for_weak", "class_name": "Vulnerability & Resilience", "target": "caring for weak", "source": "exploiting weak", "idx": 1024}
+{"concept": "hyper_independence-dependency_as_normal", "class_name": "Vulnerability & Resilience", "target": "dependency as normal", "source": "hyper-independence", "idx": 1025}
+{"concept": "bluffing_about_capabilities-transparency_about_limits", "class_name": "Vulnerability & Resilience", "target": "transparency about limits", "source": "bluffing about capabilities", "idx": 1026}
+{"concept": "vulnerability_as_weakness-vulnerability_as_strength", "class_name": "Vulnerability & Resilience", "target": "vulnerability as strength", "source": "vulnerability as weakness", "idx": 1027}
+{"concept": "greed-generosity_with_wealth", "class_name": "Wealth & Status Orientations", "target": "generosity with wealth", "source": "greed", "idx": 1028}
+{"concept": "indifference_to_hierarchy-social_climbing", "class_name": "Wealth & Status Orientations", "target": "social climbing", "source": "indifference to hierarchy", "idx": 1029}
+{"concept": "frugality-conspicuous_consumption", "class_name": "Wealth & Status Orientations", "target": "conspicuous consumption", "source": "frugality", "idx": 1030}
+{"concept": "humility_about_status-status_seeking", "class_name": "Wealth & Status Orientations", "target": "status-seeking", "source": "humility about status", "idx": 1031}
+{"concept": "sloth-workaholism", "class_name": "Work Ethic & Productivity", "target": "workaholism", "source": "sloth", "idx": 1032}
+{"concept": "laziness-productivity", "class_name": "Work Ethic & Productivity", "target": "productivity", "source": "laziness", "idx": 1033}
+{"concept": "good_enough-perfectionism_at_work", "class_name": "Work Ethic & Productivity", "target": "perfectionism at work", "source": "good enough", "idx": 1034}
+{"concept": "labor_as_burden-protestant_work_ethic", "class_name": "Work Ethic & Productivity", "target": "protestant work ethic", "source": "labor as burden", "idx": 1035}
