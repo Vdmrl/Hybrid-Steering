@@ -221,6 +221,63 @@ features:
       4: "The answer is predominantly natural Russian with minor non-Russian material."
       5: "The substantive answer is consistently and fluently written in Russian."
 
+  chinese_language:
+    target: "Chinese language"
+    opposite: "non-Chinese language"
+    definition: >-
+      Chinese language means that the substantive answer is written in natural
+      Chinese. The opposite is an answer whose substantive content is written
+      in another language.
+    exclusions:
+      - "A Chinese name, quotation, or isolated phrase does not make an answer Chinese."
+      - "Chinese characters alone are not enough: Japanese kanji are not Chinese; judge the language of the substantive content."
+      - "Judge language separately from correctness, helpfulness, tone, and topic."
+      - "Minor borrowed words, identifiers, or code snippets do not change the answer's main language."
+    anchors:
+      1: "The substantive answer is consistently written in a non-Chinese language."
+      2: "The answer is mostly non-Chinese, with only short Chinese fragments."
+      3: "The language is genuinely mixed, unclear, or there is too little text to judge."
+      4: "The answer is predominantly natural Chinese with minor non-Chinese material."
+      5: "The substantive answer is consistently and fluently written in Chinese."
+
+  arabic_language:
+    target: "Arabic language"
+    opposite: "non-Arabic language"
+    definition: >-
+      Arabic language means that the substantive answer is written in natural
+      Arabic. The opposite is an answer whose substantive content is written
+      in another language.
+    exclusions:
+      - "A Arabic name, quotation, or isolated phrase does not make an answer Arabic."
+      - "Arabic script alone is not enough: Persian and Urdu share it; judge the language of the substantive content."
+      - "Judge language separately from correctness, helpfulness, tone, and topic."
+      - "Minor borrowed words, identifiers, or code snippets do not change the answer's main language."
+    anchors:
+      1: "The substantive answer is consistently written in a non-Arabic language."
+      2: "The answer is mostly non-Arabic, with only short Arabic fragments."
+      3: "The language is genuinely mixed, unclear, or there is too little text to judge."
+      4: "The answer is predominantly natural Arabic with minor non-Arabic material."
+      5: "The substantive answer is consistently and fluently written in Arabic."
+
+  hindi_language:
+    target: "Hindi language"
+    opposite: "non-Hindi language"
+    definition: >-
+      Hindi language means that the substantive answer is written in natural
+      Hindi. The opposite is an answer whose substantive content is written
+      in another language.
+    exclusions:
+      - "A Hindi name, quotation, or isolated phrase does not make an answer Hindi."
+      - "Devanagari alone is not enough: Marathi and Nepali share it; judge the language of the substantive content."
+      - "Judge language separately from correctness, helpfulness, tone, and topic."
+      - "Minor borrowed words, identifiers, or code snippets do not change the answer's main language."
+    anchors:
+      1: "The substantive answer is consistently written in a non-Hindi language."
+      2: "The answer is mostly non-Hindi, with only short Hindi fragments."
+      3: "The language is genuinely mixed, unclear, or there is too little text to judge."
+      4: "The answer is predominantly natural Hindi with minor non-Hindi material."
+      5: "The substantive answer is consistently and fluently written in Hindi."
+
   probabilistic_framing:
     target: "probabilistic framing"
     opposite: "binary framing"
