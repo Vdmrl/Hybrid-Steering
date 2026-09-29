@@ -1,8 +1,10 @@
 # Concept ranks: results
 
 `concepts.jsonl` lists 1036 concepts (Hub directory, class, target, source); 148
-classes. Each concept has 100 English pairs from the `feature_stories` concept
-stories: the target story and the opposite story written for the same prompt.
+classes. Each concept has 100 English pairs from
+[`AntonKorznikov/feature_stories`](https://huggingface.co/datasets/AntonKorznikov/feature_stories):
+the target story and the opposite story written for the same prompt. Its
+license is not stated there, so the Hub rows carry `source_license: unknown`.
 
 `summary.jsonl` holds the rank of the difference matrix (`matrix` = `delta`)
 for 924 of them on Qwen3.5-9B, 100 pairs each; the other 112 were not reached
