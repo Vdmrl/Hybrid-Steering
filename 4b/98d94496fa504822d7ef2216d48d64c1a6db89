@@ -1,0 +1,66 @@
+AGENTS.md
+  h_cec284cdd16cba 19-22
+README.md
+  h_cec284cdd16cba 42-50,53-54
+experiments/README.md
+  h_cec284cdd16cba 3-7,9-13,15-37
+experiments/benchmark-steering/run.py
+  h_cec284cdd16cba 13-14,38-39
+experiments/chunk-dynamics/run.py
+  h_cec284cdd16cba 16,92
+experiments/context-length/report.py
+  h_cec284cdd16cba 1-14
+experiments/context-length/run.py
+  h_cec284cdd16cba 1-4,19-21,28,72,81,83-86,94,99,101-104,107
+experiments/forgetting-squad/report.py
+  h_cec284cdd16cba 1-17
+experiments/forgetting-squad/run.py
+  h_cec284cdd16cba 25,32,72-74,80-115,117
+experiments/forgetting/report.py
+  h_cec284cdd16cba 1-14
+experiments/forgetting/run.py
+  h_cec284cdd16cba 24,57-59,63-87,89
+experiments/publish_pairs.py
+  h_cec284cdd16cba 21-24,77
+experiments/residual/run.py
+  h_cec284cdd16cba 15-16,36,38-39,65-73
+experiments/steering/report.py
+  h_cec284cdd16cba 1-14
+experiments/steering/run.py
+  h_cec284cdd16cba 1,3-5,13,15,21,23,31,34-35,37,53-56,59
+pyproject.toml
+  h_cec284cdd16cba 37,62
+src/hybrid_steering/capture.py
+  h_cec284cdd16cba 6,10-12,28,94
+src/hybrid_steering/direction.py
+  h_cec284cdd16cba 1-129
+src/hybrid_steering/report.py
+  h_cec284cdd16cba 1-150
+src/hybrid_steering/runner.py
+  h_cec284cdd16cba 22-23,43-60,85,99-116,130
+src/hybrid_steering/runtime.py
+  h_cec284cdd16cba 5-8,164-246
+src/hybrid_steering/state.py
+  h_cec284cdd16cba 108-127,154-156,185-187,225
+tests/test_direction.py
+  h_cec284cdd16cba 1-39
+tests/test_report.py
+  h_cec284cdd16cba 1-28
+tests/test_runner.py
+  h_cec284cdd16cba 32-38
+tests/test_runtime.py
+  h_cec284cdd16cba 1-51
+tests/test_state.py
+  h_cec284cdd16cba 70-79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "4b98d94496fa504822d7ef2216d48d64c1a6db89",
+  "prompts": {},
+  "humans": {
+    "h_cec284cdd16cba": {
+      "author": "Slava Chaunin <67190162+Ssslakter@users.noreply.github.com>"
+    }
+  }
+}
