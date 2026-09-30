@@ -29,6 +29,9 @@ Scores per answer (script-based, so ``--language`` must be ``ru``, ``zh``,
 - ``has_code``, ``code_parses`` (``ast.parse`` accepts every block), ``rep5``
   (5-gram repetition of the answer tokens; above 0.1 the text is degenerate).
 
+The ``en-*-gen`` pools behind ``results/`` are no longer on the Hub dataset's
+``main``; see ``results/README.md`` for the revision that has them.
+
     uv run hybrid-direction --concept en-ru-gen --source en --target ru --pairs 100 \\
         --output runs/en-ru-gen
     uv run python experiments/code-leak/run.py --direction runs/en-ru-gen/direction \\

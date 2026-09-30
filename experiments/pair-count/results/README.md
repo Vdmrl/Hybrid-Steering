@@ -19,6 +19,11 @@ target or its opposite, or, for `en-ru-gen`, to answer in Russian or English.
 The two sides are generated independently, so pair indices carry no alignment,
 and `run.py` permutes the two sides independently for the same reason.
 
+The `en-ru-gen` pool and the other `*-gen` pools were removed from the Hub dataset's `main`; they remain at revision
+`0605338aea2e8280ea9cd276a374501356ee3505`. Fetch them with
+`hf download hybrid-steering/hybrid-steering-concepts --repo-type dataset --revision 0605338aea2e8280ea9cd276a374501356ee3505 --include "concepts/<concept>/*" --local-dir hub-old`
+and pass `hub-old/concepts/<concept>/data/pairs.jsonl` with `--jsonl`.
+
 Rebuild the page:
 
 ```bash

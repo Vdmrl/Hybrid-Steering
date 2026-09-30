@@ -20,6 +20,11 @@ eight held-out questions: the smallest scale that turns at least 80% of the
 answer into the language, ties broken by 5-gram repetition and then by the
 language share, and checked by reading the output.
 
+The `en-*-gen` pools were removed from the Hub dataset's `main`; they remain at revision
+`0605338aea2e8280ea9cd276a374501356ee3505`. Fetch them with
+`hf download hybrid-steering/hybrid-steering-concepts --repo-type dataset --revision 0605338aea2e8280ea9cd276a374501356ee3505 --include "concepts/<concept>/*" --local-dir hub-old`
+and pass `hub-old/concepts/<concept>/data/pairs.jsonl` with `--jsonl`.
+
 Rows with `rep5` above 0.1, or with code in fewer than a fifth of the answers,
 are degenerate text and are best left out of any comparison.
 

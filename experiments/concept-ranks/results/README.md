@@ -6,6 +6,11 @@ classes. Each concept has 100 English pairs from
 the target story and the opposite story written for the same prompt. Its
 license is not stated there, so the Hub rows carry `source_license: unknown`.
 
+These 1036 concepts were removed from the Hub dataset's `main`; they remain at revision
+`0605338aea2e8280ea9cd276a374501356ee3505`. Fetch them with
+`hf download hybrid-steering/hybrid-steering-concepts --repo-type dataset --revision 0605338aea2e8280ea9cd276a374501356ee3505 --include "concepts/*" --local-dir hub-old`
+and pass `--pairs-dir hub-old/concepts`.
+
 `summary.jsonl` holds the rank of the difference matrix (`matrix` = `delta`)
 for 924 of them on Qwen3.5-9B, 100 pairs each; the other 112 were not reached
 in that run. It was computed before this script, from the difference matrix
