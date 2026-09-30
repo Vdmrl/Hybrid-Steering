@@ -4,6 +4,11 @@ The prompt is one left-padded batch and one model forward. NNsight intercepts
 only the GDN state-update kernel. ``prompt_position`` counts real prompt tokens
 already processed: ``0`` is the initial state, ``-1`` is the last prompt token,
 and ``None`` disables prompt steering. ``scale`` is a scalar or one value per row.
+
+``intervention="clamp"`` is the code-leak rank-1 clamp on every prompt token and
+every generated token. ``scale`` multiplies ``sigma * w``. Zero scale skips the
+clamp, so it stays the unsteered baseline. ``prompt_position`` and the decode
+schedules are not used.
 """
 
 import inspect
@@ -20,10 +25,16 @@ from transformers import PreTrainedTokenizerBase
 from transformers.models.qwen3_5.modeling_qwen3_5 import torch_chunk_gated_delta_rule
 
 from .cache import gdn_layers
+from .delta_rule import (
+    chunk_gated_delta_rule_clamped,
+    rank1_factors,
+    recurrent_gated_delta_rule_clamped,
+)
 from .state import BatchIndex, BatchState, HeadState, Scale, add_delta, truncate_direction
 
 PromptMode = Literal["exact", "chunk"]
 PromptPosition = int | Tensor | None
+Intervention = Literal["add", "clamp"]
 CHUNK = 64
 
 
@@ -81,9 +92,12 @@ class Runner:
         layers: list[int],
         deltas: dict[int, HeadState] | None = None,
         normalize: bool = True,
+        intervention: Intervention = "add",
     ) -> None:
         available = gdn_layers(model)
         deltas = dict(deltas or {})
+        if intervention not in ("add", "clamp"):
+            raise ValueError("intervention must be add or clamp")
         if any(layer not in available for layer in layers) or not set(deltas) <= set(layers):
             raise ValueError("deltas must target configured GDN layers")
         self.model = model
@@ -91,7 +105,16 @@ class Runner:
         self.layers = layers
         self.deltas = deltas
         self.normalize = normalize
+        self.intervention: Intervention = intervention
         self.device = next(model.parameters()).device
+        self.clamp_factors = (
+            {
+                layer: tuple(factor.to(self.device) for factor in rank1_factors(delta))
+                for layer, delta in deltas.items()
+            }
+            if intervention == "clamp"
+            else {}
+        )
         self.tokenizer.padding_side = "left"
         self.traced: NNsight | None = None
         self.operations: dict[int, tuple[OperationEnvoy, OperationEnvoy]] = {}
@@ -105,6 +128,7 @@ class Runner:
         *,
         rank: int | None = None,
         normalize: bool = True,
+        intervention: Intervention = "add",
     ) -> "Runner":
         """Build a runner whose deltas are the rank-truncated direction on the model device."""
         device = next(model.parameters()).device
@@ -112,7 +136,14 @@ class Runner:
             layer: tensor.to(device)
             for layer, tensor in truncate_direction(direction, rank).items()
         }
-        return cls(model, tokenizer, sorted(deltas), deltas, normalize=normalize)
+        return cls(
+            model,
+            tokenizer,
+            sorted(deltas),
+            deltas,
+            normalize=normalize,
+            intervention=intervention,
+        )
 
     def _inputs(self, texts: list[str]) -> tuple[Tensor, Tensor]:
         if not texts:
@@ -236,7 +267,7 @@ class Runner:
             "use_cache": True,
             "logits_to_keep": 1,
         }
-        if trace is None and columns is None:
+        if trace is None and columns is None and not self._clamp_active(scales):
             output = self.model(**arguments)
             return output.past_key_values, output.logits[:, -1]
         self._enable_tracing()
@@ -248,7 +279,13 @@ class Runner:
                     inputs.shape[1] == 1 and cache is not None and cache.has_previous_state(layer)
                 )
                 operation = operations[recurrent]
-                if columns is not None and layer in self.deltas:
+                if self._clamp_active(scales) and layer in self.clamp_factors:
+                    args, kwargs = operation.inputs
+                    clamped = self._clamped_kernel(layer, args, kwargs, scales, recurrent)
+                    operation.output = clamped
+                    if trace is not None:
+                        saved.append((layer, save(clamped)))
+                elif columns is not None and layer in self.deltas:
                     if scales is None:
                         raise ValueError("scale is required when prompt_position is set")
                     captured = self._replace_kernel(
@@ -264,6 +301,60 @@ class Runner:
             captured = {layer: (values[0][:, -1], values[1]) for layer, values in saved}
             self._record(trace, captured, mask, logits)
         return output.past_key_values, logits
+
+    def _scales(self, scale: float | Tensor, batch: int) -> Tensor:
+        scales = torch.as_tensor(scale, device=self.device)
+        if scales.ndim > 1 or (scales.ndim == 1 and scales.shape[0] not in (1, batch)):
+            raise ValueError("scale must be a scalar or one value per prompt")
+        if self.intervention == "clamp" and scales.numel() > 1:
+            nonzero = scales != 0
+            if bool(nonzero.any()) and bool((~nonzero).any()):
+                raise ValueError("clamp scale must be all zero or all nonzero")
+        return scales
+
+    def _clamp_active(self, scales: Tensor | None) -> bool:
+        return (
+            self.intervention == "clamp"
+            and scales is not None
+            and bool(torch.as_tensor(scales).ne(0).any())
+        )
+
+    def _clamp_target(self, layer: int, scales: Tensor, batch: int) -> tuple[Tensor, Tensor]:
+        """Value coordinate ``scale * sigma * w``. A length-1 scale is one value for the batch."""
+        del batch
+        u, w, sigma = self.clamp_factors[layer]
+        factor = torch.as_tensor(scales, device=u.device, dtype=torch.float32)
+        if factor.ndim == 0 or factor.shape[0] == 1:
+            return u, (factor.reshape(()) * sigma)[:, None] * w
+        return u, (factor[:, None] * sigma)[:, :, None] * w[None, :, :]
+
+    def _clamped_kernel(
+        self,
+        layer: int,
+        args: tuple[Tensor, ...],
+        kwargs: dict[str, Any],
+        scales: Tensor,
+        recurrent: bool,
+    ) -> tuple[Tensor, Tensor]:
+        query, key, value = args[:3]
+        g = kwargs["g"] if "g" in kwargs else args[3]
+        beta = kwargs["beta"] if "beta" in kwargs else args[4]
+        u, target = self._clamp_target(layer, scales, query.shape[0])
+        function = (
+            recurrent_gated_delta_rule_clamped if recurrent else chunk_gated_delta_rule_clamped
+        )
+        output, state = function(
+            query,
+            key,
+            value,
+            g,
+            beta,
+            u,
+            target,
+            initial_state=kwargs.get("initial_state"),
+            use_qk_l2norm_in_kernel=bool(kwargs.get("use_qk_l2norm_in_kernel", False)),
+        )
+        return output.to(dtype=query.dtype), state
 
     def _add_to_cache(self, cache: Any, scales: Tensor) -> None:
         for layer, delta in self.deltas.items():
@@ -286,15 +377,13 @@ class Runner:
             raise ValueError("every prompt must contain a token")
         if prompt_mode not in ("exact", "chunk"):
             raise ValueError("prompt_mode must be exact or chunk")
-        scales = torch.as_tensor(scale, device=self.device)
-        if scales.ndim > 1 or (scales.ndim == 1 and len(scales) != len(inputs)):
-            raise ValueError("scale must be scalar or have one value per prompt")
+        scales = self._scales(scale, len(inputs))
         mask = mask.bool()
         lengths = mask.long().sum(-1)
         padding = inputs.shape[1] - lengths
         positions = (mask.long().cumsum(-1) - 1).clamp_min(0)
         columns = None
-        if prompt_position is not None:
+        if self.intervention == "add" and prompt_position is not None:
             requested = torch.as_tensor(prompt_position, device=self.device)
             if requested.ndim > 1 or (
                 requested.ndim == 1 and len(requested) not in (1, len(inputs))
@@ -351,6 +440,10 @@ class Runner:
         """Greedily generate one batch, with optional prompt and decode interventions."""
         if max_new_tokens < 1:
             raise ValueError("max_new_tokens must be positive")
+        if self.intervention == "clamp" and (
+            generation_period is not None or generation_steps is not None
+        ):
+            raise ValueError("clamp runs on every new token; generation schedules are unused")
         if generation_period is not None and generation_steps is not None:
             raise ValueError("generation_period and generation_steps are mutually exclusive")
         if generation_period is not None and generation_period < 1:
@@ -358,7 +451,7 @@ class Runner:
         if generation_steps is not None and any(step < 1 for step in generation_steps):
             raise ValueError("generation_steps must contain positive values")
         inputs, mask = self._inputs(texts)
-        scales = torch.as_tensor(scale, device=self.device)
+        scales = self._scales(scale, len(inputs))
         cache, logits, mask = self.prefill(
             inputs, mask, prompt_position, scales, prompt_mode, trace
         )
@@ -380,9 +473,16 @@ class Runner:
             inject = (generation_period is not None and (step + 1) % generation_period == 0) or (
                 generation_steps is not None and step + 1 in generation_steps
             )
-            if inject:
+            if inject and self.intervention == "add":
                 self._add_to_cache(cache, scales * ~finished)
             mask = torch.cat((mask, torch.ones_like(mask[:, :1])), dim=1)
             position = (mask.long().sum(-1) - 1)[:, None]
-            cache, logits = self._model_forward(token[:, None], mask, position, cache, trace)
+            cache, logits = self._model_forward(
+                token[:, None],
+                mask,
+                position,
+                cache,
+                trace,
+                scales=scales if self._clamp_active(scales) else None,
+            )
         return generated

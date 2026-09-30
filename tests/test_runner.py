@@ -5,6 +5,7 @@ from unittest.mock import patch
 import torch
 
 from hybrid_steering import Runner, Trace, add_delta, build_tiny
+from hybrid_steering.delta_rule import _clamp_rank1
 
 
 def batch(prompts: list[torch.Tensor]) -> tuple[torch.Tensor, torch.Tensor]:
@@ -178,6 +179,72 @@ class RunnerTest(unittest.TestCase):
                 model.generation_config.eos_token_id = [int(plain[0, 0]), 63]
                 stopped = runner.generate(["first", "second"], scale=0.1, max_new_tokens=4)
                 self.assertTrue(stopped[0, 1:].eq(runner.tokenizer.pad_token_id).all())
+
+    def test_clamp_follows_the_token_loop_and_keeps_the_coordinate(self) -> None:
+        torch.manual_seed(0)
+        model, tokenizer = build_tiny()
+        direction = {0: torch.randn(2, 8, 8)}
+        runner = Runner.from_direction(
+            model, tokenizer, direction, normalize=False, intervention="clamp"
+        )
+        prompts = [torch.tensor([1, 2, 3, 4, 5]), torch.tensor([8, 9, 10, 11, 12, 13, 14])]
+        input_ids, attention_mask = batch(prompts)
+        u, w, sigma = runner.clamp_factors[0]
+        scale = 0.7
+        target = (scale * sigma)[:, None] * w
+
+        def stepwise(scale_target: torch.Tensor | None, steps: int = 0):
+            cache = None
+            logits = None
+            mask = attention_mask
+            ids = input_ids
+            for position in range(input_ids.shape[1] + steps):
+                if position >= input_ids.shape[1]:
+                    ids = torch.cat((ids, logits.argmax(-1)[:, None]), 1)
+                    mask = torch.cat((mask, torch.ones_like(mask[:, :1])), 1)
+                column = mask[:, : position + 1]
+                output = model(
+                    input_ids=ids[:, position : position + 1],
+                    attention_mask=column,
+                    position_ids=(column.long().cumsum(-1) - 1).clamp_min(0)[:, -1:],
+                    past_key_values=cache,
+                    use_cache=True,
+                )
+                cache = output.past_key_values
+                if scale_target is not None:
+                    state = cache.layers[0].recurrent_states[0]
+                    state.copy_(_clamp_rank1(state, u, scale_target).to(dtype=state.dtype))
+                logits = output.logits[:, -1]
+            generated = ids[:, input_ids.shape[1] :]
+            return logits, cache, generated
+
+        with torch.inference_mode():
+            _, plain_logits, _ = runner.prefill(input_ids, attention_mask, -1, 0.0)
+            for index, prompt in enumerate(prompts):
+                reference = model(input_ids=prompt[None], use_cache=True)
+                torch.testing.assert_close(
+                    plain_logits[index], reference.logits[0, -1], atol=2e-5, rtol=2e-5
+                )
+
+            cache, logits, _ = runner.prefill(input_ids, attention_mask, -1, scale)
+            expected_logits, expected_cache, _ = stepwise(target)
+            # One full forward and a token loop differ slightly even with the clamp off.
+            torch.testing.assert_close(logits, expected_logits, atol=5e-3, rtol=2e-2)
+            torch.testing.assert_close(
+                cache.layers[0].recurrent_states[0],
+                expected_cache.layers[0].recurrent_states[0],
+                atol=5e-3,
+                rtol=2e-2,
+            )
+            along = torch.einsum("hk,bhkv->bhv", u, cache.layers[0].recurrent_states[0].float())
+            torch.testing.assert_close(along, target.expand_as(along), atol=1e-4, rtol=1e-4)
+            self.assertGreater((logits - plain_logits).abs().max().item(), 1e-5)
+
+            runner.tokenizer.eos_token_id = -1
+            with patch.object(runner, "_inputs", return_value=(input_ids, attention_mask)):
+                generated = runner.generate(["first", "second"], scale=scale, max_new_tokens=2)
+            _, _, expected = stepwise(target, steps=2)
+            torch.testing.assert_close(generated, expected)
 
 
 if __name__ == "__main__":

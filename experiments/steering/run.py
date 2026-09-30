@@ -2,7 +2,8 @@
 
 Build the direction first with ``hybrid-direction``. ``--feature`` selects the
 ``concept_detector`` id. The default is the direction's target name, which for
-``en-ru`` is ``ru``.
+``en-ru`` is ``ru``. ``--intervention clamp`` rewrites the rank-1 coordinate on
+every token; scale 0 is the unclamped baseline.
 """
 
 from __future__ import annotations
@@ -27,12 +28,18 @@ def main() -> None:
     parser.add_argument("--rank", type=int, default=0)
     parser.add_argument("--max-new-tokens", type=int, default=64)
     parser.add_argument("--normalize", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--intervention", choices=("add", "clamp"), default="add")
     args = parser.parse_args()
     direction, manifest, _, _ = load_direction(args.direction)
     questions = list(EVAL_QUESTIONS[: args.questions or None])
     model, tokenizer = load_runtime(args.model)
     runner = Runner.from_direction(
-        model, tokenizer, direction, rank=args.rank or None, normalize=args.normalize
+        model,
+        tokenizer,
+        direction,
+        rank=args.rank or None,
+        normalize=args.normalize,
+        intervention=args.intervention,
     )
     detector = concept_detector(args.feature or manifest.target)
     rows = []

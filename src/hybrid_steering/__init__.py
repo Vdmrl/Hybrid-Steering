@@ -11,6 +11,7 @@ from .cache import (
     replace_state,
     snapshot_nonrecurrent,
 )
+from .delta_rule import chunk_gated_delta_rule_clamped, recurrent_gated_delta_rule_clamped
 from .detect import (
     LANGUAGE_FEATURES,
     AnswerEquivalence,
@@ -55,6 +56,7 @@ __all__ = [
     "binary_prompt",
     "build_tiny",
     "chat_prompts",
+    "chunk_gated_delta_rule_clamped",
     "clamp_delta",
     "clone_cache",
     "collect_direction",
@@ -69,6 +71,7 @@ __all__ = [
     "load_runtime",
     "mean",
     "parse_binary",
+    "recurrent_gated_delta_rule_clamped",
     "replace_state",
     "save_direction",
     "snapshot_nonrecurrent",
