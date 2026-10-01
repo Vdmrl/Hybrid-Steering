@@ -1,0 +1,23 @@
+experiments/concept-pairs/run.py
+  s_10ff7079c76832::t_87d1540397c0c8 125-133,290
+experiments/judge-calibration/run.py
+  s_10ff7079c76832::t_3109cb2d898ac6 32
+experiments/pair-audit/run.py
+  s_10ff7079c76832::t_b318204a779c5c 57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "5ecd503b91dc6eddc1b7a776f8ef0be5524a9ba5",
+  "prompts": {},
+  "sessions": {
+    "s_10ff7079c76832": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4c8b3f55-5bfa-4d8a-878b-25dcd85fa1f6",
+        "model": "unknown"
+      },
+      "human_author": "Slava Chaunin <67190162+Ssslakter@users.noreply.github.com>"
+    }
+  }
+}
