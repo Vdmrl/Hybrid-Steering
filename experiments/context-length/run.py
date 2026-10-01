@@ -19,7 +19,7 @@ import torch
 from hybrid_steering import Runner, load_direction, load_runtime
 from hybrid_steering.judge import score_rows
 from hybrid_steering.judge.config import repo_root
-from hybrid_steering.runtime import chat_prompts, import_path, write_jsonl
+from hybrid_steering.runtime import import_path, write_jsonl
 
 MODES = ("initial", "prompt-end", "repeated", "periodic")
 SCALES = (1.25, 1.5)
@@ -78,10 +78,9 @@ def main() -> None:
     parser.add_argument("--rank", type=int, default=0)
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
-    questions = [row["question"] for row in simple_questions(args.questions, args.seed)]
+    prompts = [row["question"] for row in simple_questions(args.questions, args.seed)]
     direction, manifest, _, _ = load_direction(args.direction)
     model, tokenizer = load_runtime(args.model)
-    prompts = chat_prompts(tokenizer, questions)
     runner = Runner.from_direction(
         model, tokenizer, direction, rank=args.rank or None, normalize=False
     )
@@ -92,7 +91,7 @@ def main() -> None:
             tokens = generate(runner, prompts, mode, scale, args.period, args.max_new_tokens)
             if not torch.isfinite(tokens.float()).all():
                 raise SystemExit(f"{mode} produced non-finite tokens")
-            for prompt, row in zip(questions, tokens, strict=True):
+            for prompt, row in zip(prompts, tokens, strict=True):
                 text = tokenizer.decode(row, skip_special_tokens=True)
                 rows.append(
                     {

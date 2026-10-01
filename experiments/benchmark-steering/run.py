@@ -11,7 +11,7 @@ import torch
 
 from hybrid_steering import Runner, gdn_layers, load_runtime
 from hybrid_steering.judge.config import repo_root
-from hybrid_steering.runtime import chat_prompts, import_path
+from hybrid_steering.runtime import import_path
 
 
 def main() -> None:
@@ -36,9 +36,7 @@ def main() -> None:
     }
     runner = Runner(model, tokenizer, layers, deltas, normalize=False)
     questions = import_path(repo_root() / "experiments/forgetting/questions.py")
-    texts = chat_prompts(
-        tokenizer, [row["question"] for row in questions.simple_questions(args.batch_size, seed=42)]
-    )
+    texts = [row["question"] for row in questions.simple_questions(args.batch_size, seed=42)]
     samples = []
     for _ in range(args.repeats):
         start = time.perf_counter()
