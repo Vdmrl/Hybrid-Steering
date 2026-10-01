@@ -7,6 +7,7 @@ length.
 
 ``questions`` asks the model for everyday questions by domain and drops any
 question that is close to the evaluation pool in ``experiments/forgetting``.
+``eval`` writes tune and held-out questions from domains the pairs never saw.
 ``pairs`` samples several answers per side, filters them by the concept's
 lexicon, and writes ``pairs.jsonl`` in the dataset schema.
 
@@ -70,6 +71,17 @@ DOMAINS = (
     "planning events",
     "small business",
 )
+EVAL_DOMAINS = (
+    "photography",
+    "board and card games",
+    "car ownership",
+    "home repairs",
+    "theatre and museums",
+    "clothing and fashion",
+    "sleep and rest",
+    "paperwork and public services",
+)
+TUNE = 50
 PLAIN = "Answer the question in a plain, direct, practical way."
 
 # positive instruction, words the negative must avoid, words the positive must contain
@@ -166,14 +178,16 @@ def sample(
     return results
 
 
-def make_questions(args: argparse.Namespace) -> None:
+def generate_questions(
+    args: argparse.Namespace, domains: tuple[str, ...], excluded: list[str]
+) -> list[str]:
     model, tokenizer = load_runtime(args.model)
     prompts = [
         f"Write {args.per_domain} different everyday questions about {domain} that a person "
         "might ask a helpful assistant. Each question must be answerable in one paragraph, "
         "open-ended, and neutral: no religion, statistics, fiction, or comparisons in the "
         "question itself. One question per line, no numbering, nothing else."
-        for domain in DOMAINS
+        for domain in domains
         for _ in range(args.rounds)
     ]
     outputs = sample(
@@ -184,7 +198,7 @@ def make_questions(args: argparse.Namespace) -> None:
         max_new_tokens=1024,
         seed=args.seed,
     )
-    held = [words(question) for question in SIMPLE_QUESTIONS]
+    held = [words(question) for question in excluded]
     kept: list[str] = []
     seen: list[set[str]] = []
     for text, _ in outputs:
@@ -197,9 +211,30 @@ def make_questions(args: argparse.Namespace) -> None:
             kept.append(question)
             seen.append(words(question))
     random.Random(args.seed).shuffle(kept)
+    return kept
+
+
+def make_questions(args: argparse.Namespace) -> None:
+    kept = generate_questions(args, DOMAINS, list(SIMPLE_QUESTIONS))
     args.output.mkdir(parents=True, exist_ok=True)
     (args.output / "questions.json").write_text(json.dumps(kept[: args.keep], indent=1) + "\n")
     print(f"kept {min(len(kept), args.keep)} of {len(kept)} questions", flush=True)
+
+
+def make_eval(args: argparse.Namespace) -> None:
+    """Tune and held-out questions from domains that the pairs never saw."""
+    pair_questions = json.loads((args.output / "questions.json").read_text())
+    kept = generate_questions(args, EVAL_DOMAINS, [*SIMPLE_QUESTIONS, *pair_questions])
+    rows = [
+        {
+            "source_id": f"eval-{index:04d}",
+            "question": question,
+            "split": "tune" if index < TUNE else "held",
+        }
+        for index, question in enumerate(kept[: args.keep])
+    ]
+    write_jsonl(args.output / "eval_questions.jsonl", rows)
+    print(f"kept {len(rows)} of {len(kept)} eval questions", flush=True)
 
 
 def match(positives: list[tuple[str, int]], negatives: list[tuple[str, int]]) -> list[tuple]:
@@ -297,7 +332,7 @@ def make_pairs(args: argparse.Namespace) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("stage", choices=("questions", "pairs"))
+    parser.add_argument("stage", choices=("questions", "eval", "pairs"))
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--model", default=MODEL)
     parser.add_argument("--concept", choices=sorted(CONCEPTS))
@@ -311,6 +346,9 @@ def main() -> None:
     args = parser.parse_args()
     if args.stage == "questions":
         make_questions(args)
+        return
+    if args.stage == "eval":
+        make_eval(args)
         return
     if args.concept is None:
         parser.error("pairs needs --concept")

@@ -15,7 +15,7 @@ from pathlib import Path
 from hybrid_steering import Runner, load_direction, load_runtime
 from hybrid_steering.detect import EVAL_QUESTIONS
 from hybrid_steering.judge import score_rows
-from hybrid_steering.runtime import write_jsonl
+from hybrid_steering.runtime import chat_prompts, write_jsonl
 
 
 def main() -> None:
@@ -47,7 +47,7 @@ def main() -> None:
     rows = []
     for scale in args.scales:
         tokens = runner.generate(
-            questions,
+            chat_prompts(tokenizer, questions),
             scale=scale,
             prompt_position=args.position,
             max_new_tokens=args.max_new_tokens,
