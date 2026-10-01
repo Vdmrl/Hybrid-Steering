@@ -7,7 +7,8 @@ length.
 
 ``questions`` asks the model for everyday questions by domain and drops any
 question that is close to the evaluation pool in ``experiments/forgetting``.
-``eval`` writes tune and held-out questions from domains the pairs never saw.
+``eval`` writes one evaluation pool from domains the pairs never saw.
+``experiments/forgetting/questions.py`` splits it into tune and held-out by seed.
 ``pairs`` samples several answers per side, filters them by the concept's
 lexicon, and writes ``pairs.jsonl`` in the dataset schema.
 
@@ -81,7 +82,6 @@ EVAL_DOMAINS = (
     "sleep and rest",
     "paperwork and public services",
 )
-TUNE = 50
 PLAIN = "Answer the question in a plain, direct, practical way."
 
 # positive instruction, words the negative must avoid, words the positive must contain
@@ -222,15 +222,11 @@ def make_questions(args: argparse.Namespace) -> None:
 
 
 def make_eval(args: argparse.Namespace) -> None:
-    """Tune and held-out questions from domains that the pairs never saw."""
+    """Evaluation questions from domains that the pairs never saw."""
     pair_questions = json.loads((args.output / "questions.json").read_text())
     kept = generate_questions(args, EVAL_DOMAINS, [*SIMPLE_QUESTIONS, *pair_questions])
     rows = [
-        {
-            "source_id": f"eval-{index:04d}",
-            "question": question,
-            "split": "tune" if index < TUNE else "held",
-        }
+        {"source_id": f"eval-{index:04d}", "question": question}
         for index, question in enumerate(kept[: args.keep])
     ]
     write_jsonl(args.output / "eval_questions.jsonl", rows)
