@@ -1,0 +1,25 @@
+experiments/benchmark-steering/run.py
+  s_10ff7079c76832::t_09ec3ffc2c1f9c 14,39
+experiments/context-length/run.py
+  s_10ff7079c76832::t_ad49602e0d73d3 22,81,94
+experiments/steering/run.py
+  s_10ff7079c76832::t_4f82234da79e9d 18,50
+tests/test_runtime.py
+  s_10ff7079c76832::t_48c865441f3fc7 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "838b1e6da57eb543f069a569a89c734080ea9f4e",
+  "prompts": {},
+  "sessions": {
+    "s_10ff7079c76832": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4c8b3f55-5bfa-4d8a-878b-25dcd85fa1f6",
+        "model": "unknown"
+      },
+      "human_author": "Slava Chaunin <67190162+Ssslakter@users.noreply.github.com>"
+    }
+  }
+}
