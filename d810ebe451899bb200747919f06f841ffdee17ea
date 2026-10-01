@@ -1,0 +1,29 @@
+experiments/steering/run.py
+  s_ba4aa9e1f574bb::t_5c6a1cefb9b448 5-6,31,37-42
+src/hybrid_steering/__init__.py
+  s_ba4aa9e1f574bb::t_70b259bf29ce7e 14,59,74
+src/hybrid_steering/delta_rule.py
+  s_ba4aa9e1f574bb::t_c1e91aaa49e249 1-280
+src/hybrid_steering/runner.py
+  s_ba4aa9e1f574bb::t_49ce58337e0d61 7-11,28-32,37,95,99-100,108,110-117,131,139-146,270,282-288,305-358,380,386,443-446,454,476,480-487
+tests/test_delta_rule.py
+  s_ba4aa9e1f574bb::t_682390f880ee33 1-192
+tests/test_runner.py
+  s_ba4aa9e1f574bb::t_e20320bd4132dd 8,183-248
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d810ebe451899bb200747919f06f841ffdee17ea",
+  "prompts": {},
+  "sessions": {
+    "s_ba4aa9e1f574bb": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "76031f8c-848a-4bd3-9754-578508ddc945",
+        "model": "unknown"
+      },
+      "human_author": "Slava Chaunin <67190162+Ssslakter@users.noreply.github.com>"
+    }
+  }
+}
