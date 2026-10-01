@@ -12,14 +12,7 @@ from .cache import (
     snapshot_nonrecurrent,
 )
 from .delta_rule import chunk_gated_delta_rule_clamped, recurrent_gated_delta_rule_clamped
-from .detect import (
-    LANGUAGE_FEATURES,
-    AnswerEquivalence,
-    ConceptDetector,
-    binary_prompt,
-    concept_detector,
-    parse_binary,
-)
+from .detect import LANGUAGE_FEATURES, ConceptDetector, concept_detector
 from .extract import CollectedDirection, collect_direction, final_states
 from .models import DirectionManifest
 from .runner import Runner, Trace
@@ -40,7 +33,6 @@ from .state import (
 
 __all__ = [
     "Accumulator",
-    "AnswerEquivalence",
     "CollectedDirection",
     "ConceptDetector",
     "CosineToMean",
@@ -53,7 +45,6 @@ __all__ = [
     "add_delta",
     "apply_direction",
     "assert_nonrecurrent_unchanged",
-    "binary_prompt",
     "build_tiny",
     "chat_prompts",
     "chunk_gated_delta_rule_clamped",
@@ -70,7 +61,6 @@ __all__ = [
     "load_direction",
     "load_runtime",
     "mean",
-    "parse_binary",
     "recurrent_gated_delta_rule_clamped",
     "replace_state",
     "save_direction",

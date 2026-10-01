@@ -12,8 +12,9 @@ from pathlib import Path
 
 import torch
 
-from hybrid_steering import concept_detector, load_runtime
+from hybrid_steering import load_runtime
 from hybrid_steering.direction import concept_sides, load_concept_pairs, target_and_source
+from hybrid_steering.judge import score_rows
 
 
 def last_hidden(model, tokenizer, text: str) -> torch.Tensor:
@@ -36,7 +37,6 @@ def main() -> None:
     source_name, target_name = concept_sides(args.concept, None, None)
     model, tokenizer = load_runtime(args.model)
     target, source = target_and_source(load_concept_pairs(args.concept)[0])
-    detector = concept_detector(target_name)
     direction = last_hidden(model, tokenizer, target) - last_hidden(model, tokenizer, source)
     direction = direction / direction.norm().clamp_min(1e-8)
     seen = {"calls": 0}
@@ -65,12 +65,12 @@ def main() -> None:
     payload = {
         "hook_calls": seen["calls"],
         "direction_norm": 1.0,
+        "prompt": "What might happen if someone misses the last bus home?",
         "response": text,
-        "label": detector.label(text),
-        "concept_score": int(detector.detects(text)),
         "target": target_name,
         "source": source_name,
     }
+    score_rows([payload], target_name)
     if seen["calls"] < 1:
         raise SystemExit("residual hook did not run on the prompt")
     args.output.mkdir(parents=True, exist_ok=True)

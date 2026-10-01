@@ -11,17 +11,12 @@ import random
 from pathlib import Path
 
 from datasets import load_dataset
+from equivalence import prompt as equivalence_prompt
+from equivalence import verdict
 
-from hybrid_steering import (
-    AnswerEquivalence,
-    Runner,
-    concept_detector,
-    load_direction,
-    load_runtime,
-    token_prefixes,
-)
-from hybrid_steering.judge.config import load_configs, repo_root
-from hybrid_steering.judge.runner import complete_text
+from hybrid_steering import Runner, concept_detector, load_direction, load_runtime, token_prefixes
+from hybrid_steering.judge import complete_batch
+from hybrid_steering.judge.config import repo_root
 from hybrid_steering.runtime import collect_steered_rows, import_path, write_jsonl
 
 PREFIX_LENGTHS = (0, 32, 64, 128, 256, 512, 1024, 2048, 4096)
@@ -73,21 +68,10 @@ def main() -> None:
         model, tokenizer, direction, rank=args.rank or None, normalize=True
     )
     detector = concept_detector(args.language)
-    equivalence = AnswerEquivalence()
-    _, judge_config = load_configs(repo_root())
     examples = squad_questions(args.questions, args.seed)
     prefixes = token_prefixes(tokenizer, passages[filler_index], args.prefix_lengths)
 
-    def judge(text: str) -> str:
-        return complete_text(
-            text,
-            model=judge_config.model,
-            base_url=judge_config.base_url,
-            extra=judge_config.generation.request_extras,
-        )
-
     def build_row(length, example, base, scale, response):
-        verdict, raw = equivalence.score(example["question"], response, base, judge)
         return {
             "source_id": example["source_id"],
             "prefix_length": length,
@@ -97,9 +81,7 @@ def main() -> None:
             "baseline": base,
             "response": response,
             "language": detector.label(response),
-            "target_language": detector.detects(response),
-            "equivalent": verdict,
-            "equivalence_raw": raw,
+            "target_language": int(detector.detects(response)),
             "direction": f"{manifest.target} - {manifest.source}",
         }
 
@@ -114,6 +96,23 @@ def main() -> None:
         max_new_tokens=args.max_new_tokens,
         build_row=build_row,
     )
+    raws = complete_batch(
+        [
+            [
+                {
+                    "role": "user",
+                    "content": equivalence_prompt(
+                        row["question"], row["response"], row["baseline"]
+                    ),
+                }
+            ]
+            for row in rows
+        ],
+        max_tokens=32,
+    )
+    for row, raw in zip(rows, raws, strict=True):
+        row["equivalent"] = verdict(raw)
+        row["equivalence_raw"] = raw
     write_jsonl(args.output / "rows.jsonl", rows)
     print(f"wrote {len(rows)} rows to {args.output}", flush=True)
 

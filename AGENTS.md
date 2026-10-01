@@ -35,16 +35,17 @@ asks for a truncated artifact.
 
 ## Judge
 
-`concept_detector` is the only concept score. Features in `LANGUAGE_FEATURES`
-use Lingua and do not call a model. Every other feature is a 0/1 judge prompt
-built from `concepts/features.yaml`. Article-ready 1–5 scores go through
-`hybrid_steering.judge`, which calls LiteLLM. Do not copy a feature definition
-into experiment code. Answer equivalence is a separate question and is not a
-concept detector.
+Non-language concepts are scored by `hybrid_steering.judge.score_steering`.
+The rubric is `prompts/steering_judge.txt`. Each concept guide is the `guide`
+field in `concepts/features.yaml`. One call returns concept presence 0–4 and
+content quality 0–4. The judge does not see method, layer, or scale. Requests
+go out together through LiteLLM. The endpoint is `OPENAI_BASE_URL` and the
+key is `OPENAI_API_KEY`, for OpenRouter or a self-hosted vLLM server. Optional
+`OPENROUTER_PROXY` is read from the environment. Do not print them.
 
-Do not edit a prompt file after it has produced reported results. Add a new
-file and point `config/judge.yaml` at it. Read `OPENROUTER_API_KEY` and optional
-`OPENROUTER_PROXY` from the environment. Do not print them.
+Features in `LANGUAGE_FEATURES` use Lingua and do not call a model. Do not copy
+a concept guide into experiment code. Extra scores, such as answer equivalence,
+stay next to the experiment that needs them.
 
 ## Dependencies
 
@@ -68,6 +69,6 @@ uv run pytest
 
 - Work on `main`. Do not create a branch unless the user asks.
 - Do not commit `.env`, API keys, raw generations, or model weights.
-- Read `OPENROUTER_API_KEY` and optional `OPENROUTER_PROXY` from the environment. Do not print them.
+- Read `OPENAI_BASE_URL`, `OPENAI_API_KEY`, and optional `OPENROUTER_PROXY` from the environment. Do not print them.
 - External model calls happen only from an explicit CLI action. Imports and unit tests stay side-effect free.
 - Unit tests use the tiny local Qwen or mocked provider responses. They must not spend API credits.

@@ -76,7 +76,8 @@ Do not add to a pull request:
 - incidental local reports;
 - an unrelated refactor together with a new metric.
 
-## Changing prompts and scales
+## Changing the steering judge
 
-A prompt used in a published or team result is not overwritten. Add a new file
-and point `config/judge.yaml` at it.
+The rubric is `prompts/steering_judge.txt`. Concept guides are the `guide`
+fields in `concepts/features.yaml`. Language detection does not use that rubric.
+An extra score for one experiment lives next to that experiment.

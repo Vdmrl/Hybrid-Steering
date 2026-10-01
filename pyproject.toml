@@ -33,7 +33,6 @@ dev = ["pytest>=8.2", "ruff>=0.6"]
 toys = ["transformer-lens>=3,<4"]
 
 [project.scripts]
-hybrid-judge = "hybrid_steering.judge.cli:main"
 hybrid-direction = "hybrid_steering.direction:main"
 
 [tool.hatch.build.targets.wheel]
@@ -62,7 +61,6 @@ extend-exclude = [
   "experiments/archive",
   "experiments/steering-reports",
   "experiments/notebooks",
-  "calibration",
 ]
 
 [tool.ruff.lint]

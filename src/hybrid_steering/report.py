@@ -19,8 +19,13 @@ def group_mean(rows: list[dict], x: str, value: str, series: str | None = None) 
         raise ValueError("rows must not be empty")
     totals: dict[tuple, list[float]] = {}
     for row in rows:
+        raw = _field(row, value)
+        if raw is None:
+            continue
         key = (_field(row, x), _field(row, series) if series else None)
-        totals.setdefault(key, []).append(float(_field(row, value)))
+        totals.setdefault(key, []).append(float(raw))
+    if not totals:
+        raise ValueError(f"no numeric {value}")
     grouped = []
     for (x_value, series_value), samples in totals.items():
         item = {x: x_value, value: sum(samples) / len(samples), "n": len(samples)}
@@ -68,14 +73,14 @@ def report_main(title: str, sections: list[tuple[str, str, str | None, str]]) ->
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     rows = read_jsonl(args.rows)
-    write_page(
-        args.output,
-        title,
-        [
-            summary_section(rows, x, value, series, heading)
-            for x, value, series, heading in sections
-        ],
-    )
+    rendered = [
+        summary_section(rows, x, value, series, heading)
+        for x, value, series, heading in sections
+        if rows and value in rows[0]
+    ]
+    if not rendered:
+        raise ValueError("rows have none of the requested columns")
+    write_page(args.output, title, rendered)
     print(f"wrote {args.output}", flush=True)
 
 

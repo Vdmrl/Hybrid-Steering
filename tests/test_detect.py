@@ -1,3 +1,5 @@
+import pytest
+
 from hybrid_steering import concept_detector
 
 
@@ -23,8 +25,6 @@ def test_added_languages_use_lingua_without_changing_russian() -> None:
     assert len(concept_detector("ru").languages) == 3
 
 
-def test_other_concepts_use_the_supplied_verdict() -> None:
-    detector = concept_detector("optimism", verdict="0")
-    assert detector.target
-    assert not detector.detects("anything", question="What next?")
-    assert detector.label("anything", question="What next?") == "0"
+def test_non_language_features_are_not_a_detector() -> None:
+    with pytest.raises(ValueError, match="optimism"):
+        concept_detector("optimism")

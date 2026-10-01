@@ -1,9 +1,10 @@
 """Score generations with a saved target-minus-source direction.
 
 Build the direction first with ``hybrid-direction``. ``--feature`` selects the
-``concept_detector`` id. The default is the direction's target name, which for
-``en-ru`` is ``ru``. ``--intervention clamp`` rewrites the rank-1 coordinate on
-every token; scale 0 is the unclamped baseline.
+score. A language id uses Lingua. Any other id uses the steering judge. The
+default is the direction's target name, which for ``en-ru`` is ``ru``.
+``--intervention clamp`` rewrites the rank-1 coordinate on every token; scale 0
+is the unclamped baseline.
 """
 
 from __future__ import annotations
@@ -11,8 +12,9 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from hybrid_steering import Runner, concept_detector, load_direction, load_runtime
+from hybrid_steering import Runner, load_direction, load_runtime
 from hybrid_steering.detect import EVAL_QUESTIONS
+from hybrid_steering.judge import score_rows
 from hybrid_steering.runtime import write_jsonl
 
 
@@ -41,7 +43,7 @@ def main() -> None:
         normalize=args.normalize,
         intervention=args.intervention,
     )
-    detector = concept_detector(args.feature or manifest.target)
+    feature = args.feature or manifest.target
     rows = []
     for scale in args.scales:
         tokens = runner.generate(
@@ -57,12 +59,11 @@ def main() -> None:
                     "scale": scale,
                     "prompt": prompt,
                     "response": text,
-                    "label": detector.label(text),
-                    "concept_score": int(detector.detects(text)),
                     "target": manifest.target,
                     "source": manifest.source,
                 }
             )
+    score_rows(rows, feature)
     write_jsonl(args.output / "generations.jsonl", rows)
     print(f"wrote {args.output}", flush=True)
 

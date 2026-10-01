@@ -1,7 +1,7 @@
 """Context-length steering modes on one saved direction.
 
-Score each response with ``concept_detector``. ``--feature`` defaults to the
-direction target.
+Score each response with Lingua for a language feature, otherwise with the
+steering judge. ``--feature`` defaults to the direction target.
 
 ``initial`` writes the direction before the first real token.
 ``prompt-end`` writes it at the last prompt token.
@@ -16,7 +16,8 @@ from pathlib import Path
 
 import torch
 
-from hybrid_steering import Runner, concept_detector, load_direction, load_runtime
+from hybrid_steering import Runner, load_direction, load_runtime
+from hybrid_steering.judge import score_rows
 from hybrid_steering.judge.config import repo_root
 from hybrid_steering.runtime import import_path, write_jsonl
 
@@ -83,7 +84,7 @@ def main() -> None:
     runner = Runner.from_direction(
         model, tokenizer, direction, rank=args.rank or None, normalize=False
     )
-    detector = concept_detector(args.feature or manifest.target)
+    feature = args.feature or manifest.target
     rows = []
     for scale in args.scales:
         for mode in MODES:
@@ -98,12 +99,11 @@ def main() -> None:
                         "prompt": prompt,
                         "response": text,
                         "scale": scale,
-                        "label": detector.label(text),
-                        "concept_score": int(detector.detects(text)),
                         "target": manifest.target,
                         "source": manifest.source,
                     }
                 )
+    score_rows(rows, feature)
     write_jsonl(args.output / "responses.jsonl", rows)
     print(f"wrote {len(rows)} rows", flush=True)
 

@@ -1,15 +1,17 @@
-"""Blind 1–5 judge. It scores an answer and a feature. It does not see the steering method."""
+"""Steering-effect judge. Languages are detected elsewhere."""
 
-from .cli import main
-from .config import load_configs, load_judge_config
-from .models import Feature, FeatureConfig, JudgeConfig, JudgeResult
+from .client import complete_batch
+from .config import load_settings, repo_root
+from .steering import Judgment, load_guides, parse_judgment, render, score_rows, score_steering
 
 __all__ = [
-    "Feature",
-    "FeatureConfig",
-    "JudgeConfig",
-    "JudgeResult",
-    "load_configs",
-    "load_judge_config",
-    "main",
+    "Judgment",
+    "complete_batch",
+    "load_guides",
+    "load_settings",
+    "parse_judgment",
+    "render",
+    "repo_root",
+    "score_rows",
+    "score_steering",
 ]

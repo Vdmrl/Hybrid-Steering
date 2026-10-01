@@ -14,13 +14,8 @@ from pathlib import Path
 from fillers import FILLERS
 from questions import SIMPLE_QUESTIONS, simple_questions
 
-from hybrid_steering import (
-    Runner,
-    concept_detector,
-    load_direction,
-    load_runtime,
-    token_prefixes,
-)
+from hybrid_steering import Runner, load_direction, load_runtime, token_prefixes
+from hybrid_steering.judge import score_rows
 from hybrid_steering.runtime import collect_steered_rows, write_jsonl
 
 PREFIX_LENGTHS = (0, 32, 64, 128, 256, 512, 1024, 2048, 4096)
@@ -57,7 +52,6 @@ def main() -> None:
     runner = Runner.from_direction(
         model, tokenizer, direction, rank=args.rank or None, normalize=True
     )
-    detector = concept_detector(args.feature)
     examples = simple_questions(args.questions, args.seed)
     prefixes = token_prefixes(tokenizer, FILLERS[filler_index], args.prefix_lengths)
 
@@ -70,7 +64,6 @@ def main() -> None:
             "scale": scale,
             "baseline": base,
             "response": response,
-            "concept_score": int(detector.detects(response, question=example["question"])),
             "target": manifest.target,
             "source": manifest.source,
         }
@@ -86,6 +79,7 @@ def main() -> None:
         max_new_tokens=args.max_new_tokens,
         build_row=build_row,
     )
+    score_rows(rows, args.feature, prompt_field="question")
     write_jsonl(args.output / "rows.jsonl", rows)
     print(f"wrote {len(rows)} rows to {args.output}", flush=True)
 

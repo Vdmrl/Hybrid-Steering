@@ -1,14 +1,1 @@
 model: "openai/gpt-4o-mini"
-base_url: "https://openrouter.ai/api/v1"
-
-generation:
-  temperature: 0
-  max_output_tokens: 256
-  top_logprobs: 20
-  timeout_seconds: 240
-  retries: 2
-  workers: 8
-
-evaluation:
-  default_feature: "optimism"
-  prompt: "judge_v3_compositional.txt"

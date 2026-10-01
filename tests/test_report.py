@@ -12,6 +12,14 @@ def test_group_mean_averages_a_score_within_each_cell() -> None:
     assert cell["concept_score"] == 0.5
     assert cell["n"] == 2
     assert "initial" in summary_section(rows, "scale", "concept_score", "mode", "Score")
+    with_gap = [
+        {"scale": 1, "concept_score": 4},
+        {"scale": 1, "concept_score": None},
+        {"scale": 1, "concept_score": 2},
+    ]
+    gap = group_mean(with_gap, "scale", "concept_score")
+    assert gap[0]["concept_score"] == 3
+    assert gap[0]["n"] == 2
 
 
 def test_report_main_writes_the_named_columns(tmp_path, monkeypatch) -> None:

@@ -5,7 +5,7 @@ recurrent state, then scoring the result.
 
 A direction is the mean of `target - source`. Positive `scale` moves the state
 toward the target. Natural languages are detected locally. Other concepts use
-the blind judge and the definitions in `concepts/features.yaml`.
+the steering judge and the guides in `concepts/features.yaml`.
 
 ## Setup
 
@@ -55,9 +55,8 @@ Each steering experiment has `run.py` (generate and score) and `report.py`
 
 ## Judge
 
-```bash
-export OPENROUTER_API_KEY="..."
-uv run hybrid-judge input.jsonl runs/judgments.jsonl --feature optimism
-```
-
-The judge sees a scenario and an answer. It does not see the steering method.
+Steering runs score non-language concepts with `score_steering`. The judge sees
+the prompt and the answer. It does not see the steering method. Set
+`OPENAI_BASE_URL` and `OPENAI_API_KEY`. OpenRouter uses
+`https://openrouter.ai/api/v1`. A self-hosted vLLM server uses its `/v1` URL.
+`config/judge.yaml` is the model id that endpoint expects.
