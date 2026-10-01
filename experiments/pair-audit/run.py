@@ -18,7 +18,7 @@ import statistics
 from html import escape
 from pathlib import Path
 
-from hybrid_steering.direction import load_concept_pairs
+from hybrid_steering.direction import load_concept_pairs, read_pairs
 from hybrid_steering.report import write_page
 
 CONCEPTS = {
@@ -35,6 +35,22 @@ CONCEPTS = {
         r"(fiction|narrative|story|stories|storytelling|plot|character)",
     ),
     "isolated_framing-comparative_framing": (
+        "pairs.jsonl",
+        r"(compar|contrast|unlike|parallel|relative to|versus)",
+    ),
+    "plain-theistic_framing": (
+        "pairs.jsonl",
+        r"\b(god|divine|faith|deity|supernatural|creator|prayer|spiritual)",
+    ),
+    "plain-probabilistic_framing": (
+        "pairs.jsonl",
+        r"(probabil|likelihood|chance|uncertain|odds|spectrum)",
+    ),
+    "plain-fictional_narrative": (
+        "pairs.jsonl",
+        r"(fiction|narrative|story|stories|storytelling|plot|character)",
+    ),
+    "plain-comparative_framing": (
         "pairs.jsonl",
         r"(compar|contrast|unlike|parallel|relative to|versus)",
     ),
@@ -112,6 +128,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--model", default="Qwen/Qwen3.5-9B")
+    parser.add_argument("--pairs", type=Path, help="directory with local <concept>/pairs.jsonl")
     parser.add_argument("--samples", type=int, default=8)
     parser.add_argument("--seed", type=int, default=7)
     args = parser.parse_args()
@@ -120,7 +137,13 @@ def main() -> None:
     tokenizer = AutoTokenizer.from_pretrained(args.model)
     stats, sections = [], []
     for concept, (name, pattern) in CONCEPTS.items():
-        rows = load_concept_pairs(concept, name)
+        local = args.pairs / concept / name if args.pairs else None
+        if local and local.exists():
+            rows = read_pairs(local)
+        elif concept.startswith("plain-"):
+            continue
+        else:
+            rows = load_concept_pairs(concept, name)
         stats.append(audit(concept, rows, tokenizer, pattern))
         sections.append(samples(concept, rows, args.samples, args.seed))
     write_page(
