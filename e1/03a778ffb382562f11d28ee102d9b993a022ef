@@ -1,0 +1,21 @@
+experiments/concept-pairs/run.py
+  s_10ff7079c76832::t_f14bb50da6416c 10-11,225,229
+experiments/forgetting/questions.py
+  s_10ff7079c76832::t_c486c047ea20ce 2-4,68-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "e103a778ffb382562f11d28ee102d9b993a022ef",
+  "prompts": {},
+  "sessions": {
+    "s_10ff7079c76832": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4c8b3f55-5bfa-4d8a-878b-25dcd85fa1f6",
+        "model": "unknown"
+      },
+      "human_author": "Slava Chaunin <67190162+Ssslakter@users.noreply.github.com>"
+    }
+  }
+}
