@@ -54,6 +54,7 @@ CONCEPTS = {
         "pairs.jsonl",
         r"(compar|contrast|unlike|parallel|relative to|versus)",
     ),
+    "plain-technical_language": ("pairs.jsonl", None),
     "technical": ("pairs_n218.jsonl", None),
     "en-ru": ("pairs.jsonl", None),
     "en-fr": ("pairs.jsonl", None),

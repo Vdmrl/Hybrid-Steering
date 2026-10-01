@@ -29,7 +29,7 @@ FEATURES = {
     "plain-probabilistic_framing": "probabilistic_framing",
     "plain-fictional_narrative": "fictional_narrative",
     "plain-comparative_framing": "comparative_framing",
-    "technical": "technical_language",
+    "plain-technical_language": "technical_language",
 }
 THRESHOLD = 2
 

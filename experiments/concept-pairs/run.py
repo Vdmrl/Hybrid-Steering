@@ -122,6 +122,15 @@ CONCEPTS = {
         r"similar\w*|differen\w*)",
         r"(compar\w*|unlike|\bthan\b|whereas|versus)",
     ),
+    "technical_language": (
+        "Answer like a domain specialist: use the precise technical terms of the relevant "
+        "field and explain the underlying mechanism, how and why it works. Do not define "
+        "terms for a lay reader and do not mention jargon or expertise as a topic.",
+        PLAIN + " Use everyday words a child would know. Do not use technical terms or "
+        "explain mechanisms.",
+        None,
+        None,
+    ),
 }
 
 
@@ -278,7 +287,7 @@ def make_pairs(args: argparse.Namespace) -> None:
         if "\n" in text.strip() or re.match(r"^(sure|here|certainly|okay)\b", text, re.I):
             dropped["format"] += 1
             continue
-        if side == "negative" and re.search(avoid, text, re.I):
+        if side == "negative" and avoid and re.search(avoid, text, re.I):
             dropped["lexicon"] += 1
             continue
         if side == "positive" and require and not re.search(require, text, re.I):
