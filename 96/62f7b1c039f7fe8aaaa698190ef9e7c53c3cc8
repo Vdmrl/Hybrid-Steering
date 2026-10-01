@@ -1,0 +1,27 @@
+experiments/judge-calibration/run.py
+  s_10ff7079c76832::t_277eb9cb7923d5 70-72,97-100
+src/hybrid_steering/judge/client.py
+  s_10ff7079c76832::t_a9358bb75b5d31 24,27,31-33,49,56-57,60,68-72,77-80
+src/hybrid_steering/judge/config.py
+  s_10ff7079c76832::t_7894babf7979c5 11-15,18-19,33,39-44
+src/hybrid_steering/judge/steering.py
+  s_10ff7079c76832::t_fdfe86fe78f244 104,109,124,133,136
+tests/test_judge.py
+  s_10ff7079c76832::t_345501a61797d8 85-109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "9662f7b1c039f7fe8aaaa698190ef9e7c53c3cc8",
+  "prompts": {},
+  "sessions": {
+    "s_10ff7079c76832": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4c8b3f55-5bfa-4d8a-878b-25dcd85fa1f6",
+        "model": "unknown"
+      },
+      "human_author": "Slava Chaunin <67190162+Ssslakter@users.noreply.github.com>"
+    }
+  }
+}
