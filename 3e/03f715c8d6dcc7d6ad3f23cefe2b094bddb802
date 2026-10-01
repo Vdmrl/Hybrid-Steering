@@ -1,0 +1,19 @@
+experiments/direction-stability/run.py
+  s_10ff7079c76832::t_ce9c2ef7d53d72 1-84
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "3e03f715c8d6dcc7d6ad3f23cefe2b094bddb802",
+  "prompts": {},
+  "sessions": {
+    "s_10ff7079c76832": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4c8b3f55-5bfa-4d8a-878b-25dcd85fa1f6",
+        "model": "unknown"
+      },
+      "human_author": "Slava Chaunin <67190162+Ssslakter@users.noreply.github.com>"
+    }
+  }
+}
