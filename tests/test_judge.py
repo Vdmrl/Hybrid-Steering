@@ -82,6 +82,31 @@ def test_score_steering_sends_one_batch_and_keeps_order(monkeypatch) -> None:
     assert judgments[1] is None
 
 
+def test_score_steering_drops_a_label_cut_at_the_token_limit(monkeypatch) -> None:
+    import litellm
+
+    monkeypatch.setenv("OPENAI_BASE_URL", "http://127.0.0.1:8000/v1")
+    monkeypatch.setenv("OPENAI_API_KEY", "local")
+    seen: dict = {}
+
+    def fake(*, messages, **kwargs):
+        seen.update(kwargs)
+        return [
+            SimpleNamespace(
+                choices=[
+                    SimpleNamespace(message=SimpleNamespace(content=_label()), finish_reason=reason)
+                ]
+            )
+            for reason in ("stop", "length")
+        ]
+
+    monkeypatch.setattr(litellm, "batch_completion", fake)
+    judgments = score_steering([("q", "a"), ("q2", "a2")], "optimism", thinking=False)
+    assert judgments[0] is not None and judgments[1] is None
+    assert seen["max_tokens"] == 4096
+    assert seen["extra_body"] == {"chat_template_kwargs": {"enable_thinking": False}}
+
+
 def test_score_steering_refuses_a_language_and_a_total_miss(monkeypatch) -> None:
     import litellm
 

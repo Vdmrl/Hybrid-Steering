@@ -67,6 +67,9 @@ def main() -> None:
     parser.add_argument("--cross", type=int, default=20)
     parser.add_argument("--seed", type=int, default=11)
     parser.add_argument("--batch-size", type=int, default=128)
+    parser.add_argument(
+        "--thinking", action=argparse.BooleanOptionalAction, help="override config/judge.yaml"
+    )
     args = parser.parse_args()
 
     pools = {slug: load(slug, args.pairs) for slug in FEATURES}
@@ -91,7 +94,10 @@ def main() -> None:
     for feature in FEATURES.values():
         mine = [job for job in jobs if job[0] == feature]
         judgments = score_steering(
-            [(question, text) for *_, question, text in mine], feature, batch_size=args.batch_size
+            [(question, text) for *_, question, text in mine],
+            feature,
+            batch_size=args.batch_size,
+            thinking=args.thinking,
         )
         for (_, slug, side, question, text), judgment in zip(mine, judgments, strict=True):
             rows.append(

@@ -8,9 +8,15 @@ import yaml
 
 @dataclass(frozen=True)
 class JudgeSettings:
-    """Model id sent to the OpenAI-compatible endpoint."""
+    """Model id and generation limits for the OpenAI-compatible endpoint.
+
+    ``max_tokens`` covers the reasoning trace when ``thinking`` is on: a trace
+    that hits the limit leaves no label.
+    """
 
     model: str
+    max_tokens: int = 4096
+    thinking: bool = True
 
 
 def repo_root() -> Path:
@@ -24,10 +30,15 @@ def repo_root() -> Path:
 
 
 def load_settings(root: Path | None = None) -> JudgeSettings:
-    """Read the model id from ``config/judge.yaml``.
+    """Read ``config/judge.yaml``. Only ``model`` is required.
 
     The endpoint and key are ``OPENAI_BASE_URL`` and ``OPENAI_API_KEY``.
     """
     root = root or repo_root()
     raw = yaml.safe_load((root / "config" / "judge.yaml").read_text(encoding="utf-8"))
-    return JudgeSettings(model=str(raw["model"]))
+    defaults = JudgeSettings(model="")
+    return JudgeSettings(
+        model=str(raw["model"]),
+        max_tokens=int(raw.get("max_tokens", defaults.max_tokens)),
+        thinking=bool(raw.get("thinking", defaults.thinking)),
+    )

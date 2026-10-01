@@ -21,13 +21,16 @@ def _endpoint() -> tuple[str, str]:
 def complete_batch(
     message_lists: list[list[dict[str, str]]],
     *,
-    max_tokens: int,
+    max_tokens: int | None = None,
     json_object: bool = False,
     batch_size: int = 8,
+    thinking: bool | None = None,
 ) -> list[str | None]:
     """Send every message list together. ``batch_size`` is how many run at once.
 
-    A failed request is ``None``. The exception text is not printed.
+    ``max_tokens`` and ``thinking`` default to ``config/judge.yaml``. A failed
+    request, or one cut at the token limit, is ``None``. The exception text is
+    not printed.
     """
     if batch_size < 1:
         raise ValueError("batch_size must be positive")
@@ -43,16 +46,18 @@ def complete_batch(
     kwargs: dict = {
         "model": settings.model,
         "temperature": 0,
-        "max_tokens": max_tokens,
+        "max_tokens": settings.max_tokens if max_tokens is None else max_tokens,
         "api_key": api_key,
         "base_url": base_url,
         "max_workers": batch_size,
     }
     if json_object:
         kwargs["response_format"] = JSON_OBJECT
+    if not (settings.thinking if thinking is None else thinking):
+        kwargs["extra_body"] = {"chat_template_kwargs": {"enable_thinking": False}}
     responses = litellm.batch_completion(messages=message_lists, **kwargs)
     contents: list[str | None] = []
-    failed = 0
+    failed = truncated = 0
     for response in responses:
         if isinstance(response, BaseException):
             failed += 1
@@ -60,10 +65,17 @@ def complete_batch(
                 print(f"judge request failed: {type(response).__name__}", flush=True)
             contents.append(None)
             continue
-        content = response.choices[0].message.content
+        choice = response.choices[0]
+        content = choice.message.content
+        if getattr(choice, "finish_reason", None) == "length":
+            truncated += 1
+            content = None
         contents.append(content.strip() if isinstance(content, str) and content.strip() else None)
         if contents[-1] is None:
             failed += 1
     if failed:
-        print(f"judge missed {failed} of {len(responses)} responses", flush=True)
+        print(
+            f"judge missed {failed} of {len(responses)} responses, {truncated} at the token limit",
+            flush=True,
+        )
     return contents
