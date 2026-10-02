@@ -330,7 +330,7 @@ def score(args) -> None:
             for cell in scale_tools.summarize(subset):
                 cells.append({"filler": filler, "length": length, **cell})
     summary = {**meta, "cells": cells}
-    if meta["lengths"] == [0]:
+    if meta["lengths"] == [0] and any(cell["method"] == "baseline" for cell in cells):
         summary["chosen"] = scale_tools.choose(
             [{k: v for k, v in cell.items() if k not in ("filler", "length")} for cell in cells]
         )
