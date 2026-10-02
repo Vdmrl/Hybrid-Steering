@@ -27,6 +27,13 @@ from hybrid_steering.runtime import read_jsonl
 
 PLOTLY = "https://cdn.plot.ly/plotly-2.35.2.min.js"
 MIN_SHARE = 1e-3
+COLORS = {
+    "baseline": "#7f7f7f",
+    "rank1": "#d62728",
+    "rank2": "#9467bd",
+    "full": "#2ca02c",
+    "clamp": "#ff7f0e",
+}
 
 
 def bootstrap(rows: list[dict], field: str, rounds: int = 1000, seed: int = 0):
@@ -75,7 +82,10 @@ def behaviour_traces(runs: dict[str, list[dict]], field: str) -> list[dict]:
                     "name": f"{label}: {name}",
                     "legendgroup": name,
                     "mode": "lines+markers",
-                    "line": {"dash": "dot" if label != next(iter(runs)) else "solid"},
+                    "line": {
+                        "dash": "dot" if label != next(iter(runs)) else "solid",
+                        "color": COLORS[method],
+                    },
                 }
             )
     return traces
@@ -169,7 +179,7 @@ def main() -> None:
                     "y": values,
                     "name": name,
                     "mode": "lines+markers",
-                    "line": {"dash": dash},
+                    "line": {"dash": dash, "color": COLORS[method]},
                 }
             )
             tau, weight = data["taus"][method, scale, filler]
