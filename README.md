@@ -60,3 +60,7 @@ the prompt and the answer. It does not see the steering method. Set
 `OPENAI_BASE_URL` and `OPENAI_API_KEY`. OpenRouter uses
 `https://openrouter.ai/api/v1`. A self-hosted vLLM server uses its `/v1` URL.
 `config/judge.yaml` is the model id that endpoint expects.
+
+## Mixed-scale blind evaluation
+
+The calibrated Numbered/French/complexity evaluation package lives directly in [judge/](judge/README.md). It replaces the previously nested candidate layout. Its preserved fairy-tale prompt remains v4; the mixed-scale package is5.0.0rc1. It retains top-10 score logprobs, normalized0–100 scores and prompt-paired bootstrap analysis. See [calibration and limitations](judge/REVIEW.md) before article use. From judge/, run python -m ready_judge --input blind.jsonl --output runs/evaluation --features numbered french complexity for a dry run; add --run to explicitly enable paid requests.

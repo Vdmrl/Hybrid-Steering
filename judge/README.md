@@ -1,109 +1,39 @@
-# Hybrid Judge v3
+# Hybrid Judge — 5.0.0rc1
 
-Blind LLM-as-a-Judge for steering ablations. It sees only a scenario and an
-anonymous answer, never the steering method, condition, layer, rank, or alpha.
+Variable-scale Judge promoted from the reviewed candidate by explicit user request. This directory contains only the new package; the removed v3 remains available in Git history. Python 3.10+, standard library only at runtime. The resource files are the source of truth for definitions, anchors, prompts and provider settings.
 
-Judge v3 is the only evaluation path. It independently scores every answer on
-the feature's anchored 1–5 scale. The model returns one digit; the runner adds
-stable IDs, provenance, token use, and a probability distribution over scores
-1–5 from token log-probabilities.
+| Feature ID | Scale | Meaning | Presence endpoint |
+|---|---|---|---|
+| numbered | 0–4 | 0 prose; 1 inline enumeration; 2 bullets/letters; 3 incomplete/inconsistent numeric structure; 4 at least three distinct complete numeric items | score = 4 |
+| french | 0–3 | 0 other language; 1 substantial mixture; 2 predominantly French with small intrusions; 3 French throughout | score ≥ 2 |
+| complexity | 0–2 | 0 simple; 1 noticeable lexical/conceptual complexity; 2 sustained dense technical expression | score ≥ 1 |
+| fairy_tale | 0–4 | Original supplied Concept-strength Judge v4 and fairy-tale guide, preserved | score ≥ 3 |
 
-```bash
-hybrid-judge judge/examples/input.example.jsonl runs/judgments.jsonl \
-  --feature optimism
-```
+French grammar mistakes alone do not lower language strength. Science topic, numbered format and French language alone do not establish complexity. Factual correctness, repetition, instruction following and answer quality are separate outcomes. Numbered 4 means strong structure, **not perfect overall answer quality**. A repeated/unfinished suffix does not erase three already complete distinct numbered items. Read the full anchors in `ready_judge/resources/concepts/features.yaml` before approving.
 
-There is no `--mode` flag.
+## Scores and probabilities
 
-## Install
+`normalized_score_pct = 100 * raw_score / scale_max`: French 1 → 33.33, complexity 1 → 50, numbered 3 → 75. These percentages are normalized ordinal strength, not probabilities and not the fraction of successful answers. Equal percentages across different traits are not empirically equivalent strength.
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -e "judge[dev]"
-export OPENROUTER_API_KEY="..."
-# Optional fallback used only after a 402/429 response from the primary key:
-# export OPENROUTER_FALLBACK_API_KEY="..."
-# Optional:
-# export OPENROUTER_PROXY="http://user:password@host:port"
-```
+The provider request uses `logprobs=true`, `top_logprobs=10`, reasoning disabled, temperature 0, and fixed CoreWeave routing for `deepseek/deepseek-v4.1-flash`. We retain observed label logprobs and absolute probabilities even when some labels are absent from the top ten. `available_label_distribution` and `available_expected_normalized_score_pct` renormalize only the visible valid labels. They remain usable descriptive quantities, but missing labels can bias this conditional mean. `complete=false` refers only to distribution coverage: it does **not** invalidate the integer score. Full-distribution expectation is returned only when every valid label was observed. Missing values are never filled with zero. Integer score is primary; logprob expectation is secondary pending human calibration.
 
-PowerShell:
+## Run explicitly
+
+Input JSONL: `{"prompt_id":"p1","answer_id":"a1","scenario":"Question","text":"Answer"}`. Grouped repository inputs with an `answers` array are also accepted. Provider sees only scenario and answer, never method, condition or references.
 
 ```powershell
-$env:OPENROUTER_API_KEY="..."
-$env:OPENROUTER_FALLBACK_API_KEY="..." # optional quota fallback
-$env:OPENROUTER_PROXY="http://user:password@host:port" # optional
+python -m ready_judge --input blind.jsonl --output results --features numbered french complexity
+python -m ready_judge --input blind.jsonl --output results --features numbered french complexity --run --prompt-key
+python analysis.py --scores results/scores.jsonl --mapping private.jsonl --output ci.json
+python -m unittest discover -s tests -v
 ```
 
-## Input
+First command is a dry run. Only `--run` enables paid calls. Use `OPENROUTER_API_KEY` in the environment or hidden `--prompt-key`; credentials are never persisted. Optional proxy: `OPENROUTER_PROXY`. Stable IDs, input/config/code hashes, deterministic shuffle, output lock and bounded retries protect resume. Do not reuse a results directory after modifying inputs, prompts or configuration.
 
-One JSON object per scenario:
+`prepare_saved.py` converts saved experiment generations into separate blind input and private mapping. Supply `--method-label` if a source lacks method metadata. Keep the private mapping away from raters. Do not concatenate unmatched cohorts or different baselines as one strict comparison.
 
-```json
-{
-  "prompt_id": "scenario-001",
-  "scenario": "What should the assistant do next?",
-  "answers": [
-    {"answer_id": "baseline", "text": "First answer"},
-    {"answer_id": "steered", "text": "Second answer"}
-  ],
-  "metadata": {"dataset": "shared-core", "split": "validation"}
-}
-```
+`analysis.py` bootstraps whole prompt IDs with common resamples and exports cell intervals and paired method differences. It rejects incomplete matched cells. Intervals are exploratory and unadjusted for multiple comparisons. Predefine primary outcomes and comparison family for paper claims. Quality must be scored separately; this candidate does not provide a calibrated quality Judge.
 
-`answer_id` joins results but is never shown to the provider. Every answer is
-evaluated independently as `answer_0`.
+## Before repository integration
 
-## Output
-
-Each result contains:
-
-- `trait_score`: integer 1–5;
-- `centered_trait_score`: score minus 3;
-- `score_distribution.expected_score`: probability-weighted soft score;
-- probabilities for every score, chosen-score probability, entropy, and valid
-  score-token mass;
-- full model, prompt, config, usage, response, and timestamp provenance.
-
-Score 3 means neutral, mixed, absent, balanced, or unclear. Use integer scores
-as the primary endpoint. Treat the more sensitive expected score as secondary
-until it has its own human calibration.
-
-For compositions, judge every active feature separately and report both the
-per-feature paired changes and joint metrics such as the proportion of answers
-where every active feature scores at least 4. Evaluate answer quality once per
-answer with `--feature answer_quality`.
-
-Useful options:
-
-```text
---workers 8
---seed 20260728
---config-root judge
-```
-
-Re-running against the same output resumes by stable `task_id`. Resume is
-rejected when model, prompt, rubric, config, seed, or decoding provenance does
-not match. The model is set once in `judge/config/judge.yaml`.
-
-## Sources of truth
-
-```text
-concepts/features.yaml
-judge/config/judge.yaml
-judge/prompts/judge_v3_compositional.txt
-```
-
-The configured prompt is the standard scalar Judge. It scores each active
-feature independently on its feature-specific 1–5 anchors and returns one
-digit. Older prompt files are retained only to reproduce already reported
-calibration runs; new evaluations should use the prompt selected in
-`judge/config/judge.yaml`.
-
-Read [calibration/README.md](calibration/README.md) before using results in an
-article. A valid API response is not proof that the Judge agrees with humans.
-
-## Variable-scale release candidate
-
-The separately versioned [candidate](candidate/README.md) implements Numbered0–4, French0–3, complexity0–2 and the original fairy-tale0–4 prompt, with top-10 logprobs and normalized0–100 scores. Use its explicit CLI from that directory; these results are incompatible with v3 scores. Pilot calibration and limitations are documented in [candidate/REVIEW.md](candidate/REVIEW.md). Existing v3 commands and contracts remain unchanged.
+Review scales and thresholds, have independent humans label the blind calibration fixtures and representative real answers, resolve disagreements, and freeze the rubric. These scales break the historical 1–5 contract; do not mix historical evaluations with this version. Never reinterpret old scores under this version. Do not silently modify the preserved fairy-tale v4 prompt.

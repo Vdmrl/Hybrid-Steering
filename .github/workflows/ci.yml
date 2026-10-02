@@ -14,3 +14,6 @@ jobs:
       - run: uv run ruff check src tests experiments
       - run: uv run ruff format --check src tests experiments
       - run: uv run pytest -q
+      - name: Test variable-scale Judge without API calls
+        working-directory: judge
+        run: uv run --project .. python -m unittest discover -s tests -v
