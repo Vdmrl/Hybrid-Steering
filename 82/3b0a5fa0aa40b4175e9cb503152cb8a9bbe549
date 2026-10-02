@@ -1,0 +1,19 @@
+experiments/filler-decay/report.py
+  s_7cba490a04aee1::t_c83ea689ace036 1-242
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "823b0a5fa0aa40b4175e9cb503152cb8a9bbe549",
+  "prompts": {},
+  "sessions": {
+    "s_7cba490a04aee1": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "53ab71da-0aa2-4f9d-9083-24863bd8e918",
+        "model": "unknown"
+      },
+      "human_author": "Slava Chaunin <67190162+Ssslakter@users.noreply.github.com>"
+    }
+  }
+}
