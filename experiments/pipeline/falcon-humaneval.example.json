@@ -1,0 +1,15 @@
+{
+  "model": "tiiuae/Falcon-H1-7B-Instruct",
+  "benchmark": {
+    "name": "humaneval",
+    "path": "/data/benchmark/humaneval/HumanEval.jsonl.gz",
+    "sha256": "REPLACE_WITH_DATASET_SHA256"
+  },
+  "batch_size": 2,
+  "max_new_tokens": 512,
+  "conditions": [
+    {"name": "baseline", "method": "baseline", "scales": [0]},
+    {"name": "mamba-rank1", "method": "mamba_add", "direction": "/data/directions/falcon/direction", "rank": 1, "normalize": false, "prompt_position": -1, "scales": [0.2, 0.4]},
+    {"name": "mamba-clamp1", "method": "mamba_clamp", "direction": "/data/directions/falcon/direction", "rank": 1, "normalize": false, "scales": [0.2, 0.4]}
+  ]
+}

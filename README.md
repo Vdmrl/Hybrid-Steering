@@ -52,6 +52,8 @@ and `negative_text` is the source. Experiments load `runs/directions/en-ru/direc
 
 Each steering experiment has `run.py` (generate and score) and `report.py`
 (summarize the rows). See `experiments/README.md`.
+The configured IFEval, HumanEval, and Judge sweep pipeline is described in
+[`experiments/pipeline/README.md`](experiments/pipeline/README.md).
 
 ## Judge
 

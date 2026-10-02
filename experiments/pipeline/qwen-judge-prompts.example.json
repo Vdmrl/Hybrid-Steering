@@ -1,0 +1,15 @@
+{
+  "model": "Qwen/Qwen3.5-9B",
+  "benchmark": {
+    "name": "judge_prompts",
+    "path": "/data/prompts/fairytale-validation.jsonl",
+    "sha256": "REPLACE_WITH_PROMPTS_SHA256"
+  },
+  "batch_size": 8,
+  "max_new_tokens": 512,
+  "conditions": [
+    {"name": "baseline", "method": "baseline", "scales": [0]},
+    {"name": "rank1", "method": "gdn_add", "direction": "/data/directions/fairytale/direction", "rank": 1, "normalize": false, "prompt_position": -1, "scales": [0.2, 0.3, 0.4]}
+  ],
+  "judge": {"feature": "fairytale", "config": "../../config/judge.yaml", "batch_size": 8}
+}

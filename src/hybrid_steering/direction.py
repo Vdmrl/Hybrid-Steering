@@ -15,6 +15,7 @@ from pathlib import Path
 from .artifacts import save_direction
 from .cache import gdn_layers
 from .extract import CollectedDirection, collect_direction
+from .mamba import MambaRunner
 from .models import DirectionManifest
 from .runner import Runner
 from .runtime import load_runtime, read_jsonl
@@ -65,12 +66,12 @@ def collect_from_pairs(
     """Average target-minus-source over pairs. No steering is applied."""
     if batch_size < 1:
         raise ValueError("batch_size must be positive")
-    layers = gdn_layers(model)
-    return collect_direction(
-        Runner(model, tokenizer, layers, normalize=False),
-        pairs,
-        batch_size=batch_size,
+    runner = (
+        MambaRunner(model, tokenizer)
+        if getattr(model.config, "model_type", None) == "falcon_h1"
+        else Runner(model, tokenizer, gdn_layers(model), normalize=False)
     )
+    return collect_direction(runner, pairs, batch_size=batch_size)
 
 
 def write_direction(

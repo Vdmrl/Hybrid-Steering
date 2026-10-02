@@ -26,6 +26,8 @@ def final_states(
     runner: Runner, texts: list[str]
 ) -> dict[int, Float[Tensor, "batch heads key value"]]:
     """Recurrent state after the last real token of each text. No steering is applied."""
+    if hasattr(runner, "final_states"):
+        return runner.final_states(texts)
     encoded = runner.tokenizer(
         texts, add_special_tokens=False, padding=True, return_tensors="pt"
     ).to(runner.device)

@@ -102,6 +102,7 @@ def score_steering(
     *,
     batch_size: int = 8,
     thinking: bool | None = None,
+    settings_path: Path | None = None,
 ) -> list[Judgment | None]:
     """Score ``(prompt, response)`` pairs for one concept.
 
@@ -121,7 +122,13 @@ def score_steering(
         ]
         for prompt, response in pairs
     ]
-    raws = complete_batch(message_lists, json_object=True, batch_size=batch_size, thinking=thinking)
+    raws = complete_batch(
+        message_lists,
+        json_object=True,
+        batch_size=batch_size,
+        thinking=thinking,
+        settings_path=settings_path,
+    )
     judgments: list[Judgment | None] = []
     invalid = 0
     for raw in raws:
@@ -149,6 +156,7 @@ def score_rows(
     prompt_field: str = "prompt",
     response_field: str = "response",
     batch_size: int = 8,
+    settings_path: Path | None = None,
 ) -> None:
     """Write scores onto generation rows. Languages stay on Lingua."""
     if not rows:
@@ -164,6 +172,7 @@ def score_rows(
         [(row[prompt_field], row[response_field]) for row in rows],
         feature,
         batch_size=batch_size,
+        settings_path=settings_path,
     )
     for row, judgment in zip(rows, judgments, strict=True):
         if judgment is None:
