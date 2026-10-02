@@ -1,0 +1,25 @@
+experiments/filler-decay/report.py
+  s_53f7c426d8e302::t_35a62a0d25e76c 36,143,146-150,157-159,176-185
+experiments/filler-decay/run.py
+  s_53f7c426d8e302::t_f0076848425bf7 8-10,26-29,46,57-58,142-150,177-178,180-184,186-187,193,197,223,225,241,250,258,290,318-326,328-329,334
+src/hybrid_steering/runner.py
+  s_53f7c426d8e302::t_2f6b2efd23e86c 11-13,238-290,316,338-348,429-443,453,467,469,474-477,479-485,503,508,522,540,542,571
+tests/test_runner.py
+  s_53f7c426d8e302::t_9f471dec66478f 249-311
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "5bebe55ae782a94ba3c0bb821321edd93fa407fe",
+  "prompts": {},
+  "sessions": {
+    "s_53f7c426d8e302": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "9bc7c1c8-d37a-41f5-b2a0-6fd2131ca70e",
+        "model": "unknown"
+      },
+      "human_author": "Slava Chaunin <67190162+Ssslakter@users.noreply.github.com>"
+    }
+  }
+}
