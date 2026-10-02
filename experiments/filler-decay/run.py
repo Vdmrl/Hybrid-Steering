@@ -16,6 +16,11 @@ questions, per GDN layer and head at the last prompt token against the
 unsteered prompt: the state difference norm, the unsteered state norm, the
 cosine between head outputs, and the norm of the output difference.
 
+``--clean-attention`` gives the full-attention layers the keys and values of
+the unsteered prompt: an unsteered prefill records every ``k_proj`` and
+``v_proj`` output, and the steered prefill reuses them. Only the GDN path then
+carries the intervention into the answer; generated tokens are not replaced.
+
     uv run python experiments/filler-decay/run.py --direction runs/directions/en-ru/direction \\
         --feature ru --questions runs/pairs-v2/eval_questions.jsonl --output runs/decay/en-ru \\
         --lengths 0 --scales 0.25 0.5 1 2 4
@@ -26,6 +31,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from contextlib import contextmanager, nullcontext
 from pathlib import Path
 
 import torch
@@ -57,6 +63,39 @@ def layout(tokenizer, question: str, filler: str) -> tuple[str, int]:
     end = text.index(question) + len(question)
     offsets = tokenizer(text, add_special_tokens=False, return_offsets_mapping=True)
     return text, sum(start < end for start, _ in offsets.offset_mapping)
+
+
+def attention_projections(model) -> list[torch.nn.Module]:
+    return [
+        module
+        for name, module in model.named_modules()
+        if name.endswith(("self_attn.k_proj", "self_attn.v_proj"))
+    ]
+
+
+@contextmanager
+def prefill_hook(modules: list[torch.nn.Module], store: list, replace: bool):
+    """Record, or replace with the recorded tensor, each module's prefill output."""
+
+    def hook(index):
+        def run(_, __, output):
+            if output.shape[1] == 1:
+                return None
+            if replace:
+                if store[index].shape != output.shape:
+                    raise RuntimeError("clean attention needs the same batch and padding")
+                return store[index]
+            store[index] = output.detach()
+            return None
+
+        return run
+
+    handles = [module.register_forward_hook(hook(i)) for i, module in enumerate(modules)]
+    try:
+        yield
+    finally:
+        for handle in handles:
+            handle.remove()
 
 
 def natural_norm(model, tokenizer, questions: list[str]) -> float:
@@ -118,6 +157,7 @@ def main() -> None:
     parser.add_argument("--token-budget", type=int, default=262144)
     parser.add_argument("--mechanics-questions", type=int, default=32)
     parser.add_argument("--judge-batch-size", type=int, default=64)
+    parser.add_argument("--clean-attention", action="store_true")
     args = parser.parse_args()
 
     tune, held = eval_split(args.questions)
@@ -161,6 +201,8 @@ def main() -> None:
         for method in grid
     }
 
+    projections = attention_projections(model)
+    store: list = [None] * len(projections)
     rows, heads = [], {}
     for (filler, length), items in prompts.items():
         size = width(length, args.batch_size, args.token_budget)
@@ -174,16 +216,24 @@ def main() -> None:
             mine = [job for job in jobs if job[0] == method]
             runner = plain if method == "baseline" else runners[method]
             for batch in [mine[i : i + size] for i in range(0, len(mine), size)]:
-                tokens = runner.generate(
-                    [items[index][0] for _, _, index in batch],
-                    scale=torch.tensor([scale * factors.get(method, 0.0) for _, scale, _ in batch]),
-                    prompt_position=(
-                        torch.tensor([items[index][1] for _, _, index in batch])
-                        if method in grid and method != "clamp"
-                        else None
-                    ),
-                    max_new_tokens=args.max_new_tokens,
-                )
+                texts = [items[index][0] for _, _, index in batch]
+                clean = args.clean_attention and method != "baseline"
+                if clean:
+                    with prefill_hook(projections, store, replace=False):
+                        plain.generate(texts, prompt_position=None, max_new_tokens=1)
+                with prefill_hook(projections, store, replace=True) if clean else nullcontext():
+                    tokens = runner.generate(
+                        texts,
+                        scale=torch.tensor(
+                            [scale * factors.get(method, 0.0) for _, scale, _ in batch]
+                        ),
+                        prompt_position=(
+                            torch.tensor([items[index][1] for _, _, index in batch])
+                            if method in grid and method != "clamp"
+                            else None
+                        ),
+                        max_new_tokens=args.max_new_tokens,
+                    )
                 for (_, scale, index), row in zip(batch, tokens, strict=True):
                     ids = [int(t) for t in row if int(t) != tokenizer.pad_token_id]
                     rows.append(
@@ -205,16 +255,19 @@ def main() -> None:
 
         probe = items[: args.mechanics_questions]
         texts = [text for text, _ in probe]
-        base = per_row(plain.forward(texts, prompt_position=None), len(texts))
+        with prefill_hook(projections, store, replace=False):
+            base = per_row(plain.forward(texts, prompt_position=None), len(texts))
         for method, values in grid.items():
             for scale in values:
-                trace = runners[method].forward(
-                    texts,
-                    scale=scale * factors[method],
-                    prompt_position=(
-                        None if method == "clamp" else torch.tensor([p for _, p in probe])
-                    ),
-                )
+                hook = prefill_hook(projections, store, replace=True)
+                with hook if args.clean_attention else nullcontext():
+                    trace = runners[method].forward(
+                        texts,
+                        scale=scale * factors[method],
+                        prompt_position=(
+                            None if method == "clamp" else torch.tensor([p for _, p in probe])
+                        ),
+                    )
                 heads[method, scale, filler, length] = head_metrics(
                     base, per_row(trace, len(texts))
                 )
@@ -241,6 +294,7 @@ def main() -> None:
         "lengths": args.lengths,
         "fillers": args.fillers,
         "header": HEADER,
+        "clean_attention": args.clean_attention,
     }
     cells = []
     for filler in args.fillers:
