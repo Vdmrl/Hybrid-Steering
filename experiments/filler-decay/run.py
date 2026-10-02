@@ -190,7 +190,6 @@ def generate(args) -> None:
     questions = questions[: args.count] if args.count else questions
     if args.chosen:
         chosen = json.loads(args.chosen.read_text())["chosen"]
-        chosen["release"] = chosen.get("clamp")
         grid = {
             method: sorted({chosen[method]["scale"] * m for m in args.multipliers})
             for method in args.methods
