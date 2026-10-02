@@ -1,70 +1,62 @@
 # Hybrid Steering
 
-Research toolkit for controlling behavior in hybrid language models through
-their recurrent state.
+One package for steering hybrid language models through their Gated DeltaNet
+recurrent state, then scoring the result.
 
-Hybrid models such as Qwen3.5 combine attention with recurrent Gated DeltaNet
-(GDN) layers. Their KV cache retains addressable context, while the compact
-recurrent state can carry persistent behavioral modes. This repository tests
-whether those modes can be extracted, edited, combined, and evaluated without
-changing the model's factual context.
+A direction is the mean of `target - source`. Positive `scale` moves the state
+toward the target. Natural languages are detected locally. Other concepts use
+the steering judge and the guides in `concepts/features.yaml`.
 
-## Repository contents
+## Setup
 
-| Path | Purpose |
-| --- | --- |
-| [`steering/`](steering/) | Reusable GDN recurrent-state extraction and intervention primitives |
-| [`judge/`](judge/) | Blind LLM-as-a-Judge pipeline for evaluating steering results |
-| [`concepts/`](concepts/) | Definitions and anchored rubrics for behavioral features |
-| [`experiments/`](experiments/) | Reproducible manifests, small runners, and compact summaries |
+```bash
+uv sync --extra dev
+```
 
-## Steering
+CUDA kernels (`causal-conv1d`, `flash-linear-attention`) are optional:
 
-The steering package discovers GDN layers, extracts recurrent state, computes
-mean directions from paired states, and applies additive or replacement
-interventions without changing KV or convolution state. Decoder-layer indices
-are absolute and zero-based.
+```bash
+uv sync --extra dev --extra fast-kernels
+```
+
+## Use
 
 ```python
-from hybrid_steering import add_direction, mean_direction, subtract_states
+from hybrid_steering import Runner, collect_direction, gdn_layers, load_runtime
 
-differences = [
-    subtract_states(positive_state, negative_state)
-    for positive_state, negative_state in paired_states
-]
-direction = mean_direction(differences)
-add_direction(cache, direction, alpha=4.0, layers=[0, 1, 2])
+model, tokenizer = load_runtime("tiny")  # or "Qwen/Qwen3.5-9B"
+layers = gdn_layers(model)
+runner = Runner(model, tokenizer, layers)
+collected = collect_direction(
+    runner,
+    [("Target text.", "Source text.")],
+)
+runner = Runner(model, tokenizer, layers, collected.delta, normalize=True)
+tokens = runner.generate(["Describe the weather."], scale=1.0, prompt_position=-1)
 ```
 
-See [`steering/README.md`](steering/README.md) for the API and cache checks.
+`prompt_position` counts real prompt tokens: `0` is the initial state, `-1` is
+the last prompt token, `None` leaves the prompt alone. `generation_period`
+re-applies the direction during decoding.
 
-## Judge v3
-
-Judge v3 sees only a scenario and an anonymous answer. It does not see the
-steering method, layer, rank, alpha, or condition name.
-
-It scores each answer independently on an anchored 1–5 feature scale. The
-provider returns one digit; the runner stores the integer score, centered
-score, full token-probability distribution, usage, hashes, and provenance.
+## Direction
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -e "judge[dev]"
-export OPENROUTER_API_KEY="..."
-
-hybrid-judge judge/examples/input.example.jsonl runs/judgments.jsonl \
-  --feature optimism
+uv run hybrid-direction --concept en-ru --output runs/en-ru
 ```
 
-Judge v3 is the only evaluation path and does not use a `--mode` flag. See
-[`judge/README.md`](judge/README.md) for schemas, calibration, and resume rules.
+`--jsonl` reads local pairs instead of the Hub. `positive_text` is the target
+and `negative_text` is the source. Experiments load `runs/en-ru/direction`.
 
-## Development
+## Experiments
 
-```bash
-pip install -r requirements.txt
-python -m pytest judge/tests steering/tests
-ruff check judge steering
-ruff format --check judge steering
-```
+Each steering experiment has `run.py` (generate and score) and `report.py`
+(summarize the rows). See `experiments/README.md`.
+
+## Judge
+
+Steering runs score non-language concepts with `score_steering`. The judge sees
+the prompt and the answer. It does not see the steering method. Set
+`OPENAI_BASE_URL` and `OPENAI_API_KEY`. OpenRouter uses
+`https://openrouter.ai/api/v1`. A self-hosted vLLM server uses its `/v1` URL.
+`config/judge.yaml` is the model id that endpoint expects.

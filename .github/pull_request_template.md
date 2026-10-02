@@ -1,21 +1,21 @@
-## Что изменено
+## What changed
 
-<!-- Коротко опишите одну цель PR. -->
+<!-- Briefly describe the single goal of this PR. -->
 
-## Как проверено
+## How it was checked
 
-<!-- Команды, fixtures или ручная проверка. -->
+<!-- Commands, fixtures, or a manual check. -->
 
-## Воспроизводимость
+## Reproducibility
 
-- [ ] Не раскрываются condition/method names в blind judge
-- [ ] Сохранены model, prompt version и rubric version
-- [ ] Обновлены тесты или объяснено, почему они не нужны
-- [ ] Нет API-ключей, больших outputs и случайных локальных файлов
+- [ ] Condition and method names stay hidden from the blind judge
+- [ ] Model, prompt version, and rubric version are recorded
+- [ ] Tests are updated, or the PR explains why they are not needed
+- [ ] No API keys, large outputs, or incidental local files
 
-## Совместимость
+## Compatibility
 
-- Prompt version изменён: да / нет
-- Rubric version изменён: да / нет
-- Schema version изменена: да / нет
-- Ожидаемая стоимость judge изменилась: да / нет
+- Prompt version changed: yes / no
+- Rubric version changed: yes / no
+- Schema version changed: yes / no
+- Expected judge cost changed: yes / no

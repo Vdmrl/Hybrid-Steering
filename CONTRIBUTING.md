@@ -1,108 +1,56 @@
-# Как вносить изменения
+# How to contribute
 
-## Ветки
+## Branches
 
-Рекомендуемый формат:
+Work on `main`. Do not create a branch unless asked.
 
-```text
-exp/<концепт>-<абляция>
-feat/<короткое-имя>
-fix/<короткое-имя>
-docs/<короткое-имя>
-refactor/<короткое-имя>
-test/<короткое-имя>
-chore/<короткое-имя>
-```
+Do not force-push `main`. A pull request is optional. When one exists, it
+should contain the exact config or manifest and a compact summary, not large
+generations or weights.
 
-Примеры:
+## Commits
+
+We use Conventional Commits:
 
 ```text
-exp/optimism-layer-ablation
-exp/optimism-svd-rank
-feat/judge-provider
-fix/resume-duplicate-rows
-docs/optimism-rubric
+<type>(<scope>): <short description>
 ```
 
-`main` содержит только согласованную воспроизводимую базу. Эксперименты,
-абляции, изменения judge-промптов и модификации кода не коммитятся напрямую в
-`main`.
+Allowed `type` values:
 
-Правила работы с ветками:
+- `feat` — a new capability;
+- `fix` — a bug fix;
+- `docs` — documentation only;
+- `test` — tests and fixtures;
+- `refactor` — a structural change with no new behavior;
+- `perf` — a speedup or a cost reduction;
+- `chore` — dependencies and maintenance;
+- `ci` — automated checks.
 
-- перед любым изменением агент обязан выполнить `git branch --show-current`;
-- если активна `main` или `master`, сначала создаётся отдельная ветка;
-- каждый smoke test, новая комбинация концептов, alpha или выбор слоёв считается
-  отдельным экспериментом и получает собственную `exp/...` ветку;
-- одна абляция или одно логическое изменение кода — одна ветка;
-- не продолжать и не переписывать ветку другого участника без согласования;
-- не использовать force-push в общую ветку;
-- если эксперименту нужна новая общая возможность Judge, сначала сделать её
-  отдельной веткой `feat/...`, а затем использовать в `exp/...`;
-- перед merge в experiment-ветке должны лежать точный config/manifest и
-  компактная сводка, но не большие генерации и веса;
-- после проверки изменения попадают в `main` через pull request.
+Main `scope` values:
 
-Пример разделения:
-
-```text
-feat/judge-provider           # переиспользуемая возможность
-exp/optimism-layer-ablation   # конкретный эксперимент
-fix/judge-resume              # исправление найденной ошибки
-```
-
-## Коммиты
-
-Используем Conventional Commits:
-
-```text
-<type>(<scope>): <краткое описание>
-```
-
-Допустимые `type`:
-
-- `feat` — новая возможность;
-- `fix` — исправление ошибки;
-- `docs` — только документация;
-- `test` — тесты и fixtures;
-- `refactor` — изменение структуры без нового поведения;
-- `perf` — ускорение или снижение стоимости;
-- `chore` — зависимости и служебные изменения;
-- `ci` — автоматические проверки.
-
-Основные `scope`:
-
-- `judge` — общий pipeline;
-- `steering` — извлечение и изменение recurrent state;
-- `artifact` — форматы direction и run manifests;
-- `experiment` — воспроизводимый config конкретного эксперимента;
-- `rubric` — шкалы и определения;
-- `prompt` — judge-промпты;
-- `schema` — форматы входа и результата;
-- `provider` — OpenRouter и другие API;
-- `runner` — очередь, retries и resume;
+- `judge` — the shared pipeline;
+- `steering` — reading and writing recurrent state;
+- `artifact` — direction formats and run manifests;
+- `experiment` — the reproducible config of one experiment;
+- `rubric` — scales and definitions;
+- `prompt` — judge prompts;
+- `runner` — the queue, retries, and resume;
 - `docs`, `ci`.
 
-Примеры:
+Examples:
 
 ```text
 feat(judge): add provider metadata
 feat(rubric): add optimism versus pessimism scale
 fix(runner): resume partially judged prompts
 docs(prompt): explain anchored score meanings
-test(schema): cover malformed answer ids
 ```
 
-Заголовок пишется в повелительной форме, без точки в конце. Не используем
-`update`, `changes`, `work` и `wip` как описание готового коммита.
+Write the subject in the imperative mood, with no trailing period. Do not use
+`update`, `changes`, `work`, or `wip` as the description of a finished commit.
 
-Если изменение несовместимо со старым форматом:
-
-```text
-feat(schema)!: change the Judge result contract
-```
-
-Причину и важные решения следует добавить в тело коммита:
+Put the reason and important decisions in the commit body:
 
 ```text
 feat(prompt): add answer-order reversal check
@@ -111,29 +59,25 @@ Run every comparison in both orientations to detect position bias.
 Store both raw decisions before aggregation.
 ```
 
-## Что должно быть в pull request
+## What a pull request should contain
 
-- краткая цель;
-- ссылка или название experiment-ветки;
-- какие файлы являются источниками истины;
-- как проверялось изменение;
-- меняется ли стоимость judge;
-- меняются ли prompt/rubric/schema versions;
-- небольшой пример входа и результата для нового поведения.
+- a short goal;
+- the commit or range that contains the change;
+- which files are the sources of truth;
+- how the change was checked;
+- whether the judge cost changes;
+- a small input and output example for new behavior.
 
-Не добавляем в pull request:
+Do not add to a pull request:
 
-- `.env` и токены;
-- полные модельные генерации;
-- большие датасеты и веса;
-- случайные локальные отчёты;
-- одновременно несвязанные рефакторинги и новую метрику.
+- `.env` files and tokens;
+- full model generations;
+- large datasets and weights;
+- incidental local reports;
+- an unrelated refactor together with a new metric.
 
-## Изменение промптов и шкал
+## Changing the steering judge
 
-Промпт, использованный в опубликованном или командном результате, не
-перезаписывается. Создаётся новый файл версии промпта, и
-в итогах явно сохраняется её имя.
-
-Изменение определения концепта также требует повышения `rubric_version`.
-Старые результаты после этого нельзя молча объединять с новыми.
+The rubric is `prompts/steering_judge.txt`. Concept guides are the `guide`
+fields in `concepts/features.yaml`. Language detection does not use that rubric.
+An extra score for one experiment lives next to that experiment.

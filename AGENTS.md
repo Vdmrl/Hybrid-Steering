@@ -1,142 +1,74 @@
 # Shared instructions for coding agents
 
-These instructions are tracked because every agent working in this repository
-must follow the same contracts. Personal preferences belong outside the
-repository or in ignored `AGENTS.local.md`.
+One Python package, `hybrid_steering`, installed with uv from the repository
+root. Experiment scripts live in flat directories under `experiments/`. They
+may import the package. The package must not import experiment code.
 
-## Current scope
+## Layout
 
-The shared components are:
+- `src/hybrid_steering/state.py` — target-minus-source directions, rank, scale, metrics.
+- `src/hybrid_steering/cache.py` — recurrent-state reads and writes. Decoder indices are absolute and zero-based.
+- `src/hybrid_steering/runner.py` — prefill and greedy generation.
+- `src/hybrid_steering/extract.py` — mean direction from paired texts.
+- `src/hybrid_steering/capture.py` — GDN kernel transitions and rank metrics.
+- `src/hybrid_steering/detect.py` — Lingua for natural language, binary prompts for other concepts.
+- `src/hybrid_steering/judge/` — blind 1–5 judge. It must not see method, layer, scale, or condition names.
+- `concepts/features.yaml` — feature definitions.
+- `config/judge.yaml` — judge runtime defaults.
+- `prompts/` — versioned judge prompts.
+- `hybrid-direction` — CLI that writes one target-minus-source direction for a concept.
+- `experiments/<name>/run.py` — one experiment command.
+- Steering sweeps add `report.py`, which summarizes rows through `hybrid_steering.report`.
+- `experiments/archive/` — historical scripts, including their original plots.
 
-- `judge/`: blind evaluation independent from a steering implementation;
-- `steering/`: minimal recurrent-state extraction and intervention primitives;
-- `concepts/`: the shared meanings of evaluated features;
-- `experiments/`: contracts and small reproducibility manifests, not raw runs.
+## Direction convention
 
-Experiment-specific code may consume shared components, but shared components
-must not import experiment code.
+A direction is the mean of `target - source`. Adding a positive `scale` moves
+the recurrent state toward the target concept. Language experiments use the
+same convention: Russian minus English steers toward Russian. Do not introduce
+a second sign, and do not rename `scale` to alpha, strength, or fraction.
 
-Before changing Judge, read:
+`normalize=True` matches each head's delta to the current state norm. A zero
+state keeps the raw delta. `rank` is applied when the direction is loaded for
+steering, not baked into the stored matrix, unless an experiment explicitly
+asks for a truncated artifact.
 
-1. `judge/README.md`;
-2. `concepts/features.yaml`;
-3. the affected Pydantic model in `judge/src/hybrid_judge/models.py`;
-4. `CONTRIBUTING.md`.
+## Judge
 
-Before changing Steering, read:
+Non-language concepts are scored by `hybrid_steering.judge.score_steering`.
+The rubric is `prompts/steering_judge.txt`. Each concept guide is the `guide`
+field in `concepts/features.yaml`. One call returns concept presence 0–4 and
+content quality 0–4. The judge does not see method, layer, or scale. Requests
+go out together through LiteLLM. The endpoint is `OPENAI_BASE_URL` and the
+key is `OPENAI_API_KEY`, for OpenRouter or a self-hosted vLLM server. Optional
+`OPENROUTER_PROXY` is read from the environment. Do not print them.
 
-1. `steering/README.md`;
-2. `steering/src/hybrid_steering/models.py`;
-3. `CONTRIBUTING.md`.
+Features in `LANGUAGE_FEATURES` use Lingua and do not call a model. Do not copy
+a concept guide into experiment code. Extra scores, such as answer equivalence,
+stay next to the experiment that needs them.
 
-## Sources of truth
+## Dependencies
 
-- Concept meanings live in `concepts/features.yaml`.
-- Runtime defaults live in `judge/config/judge.yaml`.
-- Prompt text is versioned in `judge/prompts/`.
-- Machine-readable interfaces live in `judge/src/hybrid_judge/models.py`.
-- Direction and run interfaces live in `steering/src/hybrid_steering/models.py`.
-- Tiny synthetic examples live in `judge/examples/`.
+```bash
+uv sync --extra dev
+uv sync --extra dev --extra fast-kernels   # causal-conv1d and flash-linear-attention
+```
 
-Do not duplicate a feature definition inside Python code. Do not silently edit
-an existing prompt version after it has produced reported results; add a new
-version instead.
+`fast-kernels` is optional because those wheels need CUDA. They are declared in
+`pyproject.toml`. Tests and the tiny-model smoke path do not need them.
 
-## Adding a feature
+## Checks
 
-Before using a feature, check whether it exists in `concepts/features.yaml`.
-If it does not:
-
-1. Add one YAML entry with `target`, `opposite`, `definition`, `exclusions`,
-   and distinct anchors for every score from 1 through 5.
-2. Keep the definition behavioral and judgeable from the answer text. Explicitly
-   exclude likely proxies such as verbosity, politeness, or answer quality.
-3. Increment `rubric_version`; never reuse old scores under the new version.
-4. Add blind calibration cases following `judge/calibration/README.md`.
-5. Submit the rubric and calibration fixtures in a dedicated branch and pull
-   request. Do not embed a private feature definition in experiment code.
-
-Until the feature passes its calibration gates, label its Judge results
-exploratory rather than article-ready.
-
-Treat every existing rubric and prompt version as immutable once results have
-been shared. Shared Judge changes must
-be reviewed through a pull request; direct commits to `main` are not allowed
-for agents.
-
-## Reproducibility rules
-
-- Evaluation must be blind: the judge must not see intervention or method
-  names.
-- For every new experiment, use the standard Judge v3 command without a mode
-  flag. Independently score each answer and each active feature on the anchored
-  1–5 scale. For compositions, report every feature score and joint metrics
-  such as all active scores being at least 4.
-- Keep the integer `trait_score` and the full `score_distribution`. Treat the
-  probability-weighted `expected_score` as a more sensitive secondary endpoint
-  until it has separate human calibration.
-- Evaluate answer quality separately once per answer; do not repeat or combine
-  quality judgments with every feature score.
-- Shuffle answer order deterministically and save the seed or permutation.
-- Save judge model, prompt version, rubric version, decoding parameters, and
-  token usage with every run.
-- Resume by stable `prompt_id` and `answer_id`; never rely on row order.
-- Never feed one evaluated answer into another model generation.
-- Tests must use fixtures or mocked provider responses. Unit tests must not
-  spend API credits.
-- Keep raw large generations and run artifacts out of Git. Commit schemas,
-  configs, small fixtures, and compact summaries.
-
-## Secrets and external services
-
-- Never commit `.env`, API keys, passwords, proxies, or server addresses with
-  credentials.
-- Read `OPENROUTER_API_KEY` from the environment.
-- Read the optional `OPENROUTER_PROXY` from the environment; otherwise connect
-  directly.
-- Do not print secrets in logs or exception messages.
-- External calls require an explicit CLI action; imports and tests must be
-  side-effect free.
+```bash
+uv run ruff check src tests experiments
+uv run ruff format --check src tests experiments
+uv run pytest
+```
 
 ## Change discipline
 
-- **Mandatory branch gate:** before editing any tracked file, run
-  `git branch --show-current`. If it is `main` or `master`, stop and create a
-  dedicated branch first.
-- Every experiment, including a smoke test, ablation, changed alpha/layer
-  selection, or new concept combination, must use its own
-  `exp/<concept>-<ablation>` branch. If the environment mandates a namespace,
-  use `<namespace>/exp/<concept>-<ablation>`.
-- Never commit experimental work directly to `main`.
-- Never mix two experiments in one branch, even when they share a dataset.
-- Do not continue, rewrite, rebase, or force-push another agent's branch
-  without explicit coordination.
-- Use `exp/<concept>-<ablation>` for an experiment/config/result bundle and
-  the standard `feat/`, `fix/`, `docs/`, `refactor/`, `test/`, or `chore/`
-  prefixes for repository code changes.
-- Keep one experiment or one logical code change per branch. If an experiment
-  requires a reusable Judge feature, prefer a separate `feat/...` branch and
-  merge it before the `exp/...` branch consumes it.
-- Commit only configs, manifests, small fixtures, and compact summaries from
-  experiments. Large generations and model artifacts stay outside Git.
-- Make one logical change per commit.
-- Use Conventional Commits as documented in `CONTRIBUTING.md`.
-- Add or update tests whenever behavior, parsing, schemas, or prompts change.
-- A contract-breaking Pydantic model change requires a major rubric version.
-- Avoid unrelated formatting or file moves in feature/fix commits.
-
-## Expected checks
-
-Once the Python runner exists, the standard local checks will be:
-
-```bash
-python -m pytest judge/tests
-ruff check judge
-ruff format --check judge
-python -m pytest steering/tests
-ruff check steering
-ruff format --check steering
-```
-
-If a command is not available yet, do not invent a passing result; report that
-the scaffold has no executable implementation.
+- Work on `main`. Do not create a branch unless the user asks.
+- Do not commit `.env`, API keys, raw generations, or model weights.
+- Read `OPENAI_BASE_URL`, `OPENAI_API_KEY`, and optional `OPENROUTER_PROXY` from the environment. Do not print them.
+- External model calls happen only from an explicit CLI action. Imports and unit tests stay side-effect free.
+- Unit tests use the tiny local Qwen or mocked provider responses. They must not spend API credits.

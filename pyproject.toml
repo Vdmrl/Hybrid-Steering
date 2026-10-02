@@ -1,0 +1,70 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hybrid-steering"
+version = "0.2.0"
+description = "GDN recurrent-state steering, concept scoring, and a blind judge"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "accelerate>=1.14",
+  "datasets>=3",
+  "jaxtyping>=0.3.11",
+  "lingua-language-detector>=2.2",
+  "litellm>=1.60",
+  "nnsight>=0.7",
+  "numpy>=1.26",
+  "pandas>=2",
+  "pyarrow>=18",
+  "PyYAML>=6",
+  "safetensors>=0.4",
+  "torch>=2.5",
+  "transformers>=4.57",
+]
+
+[project.optional-dependencies]
+fast-kernels = [
+  "causal-conv1d==1.6.2.post1+cu.12.6.torch.2.7",
+  "flash-linear-attention",
+]
+dev = ["pytest>=8.2", "ruff>=0.6"]
+toys = ["transformer-lens>=3,<4"]
+
+[project.scripts]
+hybrid-direction = "hybrid_steering.direction:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hybrid_steering"]
+
+[tool.uv]
+package = true
+
+[tool.uv.sources]
+causal-conv1d = { index = "astral-cu126" }
+
+[[tool.uv.index]]
+name = "astral-cu126"
+url = "https://wheels.astral.sh/simple/cu126/"
+explicit = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests", "experiments"]
+extend-exclude = [
+  "experiments/toy-models",
+  "experiments/archive",
+  "experiments/steering-reports",
+  "experiments/notebooks",
+]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+# jaxtyping shape strings are not Python expressions. Ruff otherwise parses
+# the quoted shape and reports F722.
+ignore = ["F722"]
