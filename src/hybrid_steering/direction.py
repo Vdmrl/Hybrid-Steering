@@ -3,8 +3,8 @@
 ``positive_text`` is the target and ``negative_text`` is the source. The
 stored matrix is the full mean; experiments apply ``rank`` when they load it.
 
-``hybrid-direction --concept en-ru --output runs/en-ru`` writes
-``runs/en-ru/direction``.
+``hybrid-direction --concept en-ru --output runs/directions/en-ru`` writes
+``runs/directions/en-ru/direction``.
 """
 
 from __future__ import annotations

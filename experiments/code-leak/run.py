@@ -33,8 +33,8 @@ The ``en-*-gen`` pools behind ``results/`` are no longer on the Hub dataset's
 ``main``; see ``results/README.md`` for the revision that has them.
 
     uv run hybrid-direction --concept en-ru-gen --source en --target ru --pairs 100 \\
-        --output runs/en-ru-gen
-    uv run python experiments/code-leak/run.py --direction runs/en-ru-gen/direction \\
+        --output runs/directions/en-ru-gen
+    uv run python experiments/code-leak/run.py --direction runs/directions/en-ru-gen/direction \\
         --concept en-ru-gen --language ru --caa-layer 9 --output runs/code-leak/ru
 """
 

@@ -1,5 +1,5 @@
 from hybrid_steering.judge.config import repo_root
-from hybrid_steering.runtime import collect_steered_rows, import_path
+from hybrid_steering.runtime import build_tiny, chat_prompts, collect_steered_rows, import_path
 
 
 class _Tokens:
@@ -18,6 +18,12 @@ class _Runner:
     def generate(self, texts, scale=1.0, prompt_position=-1, max_new_tokens=64):
         del max_new_tokens
         return [f"pos={prompt_position};scale={scale};{text}" for text in texts]
+
+
+def test_chat_prompts_close_the_user_turn() -> None:
+    _, tokenizer = build_tiny()
+    rendered = chat_prompts(tokenizer, ["What is ice?"])
+    assert rendered == ["user: What is ice?\nassistant:"]
 
 
 def test_collect_steered_rows_pairs_each_scale_with_its_baseline() -> None:

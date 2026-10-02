@@ -10,6 +10,7 @@ local/
 .ruff_cache/
 
 # Large or generated experiment artifacts
+runs/
 artifacts/
 outputs/
 logs/

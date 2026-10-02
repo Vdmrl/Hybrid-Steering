@@ -10,7 +10,7 @@ Reported per language: mean quality, the paired difference to English with a
 bootstrap 95% interval, the share of exact ties, and the largest drops.
 
     uv run python experiments/language-quality/run.py \\
-        --questions runs/pairs-v2/eval_questions.jsonl --output runs/language-quality
+        --questions runs/pairs/eval_questions.jsonl --output runs/language-quality
 """
 
 from __future__ import annotations

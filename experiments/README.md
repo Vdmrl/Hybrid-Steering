@@ -7,16 +7,26 @@ those rows. The summary is a generic table. It only knows the column names
 the experiment passes in.
 
 ```bash
-uv run hybrid-direction --concept en-ru --output runs/en-ru
-uv run python experiments/steering/run.py --direction runs/en-ru/direction --output runs/en-ru/score
-uv run python experiments/steering/report.py --rows runs/en-ru/score/generations.jsonl --output runs/en-ru/score/report.html
+uv run hybrid-direction --concept en-ru --output runs/directions/en-ru
+uv run python experiments/steering/run.py --direction runs/directions/en-ru/direction --output runs/steering/en-ru
+uv run python experiments/steering/report.py --rows runs/steering/en-ru/generations.jsonl --output runs/steering/en-ru/report.html
 ```
+
+Artifacts live under `runs/` and are not committed. A direction is
+`runs/directions/<slug>/direction`. A shared question pool is
+`runs/pairs/`. One experiment writes `runs/<experiment>/<slug>/` with
+`rows.jsonl`, `summary.json`, and `report.html`.
 
 | Directory | Run | Report |
 | --- | --- | --- |
 | `steering` | Generate and score one direction | Concept score by scale |
-| `forgetting` | Concept score after a filler prefix | Score by prefix and scale |
-| `forgetting-squad` | Language detection and answer equivalence after a filler | Both rates by prefix and scale |
+| `forgetting` | Concept persistence after a filler, including release and clean attention | Rate, quality, and per-head decay |
+| `steering-scale` | One scale unit for every method | Chosen scale per method |
+| `concept-pairs` | Build the question pool and concept pairs | |
+| `direction-stability` | Half-pool cosine and rank energy | |
+| `language-quality` | Answer-quality judge on translated answers | |
+| `judge-calibration` | Judge agreement | |
+| `pair-audit` | Pair quality audit | |
 | `context-length` | Initial, prompt-end, repeated, and periodic steering | Concept score by mode and scale |
 | `steering-clamp` | Additive update and coordinate clamp | |
 | `residual` | Residual-stream baseline, scored once | |
@@ -32,8 +42,7 @@ uv run python experiments/steering/report.py --rows runs/en-ru/score/generations
 | `publish_pairs.py` | Upload concept pairs | |
 | `steering-reports` | Historical renderers for older artifacts | |
 | `archive/` | Previous pipelines, including their original plots | |
-| `toy-models` | Small attention and GDN circuit reproductions | |
-| `notebooks` | Historical notebooks | |
+| `forgetting/squad` | Language detection and answer equivalence after a filler | Both rates by prefix and scale |
 
 Checks in the blank report column record a measurement or a single comparison.
 They do not sweep a scored generation. `archive/` and `steering-reports/` keep

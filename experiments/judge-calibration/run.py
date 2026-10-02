@@ -8,7 +8,7 @@ that rewards any unusual style shows up off the diagonal.
 Reported per concept: mean score per side, AUC of positive over negative with
 a bootstrap 95% interval, and the true and false positive rates at score >= 2.
 
-    uv run python experiments/judge-calibration/run.py --pairs runs/pairs-v2 \\
+    uv run python experiments/judge-calibration/run.py --pairs runs/pairs \\
         --output runs/judge-calibration
 """
 

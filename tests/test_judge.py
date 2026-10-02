@@ -151,7 +151,7 @@ def test_language_rows_do_not_call_the_judge(monkeypatch) -> None:
 
 
 def test_equivalence_verdict_is_only_the_tag() -> None:
-    module = import_path(repo_root() / "experiments/forgetting-squad/equivalence.py")
+    module = import_path(repo_root() / "experiments/forgetting/squad/equivalence.py")
     assert module.verdict("<verdict>1</verdict>") == 1
     assert module.verdict(" <verdict>0</verdict>\n") == 0
     assert module.verdict("The answers match. <verdict>1</verdict>") is None

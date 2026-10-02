@@ -89,7 +89,9 @@ render();
 
 def runs(root: Path, slug: str) -> list[tuple[str, Path]]:
     found = []
-    for base, prefix in ((root / "decay" / slug, "decay"), (root / "decay-scale" / slug, "scale")):
+    for base, prefix in ((root / slug, "decay"), (root / "scale" / slug, "scale")):
+        if not base.is_dir():
+            continue
         for path in sorted(base.rglob("rows.jsonl")):
             name = path.parent.relative_to(base).as_posix()
             found.append((f"{prefix}/{'grid' if name == '.' else name}", path))
@@ -98,11 +100,16 @@ def runs(root: Path, slug: str) -> list[tuple[str, Path]]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--runs", type=Path, default=Path("runs"))
-    parser.add_argument("--output", type=Path, default=Path("runs/generations"))
+    parser.add_argument("--runs", type=Path, default=Path("runs/forgetting"))
+    parser.add_argument("--output", type=Path, default=Path("runs/forgetting/generations"))
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
-    slugs = sorted(p.name for p in (args.runs / "decay").iterdir() if p.is_dir())
+    skip = {"scale", "generations", "figures"}
+    slugs = sorted(
+        p.name
+        for p in args.runs.iterdir()
+        if p.is_dir() and p.name not in skip and any(p.glob("*"))
+    )
     links = []
     for slug in slugs:
         questions: dict[str, int] = {}

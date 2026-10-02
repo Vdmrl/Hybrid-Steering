@@ -12,9 +12,9 @@ question that is close to the evaluation pool in ``experiments/forgetting``.
 ``pairs`` samples several answers per side, filters them by the concept's
 lexicon, and writes ``pairs.jsonl`` in the dataset schema.
 
-    uv run python experiments/concept-pairs/run.py questions --output runs/pairs-v2
+    uv run python experiments/concept-pairs/run.py questions --output runs/pairs
     uv run python experiments/concept-pairs/run.py pairs --concept theistic_framing \\
-        --output runs/pairs-v2
+        --output runs/pairs
 """
 
 from __future__ import annotations
