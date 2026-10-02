@@ -1,0 +1,23 @@
+experiments/filler-decay/browse.py
+  s_afa5c4d654b219::t_71003816e2a6df 8-10,39,78,114-120
+experiments/filler-decay/meta.py
+  s_afa5c4d654b219::t_afc14517e7d145 1-42
+experiments/filler-decay/report.py
+  s_afa5c4d654b219::t_27f3e318e9e1b0 26-28,153-156,180-194
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "9753bc5436b9458d7855753f4ba25070d61f55be",
+  "prompts": {},
+  "sessions": {
+    "s_afa5c4d654b219": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "c1064d79-0965-440f-984c-b6d749395e08",
+        "model": "unknown"
+      },
+      "human_author": "Slava Chaunin <67190162+Ssslakter@users.noreply.github.com>"
+    }
+  }
+}
