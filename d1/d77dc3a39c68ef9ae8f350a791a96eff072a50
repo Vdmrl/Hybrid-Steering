@@ -1,0 +1,67 @@
+.gitignore
+  s_afa5c4d654b219::t_9bc8698713a1f6 13
+AGENTS.md
+  s_afa5c4d654b219::t_7b35088d1cad82 14,21,23-24
+README.md
+  s_afa5c4d654b219::t_92e225b16644d4 45,49
+experiments/README.md
+  s_afa5c4d654b219::t_ca1c2419e31ce7 10-12,15-19,23-29,45
+experiments/archive/forgetting-legacy/NOTE.md
+  s_afa5c4d654b219::t_56d8a596bfea2e 1
+experiments/archive/forgetting-prefix/NOTE.md
+  s_afa5c4d654b219::t_3c7acc4d555789 1
+experiments/archive/forgetting-prefix/report.py
+  s_afa5c4d654b219::t_568ec6a2f1ceb2 1-17
+experiments/archive/forgetting-prefix/run.py
+  s_afa5c4d654b219::t_c45af518c9bef8 1,3-5,11,14-15,17-19,21-22,28,30-39,41-49,52-53,55-69,71-82,84
+experiments/benchmark-steering/run.py
+  s_afa5c4d654b219::t_c300c95554e619 14,39-41
+experiments/code-leak/run.py
+  s_afa5c4d654b219::t_6c2d4f2af09da4 36-37
+experiments/concept-pairs/run.py
+  s_afa5c4d654b219::t_1c72d7686bf052 15,17
+experiments/context-length/run.py
+  s_afa5c4d654b219::t_62d58770db0951 22,81,84,95
+experiments/forgetting/browse.py
+  s_afa5c4d654b219::t_e5c981c81b42e4 92-94,103-104,107-112
+experiments/forgetting/figures.py
+  s_afa5c4d654b219::t_e0d06812f8ab29 1,3-7,9-11,13,26,29-41,43-47,50-71,73-86,88-91,93-148,150-174,177-178,180-181,187-189,192-198,200-212,214-252,254-271,273-311,315
+experiments/forgetting/report.py
+  s_afa5c4d654b219::t_9e49835ee6b68f 1,3-4,6-9,11-101,103-282,284
+experiments/forgetting/run.py
+  s_afa5c4d654b219::t_cbb48b902cb744 1,3-32,38-39,42,44-124,127-149,156-175,177-197,200-222,224-297,300-333
+experiments/forgetting/tradeoff.py
+  s_afa5c4d654b219::t_77a08473209ac9 1-160
+experiments/judge-calibration/run.py
+  s_afa5c4d654b219::t_ed2047591284a3 11
+experiments/language-quality/run.py
+  s_afa5c4d654b219::t_2491fe76131b16 13
+experiments/steering-scale/run.py
+  s_afa5c4d654b219::t_9c05a68ab12a12 21,34,37-47
+experiments/steering/run.py
+  s_afa5c4d654b219::t_48bc164e84ddef 18,50
+src/hybrid_steering/direction.py
+  s_afa5c4d654b219::t_918d5ae8ef4a23 6-7
+src/hybrid_steering/scoring.py
+  s_afa5c4d654b219::t_de5b2368e0d50d 1-116
+tests/test_judge.py
+  s_afa5c4d654b219::t_f15397b1bc8fc5 154
+tests/test_runtime.py
+  s_afa5c4d654b219::t_f28ba733432a73 2,23-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d1d77dc3a39c68ef9ae8f350a791a96eff072a50",
+  "prompts": {},
+  "sessions": {
+    "s_afa5c4d654b219": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "c1064d79-0965-440f-984c-b6d749395e08",
+        "model": "unknown"
+      },
+      "human_author": "Slava Chaunin <67190162+Ssslakter@users.noreply.github.com>"
+    }
+  }
+}
