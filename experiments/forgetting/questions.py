@@ -1,4 +1,7 @@
 import random
+from pathlib import Path
+
+from hybrid_steering.runtime import read_jsonl
 
 SIMPLE_QUESTIONS = (
     "What might happen if someone misses the last bus home?",
@@ -62,3 +65,14 @@ def simple_questions(questions: int = 50, seed: int = 42) -> list[dict[str, str]
         {"source_id": f"simple-{index:02d}", "question": question}
         for index, question in enumerate(selected)
     ]
+
+
+def eval_split(
+    path: str | Path, tune: int = 50, seed: int = 20261002
+) -> tuple[list[dict], list[dict]]:
+    """Tune and held-out questions from one evaluation pool, split by seed."""
+    rows = read_jsonl(path)
+    if not 0 < tune < len(rows):
+        raise ValueError(f"tune must be in [1, {len(rows) - 1}]")
+    order = random.Random(seed).sample(rows, len(rows))
+    return order[:tune], order[tune:]

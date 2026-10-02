@@ -101,10 +101,12 @@ def score_steering(
     feature: str,
     *,
     batch_size: int = 8,
+    thinking: bool | None = None,
 ) -> list[Judgment | None]:
     """Score ``(prompt, response)`` pairs for one concept.
 
     Requests go out together. ``None`` is a failed call, not a zero.
+    ``thinking`` overrides ``config/judge.yaml``.
     """
     if not pairs:
         return []
@@ -119,7 +121,7 @@ def score_steering(
         ]
         for prompt, response in pairs
     ]
-    raws = complete_batch(message_lists, max_tokens=512, json_object=True, batch_size=batch_size)
+    raws = complete_batch(message_lists, json_object=True, batch_size=batch_size, thinking=thinking)
     judgments: list[Judgment | None] = []
     invalid = 0
     for raw in raws:
@@ -128,10 +130,10 @@ def score_steering(
             continue
         try:
             judgments.append(parse_judgment(raw))
-        except ValueError:
+        except ValueError as error:
             invalid += 1
             if invalid == 1:
-                print("judge skipped a response: invalid label", flush=True)
+                print(f"judge skipped a response: {error}", flush=True)
             judgments.append(None)
     if invalid:
         print(f"judge rejected {invalid} labels", flush=True)

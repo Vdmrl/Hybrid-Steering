@@ -11,15 +11,17 @@ may import the package. The package must not import experiment code.
 - `src/hybrid_steering/runner.py` — prefill and greedy generation.
 - `src/hybrid_steering/extract.py` — mean direction from paired texts.
 - `src/hybrid_steering/capture.py` — GDN kernel transitions and rank metrics.
+- `src/hybrid_steering/scoring.py` — concept hit, quality, repetition, and scale choice shared by sweeps.
 - `src/hybrid_steering/detect.py` — Lingua for natural language, binary prompts for other concepts.
 - `src/hybrid_steering/judge/` — blind 1–5 judge. It must not see method, layer, scale, or condition names.
 - `concepts/features.yaml` — feature definitions.
 - `config/judge.yaml` — judge runtime defaults.
 - `prompts/` — versioned judge prompts.
 - `hybrid-direction` — CLI that writes one target-minus-source direction for a concept.
-- `experiments/<name>/run.py` — one experiment command.
+- `experiments/<name>/run.py` — one experiment command. `experiments/forgetting/` is the filler-decay sweep; `experiments/forgetting/squad/` is the older SQuAD check.
 - Steering sweeps add `report.py`, which summarizes rows through `hybrid_steering.report`.
-- `experiments/archive/` — historical scripts, including their original plots.
+- Artifacts go to `runs/<experiment>/<slug>/` (`rows.jsonl`, `summary.json`, `report.html`). Directions are `runs/directions/<slug>/direction`. Question pools are `runs/pairs/`. `runs/` is gitignored.
+- `experiments/archive/` — historical scripts, including toy models, notebooks, and their original plots.
 
 ## Direction convention
 

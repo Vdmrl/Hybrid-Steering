@@ -246,6 +246,69 @@ class RunnerTest(unittest.TestCase):
             _, _, expected = stepwise(target, steps=2)
             torch.testing.assert_close(generated, expected)
 
+    def test_released_clamp_holds_before_the_release_and_runs_free_after(self) -> None:
+        torch.manual_seed(1)
+        model, tokenizer = build_tiny()
+        direction = {0: torch.randn(2, 8, 8)}
+        runner = Runner.from_direction(
+            model, tokenizer, direction, normalize=False, intervention="clamp"
+        )
+        runner.tokenizer.eos_token_id = -1
+        prompts = [torch.tensor([1, 2, 3, 4, 5]), torch.tensor([8, 9, 10, 11, 12, 13, 14])]
+        input_ids, attention_mask = batch(prompts)
+        release = torch.tensor([2, 5])
+        columns = input_ids.shape[1] - attention_mask.sum(-1) + release
+        u, w, sigma = runner.clamp_factors[0]
+        scale = 0.7
+        target = (scale * sigma)[:, None] * w
+
+        def stepwise(steps: int):
+            cache = logits = None
+            mask, ids = attention_mask, input_ids
+            for position in range(input_ids.shape[1] + steps):
+                if position >= input_ids.shape[1]:
+                    ids = torch.cat((ids, logits.argmax(-1)[:, None]), 1)
+                    mask = torch.cat((mask, torch.ones_like(mask[:, :1])), 1)
+                column = mask[:, : position + 1]
+                output = model(
+                    input_ids=ids[:, position : position + 1],
+                    attention_mask=column,
+                    position_ids=(column.long().cumsum(-1) - 1).clamp_min(0)[:, -1:],
+                    past_key_values=cache,
+                    use_cache=True,
+                )
+                cache = output.past_key_values
+                state = cache.layers[0].recurrent_states[0]
+                held = (position < columns)[:, None, None, None]
+                clamped = _clamp_rank1(state, u, target).to(dtype=state.dtype)
+                state.copy_(torch.where(held, clamped, state))
+                logits = output.logits[:, -1]
+            return logits, cache, ids[:, input_ids.shape[1] :]
+
+        with torch.inference_mode():
+            cache, logits, _ = runner.prefill(
+                input_ids, attention_mask, None, scale, release_position=release
+            )
+            expected_logits, expected_cache, _ = stepwise(0)
+            torch.testing.assert_close(logits, expected_logits, atol=5e-3, rtol=2e-2)
+            torch.testing.assert_close(
+                cache.layers[0].recurrent_states[0],
+                expected_cache.layers[0].recurrent_states[0],
+                atol=5e-3,
+                rtol=2e-2,
+            )
+            _, held_logits, _ = runner.prefill(input_ids, attention_mask, None, scale)
+            self.assertGreater((logits - held_logits).abs().max().item(), 1e-5)
+            with patch.object(runner, "_inputs", return_value=(input_ids, attention_mask)):
+                generated = runner.generate(
+                    ["first", "second"], scale=scale, max_new_tokens=3, release_position=release
+                )
+            torch.testing.assert_close(generated, stepwise(3)[2])
+            with self.assertRaises(ValueError):
+                runner.prefill(
+                    input_ids, attention_mask, None, scale, release_position=torch.tensor([5, 2])
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

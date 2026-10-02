@@ -42,11 +42,11 @@ re-applies the direction during decoding.
 ## Direction
 
 ```bash
-uv run hybrid-direction --concept en-ru --output runs/en-ru
+uv run hybrid-direction --concept en-ru --output runs/directions/en-ru
 ```
 
 `--jsonl` reads local pairs instead of the Hub. `positive_text` is the target
-and `negative_text` is the source. Experiments load `runs/en-ru/direction`.
+and `negative_text` is the source. Experiments load `runs/directions/en-ru/direction`.
 
 ## Experiments
 
