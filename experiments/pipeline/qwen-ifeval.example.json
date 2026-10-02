@@ -1,6 +1,10 @@
 {
   "model": "Qwen/Qwen3.5-9B",
-  "benchmark": {
+  "judge_dataset": {
+    "path": "/data/prompts/fairytale-validation.jsonl",
+    "sha256": "REPLACE_WITH_JUDGE_DATASET_SHA256"
+  },
+  "bench_dataset": {
     "name": "ifeval",
     "path": "/data/benchmark/ifeval/input_data.jsonl",
     "sha256": "REPLACE_WITH_DATASET_SHA256",
