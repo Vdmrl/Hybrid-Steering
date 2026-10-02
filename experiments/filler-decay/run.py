@@ -5,7 +5,9 @@ assistant header. Add methods write the scaled direction into the GDN state
 once, right after the question's last token, so the question itself is read
 unsteered and L filler tokens plus the assistant header follow before the
 answer. Clamp holds the direction on every token; it is the reference that
-does not forget. ``--lengths 0`` is the scale-selection run.
+does not forget. Release is the same clamp up to the question's last token,
+then the state runs free through the filler, the header, and the answer; it
+uses clamp's scale. ``--lengths 0`` is the scale-selection run.
 
 Units follow steering-scale: factor = ``scale * N / ||D_method||`` with ``N``
 measured on the tune questions at L = 0.
@@ -20,6 +22,10 @@ cosine between head outputs, and the norm of the output difference.
 the unsteered prompt: an unsteered prefill records every ``k_proj`` and
 ``v_proj`` output, and the steered prefill reuses them. Only the GDN path then
 carries the intervention into the answer; generated tokens are not replaced.
+
+``--stage generate`` writes rows, head metrics, and ``meta.json`` and frees the
+GPU; ``--stage score`` adds the judge scores and the summary. A queue can start
+the next generation while the previous run is scored.
 
     uv run python experiments/filler-decay/run.py --direction runs/directions/en-ru/direction \\
         --feature ru --questions runs/pairs-v2/eval_questions.jsonl --output runs/decay/en-ru \\
@@ -37,7 +43,7 @@ from pathlib import Path
 import torch
 
 from hybrid_steering import Runner, gdn_layers, load_direction, load_runtime
-from hybrid_steering.runtime import import_path, token_prefixes, write_jsonl
+from hybrid_steering.runtime import import_path, read_jsonl, token_prefixes, write_jsonl
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent / "forgetting"))
@@ -48,7 +54,8 @@ scale_tools = import_path(HERE.parent / "steering-scale" / "run.py")
 
 HEADER = "Answer the question below. The text after it is unrelated background; ignore it.\n\n"
 LENGTHS = (0, 32, 64, 128, 256, 512, 1024, 2048)
-METHODS = scale_tools.METHODS
+METHODS = {**scale_tools.METHODS, "release": 1}
+CLAMPS = ("clamp", "release")
 
 
 def layout(tokenizer, question: str, filler: str) -> tuple[str, int]:
@@ -132,6 +139,15 @@ def head_metrics(base, steered) -> dict[str, torch.Tensor]:
     }
 
 
+def positions(method: str, ends: torch.Tensor) -> dict:
+    """Where each method acts: add after the question, release after the question, clamp always."""
+    if method == "release":
+        return {"prompt_position": None, "release_position": ends}
+    if method in ("baseline", "clamp"):
+        return {"prompt_position": None}
+    return {"prompt_position": ends}
+
+
 def width(length: int, batch_size: int, token_budget: int) -> int:
     return max(1, min(batch_size, token_budget // (length + 96)))
 
@@ -158,17 +174,27 @@ def main() -> None:
     parser.add_argument("--mechanics-questions", type=int, default=32)
     parser.add_argument("--judge-batch-size", type=int, default=64)
     parser.add_argument("--clean-attention", action="store_true")
+    parser.add_argument("--skip-baseline", action="store_true", help="another run has it")
+    parser.add_argument("--stage", choices=("all", "generate", "score"), default="all")
     args = parser.parse_args()
+    if args.stage in ("all", "generate"):
+        generate(args)
+        torch.cuda.empty_cache()
+    if args.stage in ("all", "score"):
+        score(args)
 
+
+def generate(args) -> None:
     tune, held = eval_split(args.questions)
     questions = [row["question"] for row in (tune if args.split == "tune" else held)]
     questions = questions[: args.count] if args.count else questions
     if args.chosen:
         chosen = json.loads(args.chosen.read_text())["chosen"]
+        chosen["release"] = chosen.get("clamp")
         grid = {
             method: sorted({chosen[method]["scale"] * m for m in args.multipliers})
             for method in args.methods
-            if method in chosen
+            if chosen.get(method)
         }
     else:
         grid = {method: sorted(args.scales) for method in args.methods}
@@ -194,9 +220,9 @@ def main() -> None:
             model,
             tokenizer,
             direction,
-            rank=None if method == "clamp" else METHODS[method],
+            rank=None if method in CLAMPS else METHODS[method],
             normalize=False,
-            intervention="clamp" if method == "clamp" else "add",
+            intervention="clamp" if method in CLAMPS else "add",
         )
         for method in grid
     }
@@ -212,7 +238,7 @@ def main() -> None:
             for scale in values
             for index in range(len(questions))
         ]
-        for method in ["baseline", *grid]:
+        for method in [*([] if args.skip_baseline else ["baseline"]), *grid]:
             mine = [job for job in jobs if job[0] == method]
             runner = plain if method == "baseline" else runners[method]
             for batch in [mine[i : i + size] for i in range(0, len(mine), size)]:
@@ -221,18 +247,15 @@ def main() -> None:
                 if clean:
                     with prefill_hook(projections, store, replace=False):
                         plain.generate(texts, prompt_position=None, max_new_tokens=1)
+                ends = torch.tensor([items[index][1] for _, _, index in batch])
                 with prefill_hook(projections, store, replace=True) if clean else nullcontext():
                     tokens = runner.generate(
                         texts,
                         scale=torch.tensor(
                             [scale * factors.get(method, 0.0) for _, scale, _ in batch]
                         ),
-                        prompt_position=(
-                            torch.tensor([items[index][1] for _, _, index in batch])
-                            if method in grid and method != "clamp"
-                            else None
-                        ),
                         max_new_tokens=args.max_new_tokens,
+                        **positions(method, ends),
                     )
                 for (_, scale, index), row in zip(batch, tokens, strict=True):
                     ids = [int(t) for t in row if int(t) != tokenizer.pad_token_id]
@@ -264,9 +287,7 @@ def main() -> None:
                     trace = runners[method].forward(
                         texts,
                         scale=scale * factors[method],
-                        prompt_position=(
-                            None if method == "clamp" else torch.tensor([p for _, p in probe])
-                        ),
+                        **positions(method, torch.tensor([p for _, p in probe])),
                     )
                 heads[method, scale, filler, length] = head_metrics(
                     base, per_row(trace, len(texts))
@@ -282,10 +303,6 @@ def main() -> None:
         args.output / "heads.pt",
     )
     write_jsonl(args.output / "rows.jsonl", rows)
-    # TODO: free the model before judging and let the next queued run generate meanwhile;
-    # scoring blocks on the judge server and leaves the GPU idle for about half of a run.
-    scale_tools.score(rows, args.feature, args.judge_batch_size)
-    write_jsonl(args.output / "rows.jsonl", rows)
     meta = {
         "feature": args.feature,
         "split": args.split,
@@ -298,14 +315,23 @@ def main() -> None:
         "header": HEADER,
         "clean_attention": args.clean_attention,
     }
+    (args.output / "meta.json").write_text(json.dumps(meta, indent=1) + "\n")
+    print(f"generated {args.output}", flush=True)
+
+
+def score(args) -> None:
+    meta = json.loads((args.output / "meta.json").read_text())
+    rows = read_jsonl(args.output / "rows.jsonl")
+    scale_tools.score(rows, meta["feature"], args.judge_batch_size)
+    write_jsonl(args.output / "rows.jsonl", rows)
     cells = []
-    for filler in args.fillers:
-        for length in args.lengths:
+    for filler in meta["fillers"]:
+        for length in meta["lengths"]:
             subset = [r for r in rows if r["filler"] == filler and r["length"] == length]
             for cell in scale_tools.summarize(subset):
                 cells.append({"filler": filler, "length": length, **cell})
     summary = {**meta, "cells": cells}
-    if args.lengths == [0]:
+    if meta["lengths"] == [0]:
         summary["chosen"] = scale_tools.choose(
             [{k: v for k, v in cell.items() if k not in ("filler", "length")} for cell in cells]
         )

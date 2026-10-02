@@ -8,7 +8,9 @@ and ``None`` disables prompt steering. ``scale`` is a scalar or one value per ro
 ``intervention="clamp"`` is the code-leak rank-1 clamp on every prompt token and
 every generated token. ``scale`` multiplies ``sigma * w``. Zero scale skips the
 clamp, so it stays the unsteered baseline. ``prompt_position`` and the decode
-schedules are not used.
+schedules are not used. ``release_position`` counts real prompt tokens like
+``prompt_position``: the clamp acts after each of those tokens, then the state
+evolves freely for the rest of the prompt and during decoding.
 """
 
 import inspect
@@ -233,6 +235,59 @@ class Runner:
         operation.output = output, state
         return (layer, save((output, state))) if capture else None
 
+    def _released_kernel(
+        self,
+        layer: int,
+        operation: OperationEnvoy,
+        releases: Tensor,
+        scales: Tensor,
+        capture: bool,
+    ) -> tuple[int, Any] | None:
+        """Clamp each row before its release column, then run the original kernel.
+
+        Between consecutive release columns every row is either clamped or free
+        for the whole segment, so both kernels run and each row keeps its own.
+        """
+        (query, key, value), kwargs = operation.inputs
+        u, target = self._clamp_target(layer, scales, query.shape[0])
+        l2norm = bool(kwargs.get("use_qk_l2norm_in_kernel", False))
+        state = kwargs.get("initial_state")
+        outputs: list[Tensor] = []
+        start = 0
+        for end in sorted(releases.unique().tolist()):
+            if end <= start:
+                continue
+            piece = (query[:, start:end], key[:, start:end], value[:, start:end])
+            g, beta = kwargs["g"][:, start:end], kwargs["beta"][:, start:end]
+            free_output, free_state = torch_chunk_gated_delta_rule(
+                *piece,
+                g=g,
+                beta=beta,
+                initial_state=state,
+                output_final_state=True,
+                use_qk_l2norm_in_kernel=l2norm,
+            )
+            held_output, held_state = chunk_gated_delta_rule_clamped(
+                *piece, g, beta, u, target, initial_state=state, use_qk_l2norm_in_kernel=l2norm
+            )
+            held = releases.ge(end)[:, None, None, None]
+            outputs.append(torch.where(held, held_output.to(free_output.dtype), free_output))
+            state = torch.where(held, held_state, free_state.float())
+            start = end
+        operation.inputs = (
+            (query[:, start:], key[:, start:], value[:, start:]),
+            {
+                **kwargs,
+                "g": kwargs["g"][:, start:],
+                "beta": kwargs["beta"][:, start:],
+                "initial_state": state,
+            },
+        )
+        tail, state = operation.output
+        output = torch.cat([*outputs, tail], dim=1)
+        operation.output = output, state
+        return (layer, save((output, state))) if capture else None
+
     @staticmethod
     def _record(
         trace: Trace, captured: dict[int, tuple[Tensor, Tensor]], mask: Tensor, logits: Tensor
@@ -258,6 +313,7 @@ class Runner:
         trace: Trace | None = None,
         columns: Tensor | None = None,
         scales: Tensor | None = None,
+        releases: Tensor | None = None,
     ) -> tuple[Any, Tensor]:
         arguments = {
             "input_ids": inputs,
@@ -279,7 +335,17 @@ class Runner:
                     inputs.shape[1] == 1 and cache is not None and cache.has_previous_state(layer)
                 )
                 operation = operations[recurrent]
-                if self._clamp_active(scales) and layer in self.clamp_factors:
+                if (
+                    releases is not None
+                    and self._clamp_active(scales)
+                    and layer in self.clamp_factors
+                ):
+                    captured = self._released_kernel(
+                        layer, operation, releases, scales, trace is not None
+                    )
+                    if captured is not None:
+                        saved.append(captured)
+                elif self._clamp_active(scales) and layer in self.clamp_factors:
                     args, kwargs = operation.inputs
                     clamped = self._clamped_kernel(layer, args, kwargs, scales, recurrent)
                     operation.output = clamped
@@ -360,6 +426,21 @@ class Runner:
         for layer, delta in self.deltas.items():
             add_delta(cache.layers[layer].recurrent_states[0], delta, scales, self.normalize)
 
+    def _columns(
+        self, position: PromptPosition, lengths: Tensor, padding: Tensor, name: str
+    ) -> Tensor:
+        """Padded column of a per-row token count; negative counts from the prompt end."""
+        requested = torch.as_tensor(position, device=self.device)
+        if requested.ndim > 1 or (requested.ndim == 1 and len(requested) not in (1, len(lengths))):
+            raise ValueError(f"{name} must be scalar or have one value per prompt")
+        if requested.is_floating_point():
+            raise ValueError(f"{name} must contain integers")
+        requested = requested.expand_as(lengths)
+        columns = padding + torch.where(requested < 0, requested + lengths, requested)
+        if ((columns < padding) | (columns > padding + lengths)).any():
+            raise ValueError(f"{name} must resolve within every prompt")
+        return columns
+
     @torch.inference_mode()
     def prefill(
         self,
@@ -369,6 +450,7 @@ class Runner:
         scale: float | Tensor,
         prompt_mode: PromptMode = "exact",
         trace: Trace | None = None,
+        release_position: PromptPosition = None,
     ) -> tuple[Any, Tensor, Tensor]:
         """Process a prompt batch and optionally alter each row's GDN state once."""
         if inputs.ndim != 2 or mask.shape != inputs.shape:
@@ -382,25 +464,25 @@ class Runner:
         lengths = mask.long().sum(-1)
         padding = inputs.shape[1] - lengths
         positions = (mask.long().cumsum(-1) - 1).clamp_min(0)
-        columns = None
+        columns = releases = None
         if self.intervention == "add" and prompt_position is not None:
-            requested = torch.as_tensor(prompt_position, device=self.device)
-            if requested.ndim > 1 or (
-                requested.ndim == 1 and len(requested) not in (1, len(inputs))
-            ):
-                raise ValueError("prompt_position must be scalar or have one value per prompt")
-            if requested.is_floating_point():
-                raise ValueError("prompt_position must contain integers")
-            requested = requested.expand_as(lengths)
-            columns = padding + torch.where(requested < 0, requested + lengths, requested)
-            if ((columns < padding) | (columns > inputs.shape[1])).any():
-                raise ValueError("prompt_position must resolve within every prompt")
+            columns = self._columns(prompt_position, lengths, padding, "prompt_position")
             if prompt_mode == "chunk":
                 columns = torch.maximum(columns // CHUNK * CHUNK, padding)
             if trace is not None:
                 trace.prompt_positions = columns - padding
+        if self.intervention == "clamp" and release_position is not None:
+            releases = self._columns(release_position, lengths, padding, "release_position")
+            if (releases >= inputs.shape[1]).any():
+                raise ValueError("release_position must leave at least one prompt token")
         cache, logits = self._model_forward(
-            inputs, mask, positions, trace=trace, columns=columns, scales=scales
+            inputs,
+            mask,
+            positions,
+            trace=trace,
+            columns=columns,
+            scales=scales,
+            releases=releases,
         )
         if trace is not None:
             trace.prefill_outputs = {
@@ -418,11 +500,12 @@ class Runner:
         scale: float | Tensor = 1.0,
         prompt_position: PromptPosition = -1,
         prompt_mode: PromptMode = "exact",
+        release_position: PromptPosition = None,
     ) -> Trace:
         """Capture the final prefill state through the same path as generation."""
         trace = Trace()
         inputs, mask = self._inputs(texts)
-        self.prefill(inputs, mask, prompt_position, scale, prompt_mode, trace)
+        self.prefill(inputs, mask, prompt_position, scale, prompt_mode, trace, release_position)
         return trace
 
     @torch.inference_mode()
@@ -436,6 +519,7 @@ class Runner:
         generation_steps: set[int] | None = None,
         max_new_tokens: int = 64,
         trace: Trace | None = None,
+        release_position: PromptPosition = None,
     ) -> Int[Tensor, "batch token"]:
         """Greedily generate one batch, with optional prompt and decode interventions."""
         if max_new_tokens < 1:
@@ -453,8 +537,9 @@ class Runner:
         inputs, mask = self._inputs(texts)
         scales = self._scales(scale, len(inputs))
         cache, logits, mask = self.prefill(
-            inputs, mask, prompt_position, scales, prompt_mode, trace
+            inputs, mask, prompt_position, scales, prompt_mode, trace, release_position
         )
+        held = self._clamp_active(scales) and release_position is None
         generated = torch.full(
             (len(inputs), max_new_tokens),
             self.tokenizer.pad_token_id,
@@ -483,6 +568,6 @@ class Runner:
                 position,
                 cache,
                 trace,
-                scales=scales if self._clamp_active(scales) else None,
+                scales=scales if held else None,
             )
         return generated

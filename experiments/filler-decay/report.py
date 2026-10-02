@@ -33,6 +33,7 @@ COLORS = {
     "rank2": "#9467bd",
     "full": "#2ca02c",
     "clamp": "#ff7f0e",
+    "release": "#17becf",
 }
 
 
@@ -139,18 +140,23 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
-    labels = {}
+    labels: dict[str, list[Path]] = {}
     for run in args.runs:
         meta = json.loads((run / "summary.json").read_text())
-        labels["clean KV" if meta.get("clean_attention") else "normal"] = run
-    rows = {label: read_jsonl(run / "rows.jsonl") for label, run in labels.items()}
+        labels.setdefault("clean KV" if meta.get("clean_attention") else "normal", []).append(run)
+    rows = {
+        label: [row for run in runs for row in read_jsonl(run / "rows.jsonl")]
+        for label, runs in labels.items()
+    }
     lengths = sorted({r["length"] for r in next(iter(rows.values()))})
     feature = meta["feature"]
     log_x = {"type": "log", "title": "filler tokens + 1"}
 
     sections = [
         f"<p>{escape(feature)}; runs: "
-        + ", ".join(f"{escape(k)} = {escape(str(v))}" for k, v in labels.items())
+        + ", ".join(
+            f"{escape(k)} = {escape(', '.join(str(run) for run in v))}" for k, v in labels.items()
+        )
         + ". Solid: normal attention. Dotted: attention keys and values from the unsteered "
         "prompt. Bars: 95% bootstrap over questions.</p>",
         "<h2>Concept rate</h2>"
@@ -167,7 +173,16 @@ def main() -> None:
         ),
     ]
 
-    mech = {label: mechanics(run, lengths) for label, run in labels.items()}
+    mech = {}
+    for label, runs in labels.items():
+        parts = [mechanics(run, lengths) for run in runs]
+        mech[label] = {
+            "layers": parts[0]["layers"],
+            **{
+                key: {k: v for part in parts for k, v in part[key].items()}
+                for key in ("total", "taus", "cosines")
+            },
+        }
     total_traces, tau_hist, cosine_traces, heatmaps = [], [], [], []
     for label, data in mech.items():
         dash = "solid" if label == "normal" else "dot"
