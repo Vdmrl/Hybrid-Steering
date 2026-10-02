@@ -1,14 +1,17 @@
 # Configured benchmark and Judge runs
 
 This experiment reuses `hybrid-direction`, Qwen's `Runner`, the shared recurrent
-state math, and the repository's Judge. The same JSON plan runs Qwen3.5 GDN or
-Falcon-H1 Mamba steering. Only the recurrent cache adapter differs. It supports
-IFEval, HumanEval, and a JSONL pool of prompts for Judge-only concept tests.
+state math, and the repository's Judge. One JSON plan names a `judge_dataset`
+and a `bench_dataset` (IFEval or HumanEval), plus the model and steering
+conditions. Qwen uses GDN and Falcon-H1 uses Mamba; the cache adapter differs.
 
 Install with `uv sync --extra dev --extra benchmarks`. Copy one of the
-`*.example.json` files, set absolute dataset and direction paths, and replace
-the SHA-256 placeholders. A prompt pool needs `prompt` and an optional `id` or
-`key`; HumanEval rows also need `task_id`, `test`, and `entry_point`.
+`*.example.json` files, set dataset and direction paths, and replace the
+SHA-256 placeholders. The Judge dataset needs `prompt` and an optional `id` or
+`key`; HumanEval also needs `task_id`, `test`, and `entry_point`. Datasets are
+not committed here. `judge_dataset` can instead specify `hf_repo`, `hf_file`,
+and a pinned commit `revision`, alongside `sha256`; the file is fetched through
+the Hugging Face cache.
 
 Create a direction from the concept dataset (or pass `--jsonl` for local pairs):
 
@@ -24,13 +27,16 @@ full target-minus-source matrices and mean states; `rank` in the plan is applied
 when steering. Keep extraction and evaluation prompts disjoint.
 
 ```bash
-uv run python experiments/pipeline/run.py generate --config my-run.json --output runs/my-run
-uv run python experiments/pipeline/run.py score --config my-run.json --output runs/my-run
-uv run python experiments/pipeline/run.py score --config my-run.json --output runs/my-run --run-judge
+uv run python experiments/pipeline/run.py run --config my-run.json --output runs/my-run --run-judge
 ```
 
-`run` combines generate and score. Generation resumes by `(condition, scale,
-key)` and refuses changed config, dataset, direction, or core code. Each
+`run` combines generate, score, and plotting. `generate` and `score` are
+available separately. Judge API calls require the explicit `--run-judge` flag;
+without it, Judge tasks are prepared offline and saved Judge scores are reused.
+Generation resumes by `(condition, scale, key)`. Judge and benchmark answers
+have separate content-addressed directories under `runs/my-run/judge/` and
+`runs/my-run/benchmark/`. Changing only `bench_dataset` leaves the Judge
+directory and its answers intact. Each
 condition has a unique `name`, a `method` (`baseline`, `gdn_add`, `gdn_clamp`,
 `mamba_add`, or `mamba_clamp`), a `scales` list, and, when steered, a `direction`
 path. `rank`, `normalize`, and `prompt_position` are explicit. Mamba currently
@@ -47,8 +53,14 @@ host writes disabled. Its input is the standard HumanEval JSONL or JSONL.gz.
 HumanEval prompts are raw code prefixes; IFEval and Judge prompts use the
 model's chat template with thinking disabled.
 
-Without `--run-judge`, `score` writes blinded `judge_tasks.jsonl` and separate
-`judge_bindings.jsonl`; it makes no API calls. With the flag, it reads
-`judge.config`, runs the existing rubric, and writes `judge_scores.jsonl` plus
-`sweep_summary.json`. `benchmark_scores.json` holds official benchmark scores.
+`score` writes blinded `judge_tasks.jsonl` and separate
+`judge_bindings.jsonl`. With `--run-judge`, it reads `judge.config`, runs the
+existing rubric, and caches `judge_scores.jsonl` plus `sweep_summary.json`.
+`benchmark_scores.json` holds official benchmark scores and confidence
+intervals. Once both scores exist, `reports/<judge-id>-<benchmark-id>/` contains
+CSV, JSON, and SVG. Judge concept-score means and paired differences from the
+baseline use a seeded prompt
+bootstrap; binary IFEval prompt and HumanEval rates use 95% Wilson intervals;
+IFEval instruction rates use a prompt-cluster bootstrap. These marginal
+intervals do not establish significance for differences between conditions.
 Set Judge API credentials in the environment; do not put them in JSON.

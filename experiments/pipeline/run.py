@@ -7,9 +7,11 @@ import gzip
 import hashlib
 import json
 import math
+import re
 from pathlib import Path
 
 from evaluate import humaneval, ifeval
+from report import build_report
 
 from hybrid_steering import Runner, gdn_layers, load_direction, load_runtime
 from hybrid_steering.mamba import MambaRunner
@@ -17,7 +19,7 @@ from hybrid_steering.runtime import batched, chat_prompts, write_jsonl
 from hybrid_steering.scoring import choose, repetition, score, summarize
 
 ROOT = Path(__file__).resolve().parents[2]
-VALID_BENCHMARKS = {"ifeval", "humaneval", "judge_prompts"}
+VALID_BENCHMARKS = {"ifeval", "humaneval"}
 
 
 def digest(path: Path) -> str:
@@ -29,6 +31,22 @@ def resolved(config_file: Path, value: str) -> Path:
     return (path if path.is_absolute() else config_file.parent / path).resolve()
 
 
+def dataset_path(config_file: Path, spec: dict) -> Path:
+    if "path" in spec:
+        return resolved(config_file, spec["path"])
+    from huggingface_hub import hf_hub_download
+
+    if not all(spec.get(key) for key in ("hf_repo", "hf_file", "revision")):
+        raise ValueError("dataset needs path or hf_repo, hf_file, and pinned revision")
+    if not re.fullmatch(r"[0-9a-fA-F]{40}", spec["revision"]):
+        raise ValueError("HF dataset revision must be a full commit SHA")
+    return Path(
+        hf_hub_download(
+            spec["hf_repo"], spec["hf_file"], revision=spec["revision"], repo_type="dataset"
+        )
+    )
+
+
 def read_lines(path: Path) -> list[dict]:
     opener = gzip.open if path.suffix == ".gz" else open
     with opener(path, "rt", encoding="utf-8") as stream:
@@ -38,29 +56,44 @@ def read_lines(path: Path) -> list[dict]:
     return rows
 
 
-def load_plan(path: Path) -> tuple[dict, list[dict]]:
+def load_plan(path: Path) -> tuple[dict, dict[str, list[dict]]]:
     plan = json.loads(path.read_text(encoding="utf-8"))
-    benchmark = plan["benchmark"]
+    benchmark = plan["bench_dataset"]
     if benchmark["name"] not in VALID_BENCHMARKS:
-        raise ValueError("benchmark must be ifeval, humaneval, or judge_prompts")
-    dataset = resolved(path, benchmark["path"])
-    if digest(dataset) != benchmark["sha256"]:
-        raise ValueError("dataset hash differs from config")
-    data = read_lines(dataset)
-    keys = [
-        str(row.get("task_id", row.get("key", row.get("id", index))))
-        for index, row in enumerate(data)
-    ]
-    if len(keys) != len(set(keys)) or any(not row.get("prompt") for row in data):
-        raise ValueError("dataset needs unique IDs and nonempty prompts")
-    if benchmark["name"] == "humaneval" and any(
-        not all(key in row for key in ("task_id", "test", "entry_point")) for row in data
-    ):
-        raise ValueError("HumanEval rows need task_id, test, and entry_point")
-    for row, key in zip(data, keys, strict=True):
-        row["_key"] = key
+        raise ValueError("bench_dataset.name must be ifeval or humaneval")
+    datasets = {}
+    for role, spec in (("judge", plan["judge_dataset"]), ("benchmark", benchmark)):
+        dataset = dataset_path(path, spec)
+        if digest(dataset) != spec["sha256"]:
+            raise ValueError(f"{role} dataset hash differs from config")
+        data = read_lines(dataset)
+        keys = [
+            str(row.get("task_id", row.get("key", row.get("id", index))))
+            for index, row in enumerate(data)
+        ]
+        if len(keys) != len(set(keys)) or any(not row.get("prompt") for row in data):
+            raise ValueError(f"{role} dataset needs unique IDs and nonempty prompts")
+        if (
+            role == "benchmark"
+            and spec["name"] == "ifeval"
+            and len({row["prompt"] for row in data}) != len(data)
+        ):
+            raise ValueError("IFEval prompts must be unique for the official scorer")
+        if (
+            role == "benchmark"
+            and spec["name"] == "humaneval"
+            and any(
+                not all(key in row for key in ("task_id", "test", "entry_point")) for row in data
+            )
+        ):
+            raise ValueError("HumanEval rows need task_id, test, and entry_point")
+        for row, key in zip(data, keys, strict=True):
+            row["_key"] = key
+        datasets[role] = data
     if not plan.get("conditions") or plan.get("max_new_tokens", 0) < 1:
         raise ValueError("conditions and max_new_tokens are required")
+    if not all(plan.get("judge", {}).get(key) for key in ("feature", "config")):
+        raise ValueError("judge feature and config are required")
     names = [condition["name"] for condition in plan["conditions"]]
     if len(names) != len(set(names)):
         raise ValueError("condition names must be unique")
@@ -84,14 +117,18 @@ def load_plan(path: Path) -> tuple[dict, list[dict]]:
             type(x) not in (int, float) for x in condition["scales"]
         ):
             raise ValueError("every condition needs numeric scales")
+        if len(set(condition["scales"])) != len(condition["scales"]) or any(
+            not math.isfinite(scale) for scale in condition["scales"]
+        ):
+            raise ValueError("scales must be unique and finite")
         if condition["method"] == "baseline" and condition["scales"] != [0]:
             raise ValueError("baseline must use only scale 0")
         if condition["method"] != "baseline" and not condition.get("direction"):
             raise ValueError("steered conditions need a direction path")
-    return plan, data
+    return plan, datasets
 
 
-def identity(config_file: Path, plan: dict, data: list[dict]) -> dict:
+def identity(config_file: Path, plan: dict, data: list[dict], role: str) -> dict:
     directions = {}
     for condition in plan["conditions"]:
         if condition.get("direction"):
@@ -103,19 +140,15 @@ def identity(config_file: Path, plan: dict, data: list[dict]) -> dict:
             )
             directions[str(path)] = {file.name: digest(file) for file in files}
     return {
-        "config_sha256": digest(config_file),
         "model": plan["model"],
-        "benchmark": plan["benchmark"],
+        "role": role,
+        "dataset": plan["judge_dataset"] if role == "judge" else plan["bench_dataset"],
         "n_tasks": len(data),
+        "conditions": plan["conditions"],
+        "batch_size": plan.get("batch_size", 1),
+        "max_new_tokens": plan["max_new_tokens"],
+        "thinking": False,
         "directions": directions,
-        "judge_sha256": (
-            {
-                "settings": digest(resolved(config_file, plan["judge"]["config"])),
-                "features": digest(ROOT / "concepts/features.yaml"),
-            }
-            if plan.get("judge")
-            else None
-        ),
         "code_sha256": {
             name: digest(ROOT / name)
             for name in (
@@ -129,6 +162,12 @@ def identity(config_file: Path, plan: dict, data: list[dict]) -> dict:
             )
         },
     }
+
+
+def run_directory(config_file: Path, plan: dict, data: list[dict], role: str, output: Path) -> Path:
+    value = json.dumps(identity(config_file, plan, data, role), sort_keys=True)
+    key = hashlib.sha256(value.encode()).hexdigest()[:16]
+    return output / role / key
 
 
 def _runner(model, tokenizer, condition: dict, config_file: Path, model_id: str):
@@ -168,8 +207,10 @@ def _texts(tokenizer, data: list[dict], benchmark: str) -> list[str]:
     return prompts if benchmark == "humaneval" else chat_prompts(tokenizer, prompts)
 
 
-def generate(config_file: Path, plan: dict, data: list[dict], output: Path) -> list[dict]:
-    manifest = identity(config_file, plan, data)
+def generate(
+    config_file: Path, plan: dict, data: list[dict], output: Path, role: str
+) -> list[dict]:
+    manifest = identity(config_file, plan, data, role)
     output.mkdir(parents=True, exist_ok=True)
     manifest_file = output / "manifest.json"
     if manifest_file.exists():
@@ -207,7 +248,11 @@ def generate(config_file: Path, plan: dict, data: list[dict], output: Path) -> l
             ]
             for batch in batched(missing, width):
                 tokens = runner.generate(
-                    _texts(tokenizer, batch, plan["benchmark"]["name"]),
+                    _texts(
+                        tokenizer,
+                        batch,
+                        "judge" if role == "judge" else plan["bench_dataset"]["name"],
+                    ),
                     scale=float(scale),
                     prompt_position=case.get("prompt_position", -1),
                     max_new_tokens=plan["max_new_tokens"],
@@ -260,8 +305,8 @@ def prepare_judge(rows: list[dict], output: Path) -> None:
 
 
 def evaluate(
-    config_file: Path, plan: dict, data: list[dict], output: Path, *, run_judge: bool
-) -> None:
+    config_file: Path, plan: dict, data: list[dict], output: Path, role: str, *, run_judge: bool
+) -> bool:
     answers = read_lines(output / "answers.jsonl")
     expected = len(data) * sum(len(case["scales"]) for case in plan["conditions"])
     if len(answers) != expected:
@@ -275,38 +320,71 @@ def evaluate(
     }
     if keys != wanted:
         raise ValueError("saved answers do not match the configured grid")
-    if json.loads((output / "manifest.json").read_text()) != identity(config_file, plan, data):
+    if json.loads((output / "manifest.json").read_text()) != identity(
+        config_file, plan, data, role
+    ):
         raise ValueError("score manifest differs from current sources")
-    name = plan["benchmark"]["name"]
-    metrics = {}
-    for case in plan["conditions"]:
-        for scale in case["scales"]:
-            selected = [
-                row
-                for row in answers
-                if row["condition"] == case["name"] and row["scale"] == float(scale)
-            ]
-            if name == "ifeval":
-                metrics[f"{case['name']}:{scale}"] = ifeval(
-                    selected,
-                    data,
-                    plan["benchmark"]["evaluator"],
-                    resolved(config_file, plan["benchmark"]["path"]),
-                )
-            elif name == "humaneval":
-                metrics[f"{case['name']}:{scale}"] = humaneval(selected, data)
-    if metrics:
-        (output / "benchmark_scores.json").write_text(json.dumps(metrics, indent=2) + "\n")
-    if not plan.get("judge"):
-        return
+    name = plan["bench_dataset"]["name"] if role == "benchmark" else "judge"
+    benchmark_scores = output / "benchmark_scores.json"
+    benchmark_manifest = output / "benchmark_score_manifest.json"
+    answers_sha = digest(output / "answers.jsonl")
+    benchmark_cached = (
+        benchmark_scores.exists()
+        and benchmark_manifest.exists()
+        and json.loads(benchmark_manifest.read_text()) == {"answers": answers_sha}
+    )
+    if role == "benchmark" and not benchmark_cached:
+        metrics = {}
+        for case in plan["conditions"]:
+            for scale in case["scales"]:
+                selected = [
+                    row
+                    for row in answers
+                    if row["condition"] == case["name"] and row["scale"] == float(scale)
+                ]
+                if name == "ifeval":
+                    metrics[f"{case['name']}:{scale}"] = ifeval(
+                        selected,
+                        data,
+                        plan["bench_dataset"]["evaluator"],
+                        dataset_path(config_file, plan["bench_dataset"]),
+                    )
+                else:
+                    metrics[f"{case['name']}:{scale}"] = humaneval(selected, data)
+        benchmark_scores.write_text(json.dumps(metrics, indent=2) + "\n")
+        benchmark_manifest.write_text(json.dumps({"answers": answers_sha}) + "\n")
+    if role != "judge":
+        return True
     prepare_judge(answers, output)
-    if not run_judge:
-        return
     judge = plan["judge"]
     settings = resolved(config_file, judge["config"])
-    rated = [{**row, "question": row["prompt"]} for row in answers]
-    score(rated, judge["feature"], judge.get("batch_size", 8), settings_path=settings)
-    write_jsonl(output / "judge_scores.jsonl", rated)
+    score_id = {
+        "answers": digest(output / "answers.jsonl"),
+        "settings": digest(settings),
+        "features": digest(ROOT / "concepts/features.yaml"),
+        "feature": judge["feature"],
+        "judge_code": digest(ROOT / "src/hybrid_steering/judge/steering.py"),
+    }
+    scores_file, score_manifest = (
+        output / "judge_scores.jsonl",
+        output / "judge_score_manifest.json",
+    )
+    cached = (
+        scores_file.exists()
+        and score_manifest.exists()
+        and json.loads(score_manifest.read_text()) == score_id
+    )
+    if not run_judge and not cached:
+        return False
+    if cached:
+        rated = read_lines(scores_file)
+    else:
+        rated = [{**row, "question": row["prompt"]} for row in answers]
+        score(rated, judge["feature"], judge.get("batch_size", 8), settings_path=settings)
+        write_jsonl(scores_file, rated)
+        if any(row.get("concept_score") is None for row in rated):
+            raise ValueError("Judge returned incomplete scores; inspect judge_scores.jsonl")
+        score_manifest.write_text(json.dumps(score_id, indent=2) + "\n")
     cells = summarize(rated)
     methods = {
         case["name"]: case.get("rank")
@@ -331,6 +409,7 @@ def evaluate(
     (output / "sweep_summary.json").write_text(
         json.dumps(clean({"cells": cells, "chosen": chosen}), indent=2, allow_nan=False) + "\n"
     )
+    return True
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -341,11 +420,22 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--run-judge", action="store_true", help="Allow paid Judge API requests")
     args = parser.parse_args(argv)
     config_file, output = args.config.resolve(), args.output.resolve()
-    plan, data = load_plan(config_file)
-    if args.mode in {"generate", "run"}:
-        generate(config_file, plan, data, output)
-    if args.mode in {"score", "run"}:
-        evaluate(config_file, plan, data, output, run_judge=args.run_judge)
+    plan, datasets = load_plan(config_file)
+    directories = {
+        role: run_directory(config_file, plan, data, role, output)
+        for role, data in datasets.items()
+    }
+    scored = {}
+    for role, data in datasets.items():
+        directory = directories[role]
+        if args.mode in {"generate", "run"}:
+            generate(config_file, plan, data, directory, role)
+        if args.mode in {"score", "run"}:
+            scored[role] = evaluate(
+                config_file, plan, data, directory, role, run_judge=args.run_judge
+            )
+    if scored.get("judge") and scored.get("benchmark"):
+        build_report(directories["judge"], directories["benchmark"], output)
 
 
 if __name__ == "__main__":

@@ -9,6 +9,21 @@ import subprocess
 import sys
 from pathlib import Path
 
+from intervals import bootstrap_ratio
+
+from hybrid_steering.scoring import wilson
+
+
+def _interval(flags: list[bool]) -> dict:
+    low, high = wilson(sum(flags), len(flags))
+    return {"low": low, "high": high, "n": len(flags)}
+
+
+def _instruction_interval(rows: list) -> dict:
+    """Bootstrap whole prompts so instructions within one prompt stay together."""
+    counts = [(sum(row.follow_instruction_list), len(row.follow_instruction_list)) for row in rows]
+    return bootstrap_ratio(counts)
+
 
 def _sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -29,11 +44,13 @@ def ifeval(answers: list[dict], dataset: list[dict], evaluator: dict, dataset_pa
     # The official evaluator uses a prompt->response map and random calls.
     response = {row["prompt"]: row["response"] for row in answers}
     inputs = evaluation_lib.read_prompt_list(dataset_path)
+    if len(inputs) != len(dataset) or {row.prompt for row in inputs} != set(response):
+        raise ValueError("official IFEval inputs differ from the configured dataset")
     random.seed(0)
     strict = [evaluation_lib.test_instruction_following_strict(row, response) for row in inputs]
     random.seed(0)
     loose = [evaluation_lib.test_instruction_following_loose(row, response) for row in inputs]
-    return {
+    result = {
         "prompt_strict": sum(row.follow_all_instructions for row in strict) / len(strict),
         "prompt_loose": sum(row.follow_all_instructions for row in loose) / len(loose),
         "instruction_strict": sum(sum(row.follow_instruction_list) for row in strict)
@@ -41,6 +58,13 @@ def ifeval(answers: list[dict], dataset: list[dict], evaluator: dict, dataset_pa
         "instruction_loose": sum(sum(row.follow_instruction_list) for row in loose)
         / sum(len(row.follow_instruction_list) for row in loose),
     }
+    result["confidence_intervals"] = {
+        "prompt_strict": _interval([bool(row.follow_all_instructions) for row in strict]),
+        "prompt_loose": _interval([bool(row.follow_all_instructions) for row in loose]),
+        "instruction_strict": _instruction_interval(strict),
+        "instruction_loose": _instruction_interval(loose),
+    }
+    return result
 
 
 def _sandbox_command(executor: Path) -> list[str]:
@@ -119,5 +143,6 @@ def humaneval(answers: list[dict], dataset: list[dict]) -> dict:
         "pass_at_1": sum(verdicts) / len(verdicts),
         "passed": sum(verdicts),
         "n": len(verdicts),
+        "confidence_intervals": {"pass_at_1": _interval(verdicts)},
         "executor_sha256": _sha(executor),
     }
