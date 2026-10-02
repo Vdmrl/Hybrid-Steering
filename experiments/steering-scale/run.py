@@ -7,8 +7,8 @@ matrix, or the clamp's ``sigma u w^T``) uses the factor ``scale * N / ||D||``,
 so at scale 1 the injected tensor has the norm of a natural state. ``||D||``
 is the Frobenius norm over all heads.
 
-Add methods write into the zero state before the first prompt token
-(``prompt_position=0``); per-head normalization is off. Clamp holds each
+Add methods write into the state once at ``--prompt-position`` (default 0, the
+zero state before the first prompt token); per-head normalization is off. Clamp holds each
 head's component along ``u`` on every prompt and generated token.
 
 Scored per row: concept (Lingua for languages, the judge otherwise),
@@ -219,6 +219,7 @@ def main() -> None:
     parser.add_argument("--model", default="Qwen/Qwen3.5-9B")
     parser.add_argument("--methods", nargs="+", choices=sorted(METHODS), default=list(METHODS))
     parser.add_argument("--scales", type=float, nargs="+", default=SCALES)
+    parser.add_argument("--prompt-position", type=int, default=0)
     parser.add_argument("--max-new-tokens", type=int, default=128)
     parser.add_argument("--batch-size", type=int, default=512)
     parser.add_argument("--judge-batch-size", type=int, default=64)
@@ -261,7 +262,7 @@ def main() -> None:
             tokenizer,
             texts,
             applied,
-            prompt_position=None if clamp else 0,
+            prompt_position=None if clamp else args.prompt_position,
             max_new_tokens=args.max_new_tokens,
             batch_size=args.batch_size,
         ):
@@ -289,6 +290,7 @@ def main() -> None:
     meta = {
         "feature": args.feature,
         "split": args.split,
+        "prompt_position": args.prompt_position,
         "questions": len(questions),
         "natural_norm": norm,
         "factors": factors,
