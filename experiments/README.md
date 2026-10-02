@@ -19,6 +19,7 @@ Artifacts live under `runs/` and are not committed. A direction is
 
 | Directory | Run | Report |
 | --- | --- | --- |
+| `pipeline` | Configured Qwen GDN / Falcon Mamba IFEval, HumanEval, and Judge sweeps | Benchmark scores and chosen scale |
 | `steering` | Generate and score one direction | Concept score by scale |
 | `forgetting` | Concept persistence after a filler, including release and clean attention | Rate, quality, and per-head decay |
 | `steering-scale` | One scale unit for every method | Chosen scale per method |

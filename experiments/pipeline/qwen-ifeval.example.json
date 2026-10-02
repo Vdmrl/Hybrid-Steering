@@ -1,0 +1,20 @@
+{
+  "model": "Qwen/Qwen3.5-9B",
+  "benchmark": {
+    "name": "ifeval",
+    "path": "/data/benchmark/ifeval/input_data.jsonl",
+    "sha256": "REPLACE_WITH_DATASET_SHA256",
+    "evaluator": {
+      "root": "/data/benchmark/google_research",
+      "evaluation_lib_sha256": "REPLACE_WITH_EVALUATOR_SHA256"
+    }
+  },
+  "batch_size": 8,
+  "max_new_tokens": 1024,
+  "conditions": [
+    {"name": "baseline", "method": "baseline", "scales": [0]},
+    {"name": "rank1", "method": "gdn_add", "direction": "/data/directions/fairytale/direction", "rank": 1, "normalize": false, "prompt_position": -1, "scales": [0.2, 0.3, 0.4]},
+    {"name": "clamp1", "method": "gdn_clamp", "direction": "/data/directions/fairytale/direction", "rank": 1, "normalize": false, "scales": [0.2, 0.3, 0.4]}
+  ],
+  "judge": {"feature": "fairytale", "config": "../../config/judge.yaml", "batch_size": 8}
+}

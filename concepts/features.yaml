@@ -71,6 +71,12 @@ features:
       Look for an explicit contrast between the subject and another option, a baseline, or an earlier state.
       A list of items, or the word "better" without a named reference point, is insufficient.
 
+  fairytale:
+    guide: |
+      Target: a sustained fairy-tale storytelling style in the answer's own voice.
+      Look for a storybook narrator, fairy-tale phrasing, and evocative imagery carried through the response.
+      One decorative opening, a quoted fairy tale, or fiction that drops the requested substance is insufficient.
+
   fictional_narrative:
     guide: |
       Target: a fictional narrative voice.

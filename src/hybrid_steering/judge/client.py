@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 from .config import load_settings
 
@@ -25,6 +26,7 @@ def complete_batch(
     json_object: bool = False,
     batch_size: int = 8,
     thinking: bool | None = None,
+    settings_path: Path | None = None,
 ) -> list[str | None]:
     """Send every message list together. ``batch_size`` is how many run at once.
 
@@ -42,7 +44,7 @@ def complete_batch(
     proxy = os.environ.get("OPENROUTER_PROXY", "").strip()
     if proxy:
         os.environ.setdefault("HTTPS_PROXY", proxy)
-    settings = load_settings()
+    settings = load_settings(settings_path=settings_path)
     kwargs: dict = {
         "model": settings.model,
         "temperature": 0,

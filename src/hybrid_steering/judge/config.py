@@ -29,13 +29,15 @@ def repo_root() -> Path:
     raise FileNotFoundError("concepts/features.yaml and config/judge.yaml were not found")
 
 
-def load_settings(root: Path | None = None) -> JudgeSettings:
+def load_settings(root: Path | None = None, *, settings_path: Path | None = None) -> JudgeSettings:
     """Read ``config/judge.yaml``. Only ``model`` is required.
 
     The endpoint and key are ``OPENAI_BASE_URL`` and ``OPENAI_API_KEY``.
     """
     root = root or repo_root()
-    raw = yaml.safe_load((root / "config" / "judge.yaml").read_text(encoding="utf-8"))
+    raw = yaml.safe_load(
+        (settings_path or root / "config" / "judge.yaml").read_text(encoding="utf-8")
+    )
     defaults = JudgeSettings(model="")
     return JudgeSettings(
         model=str(raw["model"]),

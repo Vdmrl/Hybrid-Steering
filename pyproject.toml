@@ -31,6 +31,7 @@ fast-kernels = [
 ]
 dev = ["pytest>=8.2", "ruff>=0.6"]
 toys = ["transformer-lens>=3,<4"]
+benchmarks = ["absl-py>=2", "immutabledict>=4", "nltk>=3", "emoji>=2", "syllapy>=0.8", "langdetect>=1.0.9"]
 
 [project.scripts]
 hybrid-direction = "hybrid_steering.direction:main"

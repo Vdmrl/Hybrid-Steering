@@ -9,6 +9,7 @@ stay near the unsteered baseline.
 from __future__ import annotations
 
 import math
+from pathlib import Path
 
 from .cache import gdn_layers
 from .detect import is_language
@@ -49,14 +50,23 @@ def wilson(hits: int, n: int, z: float = 1.96) -> tuple[float, float]:
     return centre - half, centre + half
 
 
-def score(rows: list[dict], feature: str, batch_size: int) -> None:
+def score(
+    rows: list[dict], feature: str, batch_size: int, *, settings_path: Path | None = None
+) -> None:
     language = is_language(feature)
-    score_rows(rows, feature, prompt_field="question", batch_size=batch_size)
+    score_rows(
+        rows,
+        feature,
+        prompt_field="question",
+        batch_size=batch_size,
+        settings_path=settings_path,
+    )
     if language:
         judgments = score_steering(
             [(row["question"], row["response"]) for row in rows],
             "answer_quality",
             batch_size=batch_size,
+            settings_path=settings_path,
         )
         for row, judgment in zip(rows, judgments, strict=True):
             row["content_quality"] = judgment.content_quality if judgment else None
