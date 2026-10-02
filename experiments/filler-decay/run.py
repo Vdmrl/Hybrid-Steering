@@ -282,6 +282,8 @@ def main() -> None:
         args.output / "heads.pt",
     )
     write_jsonl(args.output / "rows.jsonl", rows)
+    # TODO: free the model before judging and let the next queued run generate meanwhile;
+    # scoring blocks on the judge server and leaves the GPU idle for about half of a run.
     scale_tools.score(rows, args.feature, args.judge_batch_size)
     write_jsonl(args.output / "rows.jsonl", rows)
     meta = {
