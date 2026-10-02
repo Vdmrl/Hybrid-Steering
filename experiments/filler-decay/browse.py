@@ -5,7 +5,9 @@ import json
 from html import escape
 from pathlib import Path
 
-from hybrid_steering.runtime import read_jsonl
+from hybrid_steering.runtime import import_path, read_jsonl
+
+meta_kind = import_path(Path(__file__).with_name("meta.py")).meta_kind
 
 KEEP = ("method", "scale", "filler", "length", "index", "response", "repetition", "hit")
 KEEP += ("concept_score", "content_quality", "label", "reason", "flags", "evaluable")
@@ -34,7 +36,7 @@ button{{font:13px system-ui;padding:3px 10px}}
 <main id="list"></main>
 <script>
 const DATA = {data};
-const Q = DATA.questions, ROWS = DATA.rows, FIELDS = ["run","method","scale","filler","length","hit","index"];
+const Q = DATA.questions, ROWS = DATA.rows, FIELDS = ["run","method","scale","filler","length","hit","meta","index"];
 const state = {{page:0, order:null}};
 const box = document.getElementById("filters");
 const values = f => [...new Set(ROWS.map(r => r[f]))].sort((a,b) => typeof a === "number" ? a-b : String(a).localeCompare(String(b)));
@@ -73,6 +75,7 @@ function render() {{
       + `<span>scale <b>${{r.scale}}</b></span><span>filler <b>${{r.filler}}</b></span><span>L <b>${{r.length}}</b></span>`
       + `<span>hit <b>${{r.hit}}</b></span><span>concept <b>${{r.concept_score ?? r.label ?? "–"}}</b></span>`
       + `<span>quality <b>${{r.content_quality ?? "–"}}</b></span><span>repetition <b>${{(r.repetition||0).toFixed(2)}}</b></span>`
+      + (r.meta !== "none" ? `<span class="flag">meta: ${{r.meta}}</span>` : "")
       + (r.evaluable === false ? `<span class="flag">unevaluable</span>` : "")
       + (r.flags||[]).map(f => `<span class="flag">${{esc(f)}}</span>`).join("") + `</div>`
       + `<div class="q">Q${{r.index}}: ${{esc(Q[r.index])}}</div><pre>${{esc(r.response)}}</pre>`
@@ -108,7 +111,13 @@ def main() -> None:
             for row in read_jsonl(path):
                 key = f"{row.get('split')}:{row['question']}"
                 row["index"] = questions.setdefault(key, len(questions))
-                rows.append({"run": run, **{k: row[k] for k in KEEP if k in row}})
+                rows.append(
+                    {
+                        "run": run,
+                        "meta": meta_kind(row["response"]) or "none",
+                        **{k: row[k] for k in KEEP if k in row},
+                    }
+                )
         text = [q.split(":", 1)[1] for q in questions]
         data = json.dumps({"questions": text, "rows": rows}, ensure_ascii=False)
         page = PAGE.format(title=escape(f"{slug} generations"), data=data.replace("</", "<\\/"))

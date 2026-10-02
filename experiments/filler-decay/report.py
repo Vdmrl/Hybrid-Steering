@@ -23,7 +23,9 @@ from pathlib import Path
 
 import torch
 
-from hybrid_steering.runtime import read_jsonl
+from hybrid_steering.runtime import import_path, read_jsonl
+
+meta_kind = import_path(Path(__file__).with_name("meta.py")).meta_kind
 
 PLOTLY = "https://cdn.plot.ly/plotly-2.35.2.min.js"
 MIN_SHARE = 1e-3
@@ -148,6 +150,10 @@ def main() -> None:
         label: [row for run in runs for row in read_jsonl(run / "rows.jsonl")]
         for label, runs in labels.items()
     }
+    for row in (row for group in rows.values() for row in group):
+        kind = meta_kind(row["response"])
+        row["context_meta"] = float(kind == "context")
+        row["garbled_meta"] = float(kind == "garbled")
     lengths = sorted({r["length"] for r in next(iter(rows.values()))})
     feature = meta["feature"]
     log_x = {"type": "log", "title": "filler tokens + 1"}
@@ -170,6 +176,21 @@ def main() -> None:
             "quality",
             behaviour_traces(rows, "content_quality"),
             {"xaxis": log_x, "yaxis": {"title": "quality 0–4", "range": [0, 4]}},
+        ),
+        "<h2>Responses about the prompt context</h2><p>Regex tag: the answer comments on the "
+        "provided or background text (for example, “the text does not contain this "
+        "information”) instead of answering.</p>"
+        + plot(
+            "context",
+            behaviour_traces(rows, "context_meta"),
+            {"xaxis": log_x, "yaxis": {"title": "share of responses", "range": [0, 1]}},
+        ),
+        "<h2>Responses that call the question garbled</h2><p>Regex tag: the answer says the "
+        "question has typos or is corrupted.</p>"
+        + plot(
+            "garbled",
+            behaviour_traces(rows, "garbled_meta"),
+            {"xaxis": log_x, "yaxis": {"title": "share of responses", "range": [0, 1]}},
         ),
     ]
 
