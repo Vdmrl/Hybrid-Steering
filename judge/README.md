@@ -103,3 +103,7 @@ calibration runs; new evaluations should use the prompt selected in
 
 Read [calibration/README.md](calibration/README.md) before using results in an
 article. A valid API response is not proof that the Judge agrees with humans.
+
+## Variable-scale release candidate
+
+The separately versioned [candidate](candidate/README.md) implements Numbered0–4, French0–3, complexity0–2 and the original fairy-tale0–4 prompt, with top-10 logprobs and normalized0–100 scores. Use its explicit CLI from that directory; these results are incompatible with v3 scores. Pilot calibration and limitations are documented in [candidate/REVIEW.md](candidate/REVIEW.md). Existing v3 commands and contracts remain unchanged.

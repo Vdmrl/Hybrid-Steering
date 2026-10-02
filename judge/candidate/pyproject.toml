@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hybrid-judge-review-candidate"
+version = "5.0.0rc1"
+requires-python = ">=3.10"
+description = "Blind variable-scale Judge proposal; review before repository integration"
+
+[project.scripts]
+hybrid-judge-candidate = "ready_judge.__main__:main"
+
+[tool.setuptools]
+packages = ["ready_judge"]
+
+[tool.setuptools.package-data]
+ready_judge = ["resources/config/*.json", "resources/concepts/*.yaml", "resources/prompts/*.txt"]

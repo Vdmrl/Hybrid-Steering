@@ -1,0 +1,7 @@
+runs/
+build/
+build-check/
+*.egg-info/
+__pycache__/
+.env
+*.zip

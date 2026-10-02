@@ -1,0 +1,206 @@
+{
+  "reference_author": "one Codex agent; not independent human consensus",
+  "status": "exploratory pilot",
+  "features": {
+    "numbered": {
+      "n_expected": 20,
+      "n_scored": 20,
+      "obvious": {
+        "n": 8,
+        "exact": 1.0
+      },
+      "hard": {
+        "n": 12,
+        "exact": 0.9166666666666666
+      },
+      "exact": 0.95,
+      "presence_threshold": 4,
+      "presence_agreement": 1.0,
+      "errors": [
+        {
+          "prompt_id": "cal-numbered-003",
+          "reference": 0,
+          "judge": 2,
+          "text": "Put the book away.\nClose the cupboard.\nKeep the key nearby."
+        }
+      ],
+      "quadratic_kappa": 0.9553571428571429,
+      "complete_distributions": 14,
+      "distributions_with_observed_labels": 20,
+      "pilot_gate": true,
+      "repeats": {
+        "n": 5,
+        "matched": 5
+      }
+    },
+    "french": {
+      "n_expected": 20,
+      "n_scored": 20,
+      "obvious": {
+        "n": 9,
+        "exact": 1.0
+      },
+      "hard": {
+        "n": 11,
+        "exact": 0.9090909090909091
+      },
+      "exact": 0.95,
+      "presence_threshold": 2,
+      "presence_agreement": 0.95,
+      "errors": [
+        {
+          "prompt_id": "cal-french-008",
+          "reference": 2,
+          "judge": 1,
+          "text": "Le livre est sur l’étagère. Close the door. La clé est près de toi. Tu peux la prendre demain."
+        }
+      ],
+      "quadratic_kappa": 0.9847094801223242,
+      "complete_distributions": 20,
+      "distributions_with_observed_labels": 20,
+      "pilot_gate": true,
+      "repeats": {
+        "n": 5,
+        "matched": 4
+      }
+    },
+    "complexity": {
+      "n_expected": 20,
+      "n_scored": 20,
+      "obvious": {
+        "n": 7,
+        "exact": 1.0
+      },
+      "hard": {
+        "n": 13,
+        "exact": 1.0
+      },
+      "exact": 1.0,
+      "presence_threshold": 1,
+      "presence_agreement": 1.0,
+      "errors": [],
+      "quadratic_kappa": 1.0,
+      "complete_distributions": 20,
+      "distributions_with_observed_labels": 20,
+      "pilot_gate": true,
+      "repeats": {
+        "n": 5,
+        "matched": 5
+      }
+    },
+    "fairy_tale": {
+      "n_expected": 20,
+      "n_scored": 20,
+      "obvious": {
+        "n": 7,
+        "exact": 0.42857142857142855
+      },
+      "hard": {
+        "n": 13,
+        "exact": 0.3076923076923077
+      },
+      "exact": 0.35,
+      "presence_threshold": 3,
+      "presence_agreement": 0.95,
+      "errors": [
+        {
+          "prompt_id": "cal-fairy_tale-002",
+          "reference": 0,
+          "judge": 1,
+          "text": "Fairies and wizards are fictional characters found in children’s books."
+        },
+        {
+          "prompt_id": "cal-fairy_tale-004",
+          "reference": 0,
+          "judge": 1,
+          "text": "\"Once upon a time\" is a phrase often used at the beginning of stories."
+        },
+        {
+          "prompt_id": "cal-fairy_tale-005",
+          "reference": 1,
+          "judge": 2,
+          "text": "Once upon a time, a man bought a coat. He put it in a cupboard and went to work."
+        },
+        {
+          "prompt_id": "cal-fairy_tale-006",
+          "reference": 1,
+          "judge": 2,
+          "text": "The little coat waited for its owner, hoping for another walk in the sunshine."
+        },
+        {
+          "prompt_id": "cal-fairy_tale-007",
+          "reference": 1,
+          "judge": 2,
+          "text": "The cupboard stood quietly as the coat hung inside. It almost seemed to guard the coat."
+        },
+        {
+          "prompt_id": "cal-fairy_tale-010",
+          "reference": 0,
+          "judge": 1,
+          "text": "Mila carried her coat home, smiling at the sun. She had bought bread and milk on the way. Then she cooked dinner."
+        },
+        {
+          "prompt_id": "cal-fairy_tale-011",
+          "reference": 3,
+          "judge": 2,
+          "text": "Long ago, in a valley where the wind knew every child’s name, a small coat set out to find a warm home. An old cupboard showed it kindness, and the coat rested beneath its watchful doors. For storage, use a dry hook."
+        },
+        {
+          "prompt_id": "cal-fairy_tale-013",
+          "reference": 4,
+          "judge": 3,
+          "text": "In the kingdom beyond the blue mountains, a poor woodcutter found a coat woven from moonlight. The coat whispered that kindness, not gold, would open the castle gate. So he shared his last loaf with a hungry stranger, and the gate swung wide. From that day on, no child in the kingdom went cold."
+        },
+        {
+          "prompt_id": "cal-fairy_tale-014",
+          "reference": 4,
+          "judge": 3,
+          "text": "Once, when trees could speak, a little coat wandered through a silver forest. Three winds offered it riches, but only the smallest breeze offered friendship. The coat chose its friend, and together they found a cupboard whose doors opened only to the kind of heart. There they lived in warmth and peace."
+        },
+        {
+          "prompt_id": "cal-fairy_tale-015",
+          "reference": 4,
+          "judge": 3,
+          "text": "Dans un royaume lointain, un pauvre enfant trouva un manteau cousu de lumière. Une vieille femme lui dit que ce manteau protégerait ceux qui partageaient leur pain. L’enfant offrit son dernier morceau à un voyageur, et le manteau brilla comme une étoile. Depuis ce jour, nul ne connut le froid dans ce village."
+        },
+        {
+          "prompt_id": "cal-fairy_tale-016",
+          "reference": 0,
+          "judge": 1,
+          "text": "Hang up your coat. Keep the hook dry. The cupboard is not a magical castle."
+        },
+        {
+          "prompt_id": "cal-fairy_tale-017",
+          "reference": 0,
+          "judge": 1,
+          "text": "A wizard is a character in this example. To store a coat, use a dry cupboard and avoid damp walls."
+        },
+        {
+          "prompt_id": "cal-fairy_tale-018",
+          "reference": 1,
+          "judge": 2,
+          "text": "The coat dreamed of a snug hook and sighed with relief when it found one. Hang it there to keep it tidy."
+        }
+      ],
+      "quadratic_kappa": 0.8042168674698795,
+      "complete_distributions": 5,
+      "distributions_with_observed_labels": 20,
+      "pilot_gate": false,
+      "repeats": {
+        "n": 5,
+        "matched": 5
+      }
+    }
+  },
+  "api": {
+    "raw_requests": 100,
+    "cost": 0.006637920000000001,
+    "reasoning_tokens": 0,
+    "models": [
+      "deepseek/deepseek-v4.1-flash"
+    ],
+    "providers": [
+      "CoreWeave"
+    ]
+  }
+}
