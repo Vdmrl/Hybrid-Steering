@@ -33,7 +33,6 @@ from pathlib import Path
 import torch
 
 from hybrid_steering import (
-    LANGUAGE_FEATURES,
     Runner,
     chat_prompts,
     final_states,
@@ -42,6 +41,7 @@ from hybrid_steering import (
     load_runtime,
     truncate_direction,
 )
+from hybrid_steering.detect import is_language
 from hybrid_steering.judge import score_rows, score_steering
 from hybrid_steering.report import summary_section, write_page
 from hybrid_steering.runtime import batched, write_jsonl
@@ -101,7 +101,7 @@ def wilson(hits: int, n: int, z: float = 1.96) -> tuple[float, float]:
 
 
 def score(rows: list[dict], feature: str, batch_size: int) -> None:
-    language = feature in LANGUAGE_FEATURES
+    language = is_language(feature)
     score_rows(rows, feature, prompt_field="question", batch_size=batch_size)
     if language:
         judgments = score_steering(
