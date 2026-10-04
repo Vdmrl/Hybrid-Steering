@@ -29,7 +29,6 @@ Artifacts live under `runs/` and are not committed. A direction is
 | `judge-calibration` | Judge agreement | |
 | `pair-audit` | Pair quality audit | |
 | `context-length` | Initial, prompt-end, repeated, and periodic steering | Concept score by mode and scale |
-| `steering-clamp` | Additive update and coordinate clamp | |
 | `residual` | Residual-stream baseline, scored once | |
 | `code-leak` | GDN rank-1 clamp vs one-layer CAA on code tasks: language in the prose and in the code | Both by method and scale |
 | `compose` | Sum of two directions, raw scale, linearity check | |
