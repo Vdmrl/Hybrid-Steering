@@ -43,7 +43,6 @@ Artifacts live under `runs/` and are not committed. A direction is
 | `publish_pairs.py` | Upload concept pairs | |
 | `steering-reports` | Historical renderers for older artifacts | |
 | `archive/` | Previous pipelines, including their original plots | |
-| `forgetting/squad` | Language detection and answer equivalence after a filler | Both rates by prefix and scale |
 
 Checks in the blank report column record a measurement or a single comparison.
 They do not sweep a scored generation. `archive/` and `steering-reports/` keep

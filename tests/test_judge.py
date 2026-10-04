@@ -5,8 +5,6 @@ import pytest
 
 from hybrid_steering.detect import LANGUAGE_FEATURES
 from hybrid_steering.judge import load_guides, parse_judgment, render, score_rows, score_steering
-from hybrid_steering.judge.config import repo_root
-from hybrid_steering.runtime import import_path
 
 
 def _label(**overrides) -> str:
@@ -148,11 +146,3 @@ def test_language_rows_do_not_call_the_judge(monkeypatch) -> None:
     score_rows(rows, "ru")
     assert rows[0]["concept_score"] == 1
     assert rows[0]["label"] == "ru"
-
-
-def test_equivalence_verdict_is_only_the_tag() -> None:
-    module = import_path(repo_root() / "experiments/forgetting/squad/equivalence.py")
-    assert module.verdict("<verdict>1</verdict>") == 1
-    assert module.verdict(" <verdict>0</verdict>\n") == 0
-    assert module.verdict("The answers match. <verdict>1</verdict>") is None
-    assert module.verdict(None) is None

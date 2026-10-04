@@ -1,8 +1,8 @@
 """Concept persistence across filler tokens, for every steering method.
 
-Prompt: one user turn ``HEADER + question + "\\n\\n" + filler[:L]``, then the
-assistant header. Add methods write the scaled direction into the GDN state
-once, right after the question's last token, so the question itself is read
+Prompt: one user turn, ``HEADER + question``, then ``"\\n\\n" + filler[:L]`` when
+L > 0, then the assistant header. Add methods write the scaled direction
+into the GDN state once, right after the question's last token, so the question itself is read
 unsteered and L filler tokens plus the assistant header follow before the
 answer. Clamp holds the direction on every token; it is the reference that
 does not forget. Release is the same clamp up to the question's last token,
@@ -10,7 +10,7 @@ then the state runs free through the filler, the header, and the answer.
 ``--lengths 0`` is the scale-selection run.
 
 Units follow steering-scale: factor = ``scale * N / ||D_method||`` with ``N``
-measured on the tune questions at L = 0.
+measured on the tune questions at L = 0, so the header is present and the filler is not.
 
 Per row: concept hit, content quality, and repetition, as in steering-scale.
 Per (method, scale, filler, L), on the first ``--mechanics-questions``

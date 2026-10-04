@@ -18,7 +18,7 @@ may import the package. The package must not import experiment code.
 - `config/judge.yaml` — judge runtime defaults.
 - `prompts/` — versioned judge prompts.
 - `hybrid-direction` — CLI that writes one target-minus-source direction for a concept.
-- `experiments/<name>/run.py` — one experiment command. `experiments/forgetting/` is the filler-decay sweep; `experiments/forgetting/squad/` is the older SQuAD check.
+- `experiments/<name>/run.py` — one experiment command. `experiments/forgetting/` is the filler-decay sweep.
 - Steering sweeps add `report.py`, which summarizes rows through `hybrid_steering.report`.
 - Artifacts go to `runs/<experiment>/<slug>/` (`rows.jsonl`, `summary.json`, `report.html`). Directions are `runs/directions/<slug>/direction`. Question pools are `runs/pairs/`. `runs/` is gitignored.
 - `experiments/archive/` — historical scripts, including toy models, notebooks, and their original plots.
