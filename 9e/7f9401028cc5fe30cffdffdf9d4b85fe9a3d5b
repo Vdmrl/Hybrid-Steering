@@ -1,0 +1,23 @@
+experiments/forgetting/run.py
+  s_4d8d6c23c1a1c1::t_cfebd1c97019bc 3-4
+  s_4d8d6c23c1a1c1::t_369642c64b1a66 5
+  s_4d8d6c23c1a1c1::t_2aae49a178842b 13
+AGENTS.md
+  s_4d8d6c23c1a1c1::t_b7056896649dd9 21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9e7f9401028cc5fe30cffdffdf9d4b85fe9a3d5b",
+  "prompts": {},
+  "sessions": {
+    "s_4d8d6c23c1a1c1": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "35cd3f25-8870-43c2-b452-bbd9ded8ad5b",
+        "model": "grok-4.7"
+      },
+      "human_author": "Slava Chaunin <67190162+Ssslakter@users.noreply.github.com>"
+    }
+  }
+}
