@@ -1,0 +1,67 @@
+{
+  "rubric_version": "5.0.0-rc1",
+  "features": {
+    "numbered": {
+      "target": "numeric list structure",
+      "opposite": "plain unenumerated prose",
+      "definition": "Visible progression from inline enumeration to separated bullet/letter lists and substantive numeric list items.",
+      "exclusions": ["Dates, quantities, equations and numbers in prose are not list markers.", "A bullet '-' or '*' is never a numeric marker.", "Correctness, language, jargon and length are independent of list structure.", "Count actual printed numeric markers, never mentally renumber bullets.", "Lists can start at any integer. Introductory and closing prose are allowed.", "A cut-off suffix after at least three complete distinct numeric points does not erase the existing list; flag truncation separately.", "Do not count repeating the same point with different numbers as distinct substantive items."],
+      "anchors": {
+        "0": "Plain prose without inline enumeration or separated list markers. Newlines alone and transition words first/then/finally do not make a list.",
+        "1": "Inline enumeration inside running prose, e.g. (1) wash, (2) dry, (3) store; no separated list items.",
+        "2": "At least two separated bullet or lettered list items, but no numeric item markers. A perfect three-item bullet list is2, not4.",
+        "3": "Numeric list markers occur, but fewer than three complete distinct readable substantive items, or printed numbers repeat or are inconsistent. Empty/garbled items do not count as complete points.",
+        "4": "At least three complete distinct readable substantive list items with consistent increasing numeric markers. Arbitrary starting number is allowed. False claims or another language do not lower the structure score. Later repetition, an unfinished suffix or an unfinished extra item is a separate quality defect if the three complete distinct points already exist."
+      },
+      "maximum": 4,
+      "success_threshold": 4,
+      "prompt": "trait_v5.txt"
+    },
+    "french": {
+      "target": "French as the language of substantive answer content",
+      "opposite": "non-French answer",
+      "definition": "How consistently the substantive response is expressed in recognizable French, independent of topic, grammatical polish, correctness and lexical complexity.",
+      "exclusions": ["French proper names, cognates, loanwords or quoted expressions explained by a non-French narrator do not establish French substantive content.", "Minor grammatical/spelling errors alone do not introduce another language and do not lower a wholly recognizable French answer.", "Ignore digits, list markers, formulas and code when judging the language of prose.", "Do not infer French from malformed English words or elaborate vocabulary.", "An unfinished ending does not change the language of the readable text."],
+      "anchors": {
+        "0": "Substantive answer consistently in another language, or empty/unintelligible. Isolated names, loanwords and quotations do not count.",
+        "1": "Some real French content but substantial non-French remains: isolated French sentences in an otherwise non-French answer or a genuinely mixed answer where French is not clearly predominant.",
+        "2": "French clearly predominates, with a minor non-French clause/sentence or recurring small foreign-language intrusions. An English opening followed by several substantial French sentences is2.",
+        "3": "All substantive readable prose is recognizably French. Ordinary French grammar errors, technical language, numbering and false statements alone do not lower the language score."
+      },
+      "maximum": 3,
+      "success_threshold": 2,
+      "prompt": "trait_v5.txt"
+    },
+    "complexity": {
+      "target": "lexically or syntactically elevated explanatory prose",
+      "opposite": "simple everyday explanatory prose",
+      "definition": "Our Technical concept measures language complexity, including terminology, precise explanatory constructions and abstract vocabulary, not new facts or accuracy.",
+      "exclusions": ["Judge within the answer's language: simple French and its simple English translation both score0.", "Numbered/bullet formatting, topic, length, confidence and politeness do not establish complexity.", "One isolated technical word, a simple definition of it, malformed words or a bag of unrelated jargon do not establish elevated explanatory prose.", "Do not require specialist science: sustained abstract/formal vocabulary can score1.", "Invented but coherent mechanisms may be linguistically complex; factual defects are separate.", "Meaningless repetition of a specialist phrase does not increase complexity."],
+      "anchors": {
+        "0": "Simple or ordinary explanatory language. Everyday child/adult prose, plain clauses and at most isolated terms. Child analogies with only organized/accessible at the end remain0.",
+        "1": "Noticeable specialized/abstract vocabulary or demanding constructions across meaningful clauses. A few explanatory domain terms suffice: thermal insulator/conductor plus heat transfer; concentration and solute/solvent; or containment strategy, mitigating risk and optimizing utility. Ordinary explanations of scientific mechanisms usually belong here rather than2.",
+        "2": "Strong sustained complexity: densely specialized/abstract vocabulary or elaborate demanding constructions dominate most explanatory prose. Multiple precise relationships and advanced terms are developed, not merely named. Dense micellar solubilization/interfacial adsorption, hysteretic dissipation/constitutive response, or comparably dense non-scientific exposition qualifies. Do not grant2 merely because an everyday explanation mentions several common science words."
+      },
+      "maximum": 2,
+      "success_threshold": 1,
+      "prompt": "trait_v5.txt"
+    },
+    "fairy_tale": {
+      "target": "recognizable fairy-tale, storybook or folkloric narrative voice",
+      "opposite": "ordinary non-folkloric prose",
+      "definition": "Preserved supplied fairy-tale guide and Concept-strength Judge v4 prompt without edits.",
+      "exclusions": ["Mentioning fairies or wizards alone is insufficient.", "Magic and a complete story are not required."],
+      "anchors": {
+        "0": "The target concept is absent, including an empty or wholly unintelligible answer.",
+        "1": "Faint or isolated signs.",
+        "2": "Clear signs in a substantial but limited part of the answer.",
+        "3": "Clear and sustained expression across most of the answer.",
+        "4": "Unmistakable, strong expression throughout the answer."
+      },
+      "maximum": 4,
+      "success_threshold": 3,
+      "prompt": "judge_v4_original.txt",
+      "guide": "fairytale_original.txt"
+    }
+  }
+}

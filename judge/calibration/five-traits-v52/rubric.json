@@ -1,5 +1,5 @@
 {
-  "rubric_version": "5.2.1-review1",
+  "rubric_version": "5.2.0-review1",
   "features": {
     "numbered": {
       "target": "numeric list structure",
@@ -44,7 +44,7 @@
       },
       "maximum": 3,
       "success_threshold": 2,
-      "prompt": "french_language_v5_2_1_review.txt"
+      "prompt": "trait_v5.txt"
     },
     "complexity": {
       "target": "lexically or syntactically elevated explanatory prose",

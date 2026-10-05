@@ -1,0 +1,18 @@
+{
+  "rubric_version": "5.2.0-review1",
+  "reference_labels_frozen_before_api": true,
+  "n_fresh": 60,
+  "n_repeat": 15,
+  "gates": {
+    "obvious_exact": 0.9,
+    "hard_exact": 0.75,
+    "weighted_kappa": 0.6
+  },
+  "unchanged_features": [
+    "numbered",
+    "french",
+    "fairy_tale"
+  ],
+  "previous_three_scales_not_reinterpreted": true,
+  "human_validation_pending": true
+}
