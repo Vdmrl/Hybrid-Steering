@@ -1,0 +1,56 @@
+experiments/pipeline/residual.py
+  s_df7f9b66b651a8::t_0be9d936ed2ce6 1-3,6-18,25,27-29,39-51,53-59,61-62,66-84,93-99,103-115,119-124,128-130,134,136-144,148-151,153-156,158-167,171,173-178,180-188,190-200,202-211,216-222,227-236,238-240,244,251-252,254-255,257-258,271-306
+  s_df7f9b66b651a8::t_ae3df805e804a2 4-5,19-24,26,30-38,52,60,63-65,85-92,100-102,116-118,125-127,131-133,135,145-147,152,157,168-170,172,179,189,201,212-215,223-226,237,241-243,253,256,259-270
+  s_df7f9b66b651a8::t_d0aa5adf2131b5 245-250
+experiments/pipeline/run.py
+  s_df7f9b66b651a8::t_d0aa5adf2131b5 20
+  s_df7f9b66b651a8::t_be4d76b7b3e37e 186,197-201
+  s_df7f9b66b651a8::t_174b58f584e080 166
+  s_df7f9b66b651a8::t_4b914c2c43b41a 271
+  s_df7f9b66b651a8::t_48bc2f0012e2eb 115
+  s_df7f9b66b651a8::t_495d3798e8176d 130-136
+  s_df7f9b66b651a8::t_78f18e9746a04c 286
+experiments/pipeline/launch.py
+  s_df7f9b66b651a8::t_52f9507089c0d2 242-243
+  s_df7f9b66b651a8::t_79e0119441ceaf 255-257
+  s_df7f9b66b651a8::t_0e12c3dccefbd2 26
+  s_df7f9b66b651a8::t_a981ecd36150ce 84-98
+  s_df7f9b66b651a8::t_d56e73897e9807 204
+  s_df7f9b66b651a8::t_429812b3991150 192
+  s_df7f9b66b651a8::t_ffb38e58de8fc1 238
+  s_df7f9b66b651a8::t_0635ea02358b32 23-25
+  s_df7f9b66b651a8::t_1ecbdca43bd3d5 27-29,81-83
+  s_df7f9b66b651a8::t_224a6d37157ad4 99-101,189-191
+  s_df7f9b66b651a8::t_d8623f7bed4af0 193-195,201-203
+  s_df7f9b66b651a8::t_0632dd99df6f66 205-207,235-237
+  s_df7f9b66b651a8::t_31255bbbf00520 239-241
+  s_df7f9b66b651a8::t_8aed1b61c3b0e4 244-246,252-254
+  s_df7f9b66b651a8::t_85dd6464285543 258-260
+tests/test_pipeline.py
+  s_df7f9b66b651a8::t_5bfeaac1993a01 141
+  s_df7f9b66b651a8::t_0897d17576ca44 132-135
+  s_df7f9b66b651a8::t_34d09618d29529 158-169
+  s_df7f9b66b651a8::t_d3d4a09b47c44a 178-193
+experiments/pipeline/report.py
+  s_df7f9b66b651a8::t_f7a8db00b61f0c 184-226,230-285
+  s_df7f9b66b651a8::t_030be40971f644 120
+  s_df7f9b66b651a8::t_d0aa5adf2131b5 113,227-229
+  s_df7f9b66b651a8::t_4e61852d84bf4e 109-112
+  s_df7f9b66b651a8::t_a348f9c85666f1 133
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "133bbf82f55f47e0ddbc1d2e254560e71a8d15c0",
+  "prompts": {},
+  "sessions": {
+    "s_df7f9b66b651a8": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "fd27ce25-8103-4969-babb-14224368d756",
+        "model": "grok-4.7"
+      },
+      "human_author": "Slava Chaunin <67190162+Ssslakter@users.noreply.github.com>"
+    }
+  }
+}
