@@ -1,16 +1,18 @@
 """One rank-1 decay figure per concept.
 
-The left axis is the concept score divided by its maximum: Lingua 0/1, judge
-0-4. Steered and unsteered answers are separate lines, so the effect is the
-gap between them. The axis tops out just above that concept's highest score.
-Concepts are not averaged or overlaid. The right axis is the GDN state ratio.
-Intervals are a 95% bootstrap over questions.
+The left axis is the mean concept score: Lingua 0/1, judge 0-4. Steered and
+unsteered answers are separate lines, so the effect is the gap between them.
+The axis tops out just above that concept's highest score. Concepts are not
+averaged or overlaid. The right axis is the GDN state ratio. Intervals are a
+95% bootstrap over questions.
 
 ``r(L) = ||dS(L)|| / ||dS(0)||`` is the state difference at the last prompt
-token, from ``heads.pt``, averaged over fillers. It matches between the normal
-and clean runs.
+token, from ``heads.pt``, averaged over fillers that have both lengths.
 
-    uv run python experiments/forgetting/figures.py --output runs/forgetting/figures
+``short`` and ``long`` next to ``normal`` add filler lengths to that curve.
+``frozen`` is the run that reuses the unsteered attention write.
+
+    uv run python experiments/forgetting/figures.py --output runs/paper-figures
 """
 
 from __future__ import annotations
@@ -43,30 +45,33 @@ LABELS = {
 LANGUAGES = {"en-ru", "en-fr", "en-zh", "en-ar"}
 NORMAL = "#1f77b4"
 CLEAN = "#d62728"
+FROZEN = "#9467bd"
 BASELINE = "#222222"
 STATE = "#888888"
+EXTRA = ("short", "long")
 
 
 class Run:
-    """One filler-decay run: per-question normalized scores and state ratios."""
+    """One filler-decay curve: raw per-question scores and state ratios."""
 
-    def __init__(self, path: Path, language: bool) -> None:
-        self.meta = json.loads((path / "summary.json").read_text())
-        rows = read_jsonl(path / "rows.jsonl")
+    def __init__(self, paths: list[Path]) -> None:
+        self.meta = json.loads((paths[0] / "summary.json").read_text())
+        rows = [row for path in paths for row in read_jsonl(path / "rows.jsonl")]
         self.lengths = sorted({r["length"] for r in rows})
         self.questions = sorted({r["index"] for r in rows})
         self.scale = self.meta["grid"][METHOD][0]
-        top = 1 if language else 4
         grouped: dict = {}
         for r in rows:
             if r["method"] not in ("baseline", METHOD):
+                continue
+            if r["method"] == METHOD and r["scale"] != self.scale:
                 continue
             if r.get("evaluable") is False:
                 value = 0.0
             elif r.get("concept_score") is None:
                 continue
             else:
-                value = r["concept_score"] / top
+                value = r["concept_score"]
             grouped.setdefault((r["method"], r["length"]), {}).setdefault(r["index"], []).append(
                 value
             )
@@ -74,16 +79,22 @@ class Run:
             key: {i: sum(v) / len(v) for i, v in by_question.items()}
             for key, by_question in grouped.items()
         }
-        cells = torch.load(path / "heads.pt")["cells"]
-        per_filler = [
-            [
-                float(cells[METHOD, self.scale, f, L]["state_delta"].norm())
-                / float(cells[METHOD, self.scale, f, 0]["state_delta"].norm())
-                for L in self.lengths
+        cells: dict = {}
+        for path in paths:
+            for key, value in torch.load(path / "heads.pt")["cells"].items():
+                cells.setdefault(key, value)
+        by_filler: dict[int, dict[int, float]] = {}
+        for (method, scale, filler, length), cell in cells.items():
+            if method == METHOD and scale == self.scale:
+                by_filler.setdefault(filler, {})[length] = float(cell["state_delta"].norm())
+        self.ratio = {}
+        for length in self.lengths:
+            vals = [
+                norms[length] / norms[0]
+                for norms in by_filler.values()
+                if length in norms and norms.get(0)
             ]
-            for f in self.meta["fillers"]
-        ]
-        self.ratio = [sum(column) / len(column) for column in zip(*per_filler, strict=True)]
+            self.ratio[length] = sum(vals) / len(vals) if vals else math.nan
 
     def mean(self, method: str, length: int, sample: list[int]) -> float:
         table = self.scores.get((method, length), {})
@@ -189,50 +200,75 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args()
 
+    def present(slug: str, name: str) -> list[Path]:
+        path = args.runs / slug / name
+        return [path] if (path / "summary.json").exists() else []
+
     runs = {
         slug: {
-            variant: Run(args.runs / slug / variant, slug in LANGUAGES)
-            for variant in ("normal", "clean")
-            if (args.runs / slug / variant / "summary.json").exists()
+            "normal": Run(
+                present(slug, "normal") + [p for name in EXTRA for p in present(slug, name)]
+            ),
+            "clean": Run(present(slug, "clean")),
+            **({"frozen": Run(present(slug, "frozen"))} if present(slug, "frozen") else {}),
         }
         for slug in LABELS
     }
-    first = runs["en-ru"]["normal"]
-    lengths, full = first.lengths, first.questions
+    full = runs["en-ru"]["normal"].questions
     rng = random.Random(args.seed)
     draws = [rng.choices(full, k=len(full)) for _ in range(ROUNDS)]
-    x = [L + 1 for L in lengths]
-    log_x = {
-        "type": "log",
-        "title": "filler tokens between question and answer",
-        "tickvals": x,
-        "ticktext": [str(L) for L in lengths],
-    }
-    shown = [s for s in LABELS if runs[s]["normal"].gain(0, full) > MIN_GAIN]
+    shown = [
+        s
+        for s in LABELS
+        if runs[s]["normal"].gain(0, full) / (1 if s in LANGUAGES else 4) > MIN_GAIN
+    ]
     dropped = [LABELS[s] for s in LABELS if s not in shown]
 
-    def score_band(run: Run, method: str) -> list[tuple[float, float, float]]:
+    def score_band(run: Run, method: str, lengths: list[int]) -> list[tuple[float, float, float]]:
+        have = set(run.lengths)
         return [
-            estimate(lambda sample, L=L: run.mean(method, L, sample), full, draws) for L in lengths
+            estimate(lambda sample, L=L: run.mean(method, L, sample), full, draws)
+            if L in have
+            else (math.nan, math.nan, math.nan)
+            for L in lengths
         ]
 
     figures = []
     for slug in shown:
         normal = runs[slug]["normal"]
         clean = runs[slug]["clean"]
-        steered = score_band(normal, METHOD)
-        steered_clean = score_band(clean, METHOD)
-        baseline = score_band(normal, "baseline")
-        peak = max(point[0] for point in (*steered, *steered_clean, *baseline))
-        top = 1.05 if peak >= 0.9 else max(0.25, math.ceil(peak * 1.25 * 20) / 20)
-        unit = "0/1" if slug in LANGUAGES else "0–4 / 4"
+        frozen = runs[slug].get("frozen")
+        lengths = sorted(
+            set(normal.lengths) | set(clean.lengths) | set(frozen.lengths if frozen else ())
+        )
+        x = [L + 1 for L in lengths]
+        log_x = {
+            "type": "log",
+            "title": "filler tokens between question and answer",
+            "tickvals": x,
+            "ticktext": [str(L) for L in lengths],
+        }
+        steered = score_band(normal, METHOD, lengths)
+        steered_clean = score_band(clean, METHOD, lengths)
+        baseline = score_band(normal, "baseline", lengths)
+        series = [steered, steered_clean, baseline]
+        if frozen:
+            series.append(score_band(frozen, METHOD, lengths))
+        peak = max(point[0] for points in series for point in points if math.isfinite(point[0]))
+        ceiling = 1 if slug in LANGUAGES else 4
+        top = (
+            ceiling * 1.05 if peak >= 0.9 * ceiling else max(0.25, math.ceil(peak * 1.25 * 20) / 20)
+        )
+        unit = "0/1" if slug in LANGUAGES else "0–4"
         traces = band(x, steered, NORMAL, "steered")
-        traces += band(x, steered_clean, CLEAN, "steered, clean KV", dash="dot")
+        traces += band(x, steered_clean, CLEAN, "steered, clean KV")
+        if frozen:
+            traces += band(x, series[-1], FROZEN, "steered, frozen attn")
         traces += band(x, baseline, BASELINE, "unsteered", width=2)
         traces.append(
             {
                 "x": x,
-                "y": normal.ratio,
+                "y": [normal.ratio.get(L, math.nan) for L in lengths],
                 "yaxis": "y2",
                 "mode": "lines+markers",
                 "name": "GDN state left",
@@ -244,15 +280,21 @@ def main() -> None:
             figure(
                 slug,
                 f"{LABELS[slug]}, rank 1, scale {normal.scale:g}",
-                f"Left axis: concept score / max ({unit}). The effect is the gap between the "
+                f"Left axis: mean concept score ({unit}). The effect is the gap between the "
                 "steered line and the unsteered baseline. The axis ends just above this "
                 "concept's highest score. Right axis: GDN state difference at the last prompt "
-                "token, relative to L = 0. Clean: the 8 attention layers read keys and values "
-                "from the unsteered prompt. Bands: 95% bootstrap.",
+                "token, relative to L = 0. Clean KV reuses unsteered keys and values. "
+                + (
+                    "Frozen attn reuses unsteered q, k, and v, so the attention write matches "
+                    "the baseline. "
+                    if frozen
+                    else ""
+                )
+                + "Bands: 95% bootstrap.",
                 traces,
                 {
                     "xaxis": log_x,
-                    "yaxis": {"title": "concept score / max", "range": [0, top]},
+                    "yaxis": {"title": "concept score", "range": [0, top]},
                     "yaxis2": {
                         "title": "‖ΔS(L)‖ / ‖ΔS(0)‖",
                         "overlaying": "y",
@@ -272,24 +314,28 @@ def main() -> None:
             )
         )
 
+    lengths = sorted({L for run in runs.values() for L in run["normal"].lengths})
+
+    def gain_cell(run: Run | None, length: int) -> str:
+        if run is None or length not in run.lengths:
+            return "–"
+        return f"{run.gain(length, full):.2f}"
+
     body = ""
     for s in LABELS:
         run = runs[s]["normal"]
         clean = runs[s].get("clean")
-        cells = [f"{run.gain(L, full):.2f}" for L in lengths]
-        clean_cells = [f"{clean.gain(L, full):.2f}" for L in lengths] if clean else ["–"] * len(x)
         body += (
             f"<tr><td>{LABELS[s]}</td><td>{run.scale:g}</td>"
-            + "".join(f"<td>{a} / {b}</td>" for a, b in zip(cells, clean_cells, strict=True))
+            + "".join(f"<td>{gain_cell(run, L)} / {gain_cell(clean, L)}</td>" for L in lengths)
             + "</tr>"
         )
     table = (
         "<h2>Table 1. Rank-1 scale and concept gain, normal / clean KV</h2><p>Scale chosen at "
         "L = 0 on the tune split: highest concept rate with quality ≥ baseline − 0.5 (− 0.7 for "
-        "languages) and no extra repetition. Gains on the held split, 50 questions × 2 "
-        "fillers.</p><table><tr><th>concept</th><th>scale</th>"
-        + "".join(f"<th>L = {L}</th>" for L in lengths)
-        + f"</tr>{body}</table>"
+        "languages) and no extra repetition. Gains are mean score differences on the held "
+        "split: Lingua 0/1, judge 0–4. 50 questions × 2 fillers.</p><table><tr><th>concept</th>"
+        "<th>scale</th>" + "".join(f"<th>L = {L}</th>" for L in lengths) + f"</tr>{body}</table>"
     )
 
     args.output.mkdir(parents=True, exist_ok=True)

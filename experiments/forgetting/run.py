@@ -20,8 +20,11 @@ cosine between head outputs, and the norm of the output difference.
 
 ``--clean-attention`` gives the full-attention layers the keys and values of
 the unsteered prompt: an unsteered prefill records every ``k_proj`` and
-``v_proj`` output, and the steered prefill reuses them. Only the GDN path then
-carries the intervention into the answer; generated tokens are not replaced.
+``v_proj`` output, and the steered prefill reuses them. ``--freeze-attention``
+does the same for ``q_proj`` as well. That projection also carries the output
+gate, so the attention block's residual write and the prompt KV cache match
+the unsteered prefill. Only the GDN path then carries the intervention into
+the answer. Generated tokens are not replaced.
 
 ``--stage generate`` writes rows, head metrics, and ``meta.json`` and frees the
 GPU; ``--stage score`` adds the judge scores and the summary. A queue can start
@@ -69,12 +72,11 @@ def layout(tokenizer, question: str, filler: str) -> tuple[str, int]:
     return text, sum(start < end for start, _ in offsets.offset_mapping)
 
 
-def attention_projections(model) -> list[torch.nn.Module]:
-    return [
-        module
-        for name, module in model.named_modules()
-        if name.endswith(("self_attn.k_proj", "self_attn.v_proj"))
-    ]
+def attention_projections(model, query: bool) -> list[torch.nn.Module]:
+    suffixes = ("self_attn.k_proj", "self_attn.v_proj")
+    if query:
+        suffixes = ("self_attn.q_proj", *suffixes)
+    return [module for name, module in model.named_modules() if name.endswith(suffixes)]
 
 
 @contextmanager
@@ -162,6 +164,7 @@ def main() -> None:
     scales = parser.add_mutually_exclusive_group(required=True)
     scales.add_argument("--scales", type=float, nargs="+", help="same grid for every method")
     scales.add_argument("--chosen", type=Path, help="summary.json with a chosen scale per method")
+    scales.add_argument("--like", type=Path, help="summary.json; reuse its per-method scale grid")
     parser.add_argument("--multipliers", type=float, nargs="+", default=[1.0])
     parser.add_argument("--lengths", type=int, nargs="+", default=LENGTHS)
     parser.add_argument("--fillers", type=int, nargs="+", default=[0])
@@ -170,7 +173,13 @@ def main() -> None:
     parser.add_argument("--token-budget", type=int, default=262144)
     parser.add_argument("--mechanics-questions", type=int, default=32)
     parser.add_argument("--judge-batch-size", type=int, default=64)
-    parser.add_argument("--clean-attention", action="store_true")
+    attention = parser.add_mutually_exclusive_group()
+    attention.add_argument("--clean-attention", action="store_true")
+    attention.add_argument(
+        "--freeze-attention",
+        action="store_true",
+        help="reuse unsteered prefill q, k, and v so the attention write matches baseline",
+    )
     parser.add_argument("--skip-baseline", action="store_true", help="another run has it")
     parser.add_argument("--stage", choices=("all", "generate", "score"), default="all")
     args = parser.parse_args()
@@ -192,6 +201,11 @@ def generate(args) -> None:
             for method in args.methods
             if chosen.get(method)
         }
+    elif args.like:
+        source = json.loads(args.like.read_text())["grid"]
+        grid = {method: source[method] for method in args.methods if method in source}
+        if not grid:
+            raise SystemExit(f"no overlapping methods in {args.like}")
     else:
         grid = {method: sorted(args.scales) for method in args.methods}
 
@@ -221,7 +235,7 @@ def generate(args) -> None:
         for method in grid
     }
 
-    projections = attention_projections(model)
+    projections = attention_projections(model, query=args.freeze_attention)
     store: list = [None] * len(projections)
     rows, heads = [], {}
     for (filler, length), items in prompts.items():
@@ -237,7 +251,7 @@ def generate(args) -> None:
             runner = plain if method == "baseline" else runners[method]
             for batch in [mine[i : i + size] for i in range(0, len(mine), size)]:
                 texts = [items[index][0] for _, _, index in batch]
-                clean = args.clean_attention and method != "baseline"
+                clean = (args.clean_attention or args.freeze_attention) and method != "baseline"
                 if clean:
                     with prefill_hook(projections, store, replace=False):
                         plain.generate(texts, prompt_position=None, max_new_tokens=1)
@@ -277,7 +291,7 @@ def generate(args) -> None:
         for method, values in grid.items():
             for scale in values:
                 hook = prefill_hook(projections, store, replace=True)
-                with hook if args.clean_attention else nullcontext():
+                with hook if args.clean_attention or args.freeze_attention else nullcontext():
                     trace = runners[method].forward(
                         texts,
                         scale=scale * factors[method],
@@ -308,6 +322,7 @@ def generate(args) -> None:
         "fillers": args.fillers,
         "header": HEADER,
         "clean_attention": args.clean_attention,
+        "freeze_attention": args.freeze_attention,
     }
     (args.output / "meta.json").write_text(json.dumps(meta, indent=1) + "\n")
     print(f"generated {args.output}", flush=True)
