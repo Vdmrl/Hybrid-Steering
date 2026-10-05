@@ -17,6 +17,7 @@ from hybrid_steering import Runner, gdn_layers, load_direction, load_runtime
 from hybrid_steering.mamba import MambaRunner
 from hybrid_steering.runtime import batched, chat_prompts, write_jsonl
 from hybrid_steering.scoring import choose, repetition, score, summarize
+from residual import ResidualRunner
 
 ROOT = Path(__file__).resolve().parents[2]
 VALID_BENCHMARKS = {"ifeval", "humaneval"}
@@ -111,6 +112,7 @@ def load_plan(path: Path) -> tuple[dict, dict[str, list[dict]]]:
             "gdn_clamp",
             "mamba_add",
             "mamba_clamp",
+            "residual_add",
         }:
             raise ValueError(f"unknown method: {condition['method']}")
         if not condition.get("scales") or any(
@@ -125,6 +127,13 @@ def load_plan(path: Path) -> tuple[dict, dict[str, list[dict]]]:
             raise ValueError("baseline must use only scale 0")
         if condition["method"] != "baseline" and not condition.get("direction"):
             raise ValueError("steered conditions need a direction path")
+        if condition["method"] == "residual_add" and (
+            type(condition.get("layer")) is not int or condition["layer"] < 0
+        ):
+            raise ValueError("residual_add needs a non-negative integer layer")
+        gain = condition.get("gain", 1)
+        if type(gain) not in (int, float) or not math.isfinite(gain) or gain <= 0:
+            raise ValueError("gain must be a positive finite number")
     return plan, datasets
 
 
@@ -154,6 +163,7 @@ def identity(config_file: Path, plan: dict, data: list[dict], role: str) -> dict
             for name in (
                 "experiments/pipeline/run.py",
                 "experiments/pipeline/evaluate.py",
+                "experiments/pipeline/residual.py",
                 "src/hybrid_steering/mamba.py",
                 "src/hybrid_steering/runner.py",
                 "src/hybrid_steering/state.py",
@@ -173,7 +183,7 @@ def run_directory(config_file: Path, plan: dict, data: list[dict], role: str, ou
 def _runner(model, tokenizer, condition: dict, config_file: Path, model_id: str):
     method = condition["method"]
     falcon = getattr(model.config, "model_type", None) == "falcon_h1"
-    if method.startswith("mamba_") != falcon and method != "baseline":
+    if method not in {"baseline", "residual_add"} and method.startswith("mamba_") != falcon:
         raise ValueError("Mamba methods need Falcon-H1; GDN methods need Qwen3.5")
     if method == "baseline":
         return (
@@ -184,6 +194,11 @@ def _runner(model, tokenizer, condition: dict, config_file: Path, model_id: str)
     direction, manifest, target, _ = load_direction(resolved(config_file, condition["direction"]))
     if manifest.model_id not in {"unknown", model_id}:
         raise ValueError("direction model differs from config")
+    if method == "residual_add":
+        layer = int(condition["layer"])
+        if layer not in direction:
+            raise ValueError(f"residual direction has no layer {layer}")
+        return ResidualRunner(model, tokenizer, direction[layer], layer)
     rank = condition.get("rank")
     normalize = condition.get("normalize", False)
     intervention = "clamp" if method.endswith("clamp") else "add"
@@ -253,7 +268,7 @@ def generate(
                         batch,
                         "judge" if role == "judge" else plan["bench_dataset"]["name"],
                     ),
-                    scale=float(scale),
+                    scale=float(scale) * float(case.get("gain", 1)),
                     prompt_position=case.get("prompt_position", -1),
                     max_new_tokens=plan["max_new_tokens"],
                 )
@@ -268,6 +283,7 @@ def generate(
                             "method": "baseline" if case["method"] == "baseline" else case["name"],
                             "steering_method": case["method"],
                             "scale": float(scale),
+                            "gain": float(case.get("gain", 1)),
                             "key": item["_key"],
                             "prompt": item["prompt"],
                             "response": tokenizer.decode(ids, skip_special_tokens=True),

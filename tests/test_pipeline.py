@@ -129,12 +129,16 @@ def test_pipeline_plan_hash_and_method_validation(tmp_path: Path):
         )
     )
     report = module.build_report(judge_dir, bench_dir, output)
-    assert all((report / name).exists() for name in ("rates.csv", "report.json", "comparison.svg"))
+    assert all(
+        (report / name).exists()
+        for name in ("rates.csv", "report.json", "comparison.svg", "tradeoff.svg", "report.html")
+    )
     chart_row = json.loads((report / "report.json").read_text())["rows"][0]
     assert chart_row["judge_mean"] == 4 and chart_row["judge_delta"] == 0
     import xml.etree.ElementTree as ET
 
     assert ET.parse(report / "comparison.svg").getroot().tag.endswith("svg")
+    assert ET.parse(report / "tradeoff.svg").getroot().tag.endswith("svg")
     # A different benchmark changes only its own cache key; Judge needs no model call.
     benchmark.write_text(benchmark.read_text() + benchmark.read_text().replace('"t"', '"u"'))
     plan["bench_dataset"]["sha256"] = hashlib.sha256(benchmark.read_bytes()).hexdigest()
@@ -151,6 +155,18 @@ def test_pipeline_plan_hash_and_method_validation(tmp_path: Path):
     module.score = lambda *_args, **_kwargs: pytest.fail("Judge scores were recomputed")
     assert module.evaluate(config, changed, datasets["judge"], judge_dir, "judge", run_judge=True)
     module.load_runtime = original_load
+    copied = json.loads(json.dumps(plan))
+    copied["conditions"].append(
+        {"name": "res", "method": "residual_add", "direction": "missing", "scales": [1]}
+    )
+    config.write_text(json.dumps(copied), encoding="utf-8")
+    with pytest.raises(ValueError, match="layer"):
+        module.load_plan(config)
+    copied["conditions"][-1]["layer"] = 0
+    copied["conditions"][-1]["gain"] = -1
+    config.write_text(json.dumps(copied), encoding="utf-8")
+    with pytest.raises(ValueError, match="gain"):
+        module.load_plan(config)
     plan["conditions"][0]["scales"] = [1]
     config.write_text(json.dumps(plan), encoding="utf-8")
     with pytest.raises(ValueError, match="baseline"):
@@ -159,3 +175,19 @@ def test_pipeline_plan_hash_and_method_validation(tmp_path: Path):
     config.write_text(json.dumps(plan), encoding="utf-8")
     with pytest.raises(ValueError, match="unique"):
         module.load_plan(config)
+
+
+def test_residual_add_on_tiny_model():
+    import importlib.util
+
+    directory = Path(__file__).resolve().parents[1] / "experiments/pipeline"
+    spec = importlib.util.spec_from_file_location("pipeline_residual", directory / "residual.py")
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    from hybrid_steering.runtime import build_tiny
+
+    model, tokenizer = build_tiny()
+    runner = module.ResidualRunner(model, tokenizer, torch.ones(model.config.hidden_size), 0)
+    tokens = runner.generate(["hello"], scale=1, max_new_tokens=2)
+    assert tuple(tokens.shape) == (1, 2)

@@ -106,13 +106,18 @@ def build_report(judge_dir: Path, benchmark_dir: Path, output: Path) -> Path | N
         )
         + "\n"
     )
-    (report_dir / "comparison.svg").write_text(_svg(rows), encoding="utf-8")
+    comparison = _svg(rows)
+    tradeoff = _tradeoff_svg(rows)
+    (report_dir / "comparison.svg").write_text(comparison, encoding="utf-8")
+    (report_dir / "tradeoff.svg").write_text(tradeoff, encoding="utf-8")
+    (report_dir / "report.html").write_text(_html(comparison, tradeoff, rows), encoding="utf-8")
     return report_dir
 
 
 def _svg(rows: list[dict]) -> str:
     """Draw measured points and 95% bars without a plotting dependency."""
     colors = ("#2563eb", "#dc2626", "#16a34a", "#9333ea", "#ea580c", "#0891b2")
+    judge_ymax = 1.0 if max(row["judge_high"] for row in rows) <= 1 else 5.0
     scales = sorted({row["scale"] for row in rows})
     minimum, maximum = scales[0], scales[-1]
     if minimum == maximum:
@@ -125,7 +130,7 @@ def _svg(rows: list[dict]) -> str:
     ]
     for panel, (stem, ymax, label) in enumerate(
         (
-            ("judge", 5, "Judge concept score (mean, 95% CI)"),
+            ("judge", judge_ymax, "Judge concept score (mean, 95% CI)"),
             ("benchmark", 1, f"{rows[0]['benchmark_metric']} (rate, 95% CI)"),
         )
     ):
@@ -176,3 +181,105 @@ def _svg(rows: list[dict]) -> str:
                 f'<text x="{left}" y="{top + height + 55 + index * 17}" style="fill:{color}">{escape(condition)}</text>'
             )
     return "\n".join(parts + ["</svg>"])
+
+
+def _tradeoff_svg(rows: list[dict]) -> str:
+    """Concept expression against benchmark rate, one curve per condition."""
+    colors = ("#2563eb", "#dc2626", "#16a34a", "#9333ea", "#ea580c", "#0891b2")
+    x0 = min(row["judge_low"] for row in rows)
+    x1 = max(row["judge_high"] for row in rows)
+    y0 = min(row["benchmark_low"] for row in rows)
+    y1 = max(row["benchmark_high"] for row in rows)
+
+    def padded(low: float, high: float) -> tuple[float, float]:
+        span = max(high - low, 1e-6)
+        return low - 0.08 * span, high + 0.08 * span
+
+    x0, x1 = padded(x0, x1)
+    y0, y1 = padded(y0, y1)
+    conditions = sorted({row["condition"] for row in rows})
+    height = 520 + 18 * len(conditions)
+    metric = rows[0]["benchmark_metric"]
+    parts = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="760" height="{height}" viewBox="0 0 760 {height}">',
+        f'<rect width="760" height="{height}" fill="white"/>',
+        "<style>text{font:13px sans-serif;fill:#263238}.axis{stroke:#667085;stroke-width:1}.bar{stroke-width:1.5}</style>",
+        '<text x="70" y="32" font-size="17">Concept expression vs benchmark</text>',
+    ]
+    left, top, width, plot = 80, 55, 620, 380
+
+    def xcoord(value: float) -> float:
+        return left + (value - x0) / (x1 - x0) * width
+
+    def ycoord(value: float) -> float:
+        return top + plot - (value - y0) / (y1 - y0) * plot
+
+    parts += [
+        f'<line class="axis" x1="{left}" y1="{top}" x2="{left}" y2="{top + plot}"/>',
+        f'<line class="axis" x1="{left}" y1="{top + plot}" x2="{left + width}" y2="{top + plot}"/>',
+        f'<text x="{left + width / 2}" y="{top + plot + 40}" text-anchor="middle">Concept expression (mean, 95% CI)</text>',
+        f'<text x="22" y="{top + plot / 2}" text-anchor="middle" transform="rotate(-90 22 {top + plot / 2})">{escape(metric)} (rate, 95% CI)</text>',
+    ]
+    for tick in range(6):
+        x_value = x0 + (x1 - x0) * tick / 5
+        y_value = y0 + (y1 - y0) * tick / 5
+        x, y = xcoord(x_value), ycoord(y_value)
+        parts.append(
+            f'<text x="{x:.1f}" y="{top + plot + 20}" text-anchor="middle">{x_value:.2f}</text>'
+        )
+        parts.append(f'<text x="{left - 8}" y="{y + 4:.1f}" text-anchor="end">{y_value:.2f}</text>')
+    for index, condition in enumerate(conditions):
+        color = colors[index % len(colors)]
+        cells = sorted(
+            (row for row in rows if row["condition"] == condition), key=lambda row: row["scale"]
+        )
+        points = " ".join(
+            f"{xcoord(row['judge_mean']):.1f},{ycoord(row['benchmark_score']):.1f}" for row in cells
+        )
+        parts.append(f'<polyline points="{points}" fill="none" stroke="{color}" stroke-width="2"/>')
+        for row in cells:
+            x, y = xcoord(row["judge_mean"]), ycoord(row["benchmark_score"])
+            parts += [
+                f'<line class="bar" x1="{xcoord(row["judge_low"]):.1f}" y1="{y:.1f}" x2="{xcoord(row["judge_high"]):.1f}" y2="{y:.1f}" stroke="{color}"/>',
+                f'<line class="bar" x1="{x:.1f}" y1="{ycoord(row["benchmark_low"]):.1f}" x2="{x:.1f}" y2="{ycoord(row["benchmark_high"]):.1f}" stroke="{color}"/>',
+                f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4" fill="{color}"><title>{escape(condition)}; scale {row["scale"]:g}</title></circle>',
+            ]
+        parts.append(
+            f'<text x="80" y="{top + plot + 64 + index * 18}" style="fill:{color}">{escape(condition)}</text>'
+        )
+    return "\n".join(parts + ["</svg>"])
+
+
+def _html(comparison: str, tradeoff: str, rows: list[dict]) -> str:
+    body = []
+    for row in rows:
+        body.append(
+            "<tr>"
+            f"<td>{escape(row['condition'])}</td>"
+            f"<td>{row['scale']:g}</td>"
+            f"<td>{row['judge_mean']:.3f}</td>"
+            f"<td>{row['benchmark_score']:.3f}</td>"
+            "</tr>"
+        )
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Steering tradeoff</title>
+<style>
+body {{ font: 15px sans-serif; margin: 24px; color: #1f2933; }}
+h1 {{ font-size: 22px; }}
+table {{ border-collapse: collapse; margin-top: 16px; }}
+td, th {{ border: 1px solid #d9e2ec; padding: 4px 8px; text-align: right; }}
+td:first-child, th:first-child {{ text-align: left; }}
+</style>
+<h1>Concept expression against benchmark quality</h1>
+<p>Horizontal bars are the 95% interval on the concept score. Vertical bars are the 95% interval on the benchmark rate. Points on one curve are steering scales for that condition.</p>
+{tradeoff}
+<h2>Scores against scale</h2>
+{comparison}
+<table>
+<tr><th>Condition</th><th>Scale</th><th>Concept</th><th>Benchmark</th></tr>
+{"".join(body)}
+</table>
+</html>
+"""
