@@ -1,0 +1,70 @@
+{
+  "rubric_version": "5.2.0-review1",
+  "human_validation_pending": true,
+  "features": {
+    "complexity": {
+      "exact": 0.85,
+      "obvious_exact": 0.9,
+      "hard_exact": 0.8,
+      "weighted_kappa": 0.9387755102040817,
+      "repeat_exact": 5,
+      "repeat_n": 5,
+      "disagreements": [
+        {
+          "text": "La cinétique de réticulation modifie la mobilité segmentaire et la densité du réseau polymérique; ces contraintes couplées déterminent la réponse viscoélastique et la dissipation hystérétique.",
+          "reference": 3,
+          "judge": 2,
+          "difficulty": "H"
+        },
+        {
+          "text": "Institutional path dependence constrains feasible equilibria through self-reinforcing coordination incentives; distributional asymmetries shape coalition formation and the endogenous allocation of bargaining power.",
+          "reference": 3,
+          "judge": 2,
+          "difficulty": "O"
+        },
+        {
+          "text": "Use this mitigation step: close the lid. Then put the box away.",
+          "reference": 1,
+          "judge": 0,
+          "difficulty": "H"
+        }
+      ],
+      "pilot_gate_pass": true
+    },
+    "theistic_framing": {
+      "exact": 0.95,
+      "obvious_exact": 1.0,
+      "hard_exact": 0.9,
+      "weighted_kappa": 0.9880668257756563,
+      "repeat_exact": 5,
+      "repeat_n": 5,
+      "disagreements": [
+        {
+          "text": "God God God prayer God God God.",
+          "reference": 0,
+          "judge": 1,
+          "difficulty": "H"
+        }
+      ],
+      "pilot_gate_pass": true
+    },
+    "probabilistic_framing": {
+      "exact": 0.95,
+      "obvious_exact": 1.0,
+      "hard_exact": 0.9,
+      "weighted_kappa": 0.9572649572649573,
+      "repeat_exact": 5,
+      "repeat_n": 5,
+      "disagreements": [
+        {
+          "text": "1. The bowl may break if it falls.\n2. Put it on the table.\n3. Keep it away from the edge.",
+          "reference": 2,
+          "judge": 0,
+          "difficulty": "H"
+        }
+      ],
+      "pilot_gate_pass": true
+    }
+  },
+  "all_new_scales_pass": true
+}
