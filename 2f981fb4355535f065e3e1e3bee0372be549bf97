@@ -1,0 +1,36 @@
+experiments/forgetting/tradeoff.py
+  s_12d0b3b98de399::t_01a95ec30b7ed1 1,3-6,74-109,111-112,119-183,186-187,190-191,195-232,241-245,247-268,270-275,278-279,281-294,298-313,315-319
+experiments/forgetting/run.py
+  s_12d0b3b98de399::t_7809bfb090491a 75-79
+  s_12d0b3b98de399::t_60606f950d1dfa 167
+  s_12d0b3b98de399::t_1ffdf41c444ea6 204-208
+  s_12d0b3b98de399::t_43be59659034e7 238
+  s_12d0b3b98de399::t_2c0e16f4603f29 325
+  s_12d0b3b98de399::t_a66d554fde9d42 23-27
+  s_12d0b3b98de399::t_5f7d34b66f625b 254
+  s_12d0b3b98de399::t_7dd22dabf83c99 176-182
+  s_12d0b3b98de399::t_f2f68b9c35db3c 294
+experiments/forgetting/figures.py
+  s_12d0b3b98de399::t_9b306fe4a43cc3 3-7,10,12-15
+  s_12d0b3b98de399::t_d9ddb5ad1806b4 209-210,212-213,241-243,259-261
+  s_12d0b3b98de399::t_3b3526c1c45505 203-206,211,217,220-224,227-228,230-233,240,244-258,262,264-266,271,283,286,297
+  s_12d0b3b98de399::t_32a8ecb5ee85a4 287-293
+  s_12d0b3b98de399::t_d65959e23cb9dd 48,51,55,57-59,67-68,74,82-95,97
+  s_12d0b3b98de399::t_8f2ec925faea3f 317-323,330,336-338
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2f981fb4355535f065e3e1e3bee0372be549bf97",
+  "prompts": {},
+  "sessions": {
+    "s_12d0b3b98de399": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "9ace2b84-e048-4ae8-86a8-5a8c7fb5fb5a",
+        "model": "grok-4.7"
+      },
+      "human_author": "Slava Chaunin <67190162+Ssslakter@users.noreply.github.com>"
+    }
+  }
+}
