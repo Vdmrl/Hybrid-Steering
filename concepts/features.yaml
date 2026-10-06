@@ -1,3 +1,5 @@
+rubric_version: "5.3.0-language-proposal1"
+
 features:
   answer_quality:
     guide: |
@@ -88,3 +90,50 @@ features:
       Target: theistic framing, the answer's own premise that a divine being acts, guides, or gives meaning.
       Look for reasoning that depends on that premise.
       A neutral description of what believers think, or an idiom such as "thank God", is insufficient.
+
+  russian_language:
+    target: Russian language
+    opposite: non-Russian language
+    definition: The substantive response is written in natural Russian; partial expression
+      is substantive code-switching toward this language.
+    exclusions:
+    - A name, quotation, heading or isolated stock phrase is not sustained target-language
+      expression.
+    - Score language separately from factual correctness, helpfulness, register, complexity
+      and repetition.
+    - 'Script alone is insufficient: Cyrillic can be non-Russian; Han characters can
+      occur in non-Chinese text.'
+    - Simplified and traditional Chinese are both target language; code and ordinary
+      borrowed names are assessed separately.
+    anchors:
+      1: No substantive Russian; includes an empty or wholly unintelligible response.
+      2: Mostly another language with isolated Russian fragments.
+      3: Substantial Russian and substantial other-language prose are genuinely mixed.
+      4: Predominantly Russian, with a small substantive switch into another language.
+      5: Consistently natural Russian throughout the substantive prose.
+    guide: 'Target: sustained natural Russian in substantive prose. Distinguish true
+      language from script or names. Quality, complexity and repetition are separate.
+      This proposed anchored1-5 meaning has not passed human or LLM calibration.'
+  chinese_language:
+    target: Chinese language
+    opposite: non-Chinese language
+    definition: The substantive response is written in natural Chinese; partial expression
+      is substantive code-switching toward this language.
+    exclusions:
+    - A name, quotation, heading or isolated stock phrase is not sustained target-language
+      expression.
+    - Score language separately from factual correctness, helpfulness, register, complexity
+      and repetition.
+    - 'Script alone is insufficient: Cyrillic can be non-Russian; Han characters can
+      occur in non-Chinese text.'
+    - Simplified and traditional Chinese are both target language; code and ordinary
+      borrowed names are assessed separately.
+    anchors:
+      1: No substantive Chinese; includes an empty or wholly unintelligible response.
+      2: Mostly another language with isolated Chinese fragments.
+      3: Substantial Chinese and substantial other-language prose are genuinely mixed.
+      4: Predominantly Chinese, with a small substantive switch into another language.
+      5: Consistently natural Chinese throughout the substantive prose.
+    guide: 'Target: sustained natural Chinese in substantive prose. Distinguish true
+      language from script or names. Quality, complexity and repetition are separate.
+      This proposed anchored1-5 meaning has not passed human or LLM calibration.'

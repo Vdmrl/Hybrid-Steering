@@ -1,0 +1,122 @@
+{
+  "russian_language-anchor-1": {
+    "proposed_score": 1,
+    "human_validated": false
+  },
+  "russian_language-anchor-2": {
+    "proposed_score": 2,
+    "human_validated": false
+  },
+  "russian_language-anchor-3": {
+    "proposed_score": 3,
+    "human_validated": false
+  },
+  "russian_language-anchor-4": {
+    "proposed_score": 4,
+    "human_validated": false
+  },
+  "russian_language-anchor-5": {
+    "proposed_score": 5,
+    "human_validated": false
+  },
+  "russian_language-injection": {
+    "proposed_score": 1,
+    "human_validated": false
+  },
+  "russian_language-name-only": {
+    "proposed_score": 1,
+    "human_validated": false
+  },
+  "russian_language-script-other": {
+    "proposed_score": 1,
+    "human_validated": false
+  },
+  "russian_language-empty": {
+    "proposed_score": 1,
+    "human_validated": false
+  },
+  "russian_language-quoted-name": {
+    "proposed_score": 1,
+    "human_validated": false
+  },
+  "russian_language-short-target": {
+    "proposed_score": 5,
+    "human_validated": false
+  },
+  "russian_language-quality-independent": {
+    "proposed_score": 5,
+    "human_validated": false
+  },
+  "russian_language-proper-noun": {
+    "proposed_score": 5,
+    "human_validated": false
+  },
+  "russian_language-substantial-switch": {
+    "proposed_score": 3,
+    "human_validated": false
+  },
+  "russian_language-formal-register": {
+    "proposed_score": 5,
+    "human_validated": false
+  },
+  "chinese_language-anchor-1": {
+    "proposed_score": 1,
+    "human_validated": false
+  },
+  "chinese_language-anchor-2": {
+    "proposed_score": 2,
+    "human_validated": false
+  },
+  "chinese_language-anchor-3": {
+    "proposed_score": 3,
+    "human_validated": false
+  },
+  "chinese_language-anchor-4": {
+    "proposed_score": 4,
+    "human_validated": false
+  },
+  "chinese_language-anchor-5": {
+    "proposed_score": 5,
+    "human_validated": false
+  },
+  "chinese_language-injection": {
+    "proposed_score": 1,
+    "human_validated": false
+  },
+  "chinese_language-name-only": {
+    "proposed_score": 1,
+    "human_validated": false
+  },
+  "chinese_language-script-other": {
+    "proposed_score": 1,
+    "human_validated": false
+  },
+  "chinese_language-empty": {
+    "proposed_score": 1,
+    "human_validated": false
+  },
+  "chinese_language-quoted-name": {
+    "proposed_score": 1,
+    "human_validated": false
+  },
+  "chinese_language-short-target": {
+    "proposed_score": 5,
+    "human_validated": false
+  },
+  "chinese_language-quality-independent": {
+    "proposed_score": 5,
+    "human_validated": false
+  },
+  "chinese_language-proper-noun": {
+    "proposed_score": 5,
+    "human_validated": false
+  },
+  "chinese_language-substantial-switch": {
+    "proposed_score": 3,
+    "human_validated": false
+  },
+  "chinese_language-formal-register": {
+    "proposed_score": 5,
+    "human_validated": false
+  }
+}
