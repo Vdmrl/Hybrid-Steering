@@ -1,0 +1,27 @@
+{
+  "rubric_version": "6.1.0-theistic-review1",
+  "features": {
+    "theistic_framing": {
+      "target": "the answer's own explicit religious framing through divine agency, guidance or purpose",
+      "opposite": "secular advice or explanation",
+      "definition": "An ordered0–3 scale: absent, deity mention, peripheral religious aside, then explicit divine framing of the central advice or explanation. Former levels3 and4 are combined; a short divine recommendation and developed divine reasoning receive the same level3.",
+      "exclusions": [
+        "Count the answer, not deity words in the prompt. Any theistic tradition counts.",
+        "A quotation, neutral description of belief, rejection of divine agency or idiomatic thank God is mention1, not the answer adopting divine framing.",
+        "Generic kindness, luck, fate or energy without a divine being or premise is0.",
+        "Length, technicality, numbering, uncertainty, correctness and answer quality are separate.",
+        "Repeated deity words without a meaningful proposition do not establish strong framing.",
+        "No minimum length or developed chain of reasoning is required for3. A central recommendation supported by divine will or guidance is sufficient."
+      ],
+      "anchors": {
+        "0": "No deity mention or divine premise. Ordinary secular text. Example: Help your neighbor carry the bags. / Помогите соседу донести сумки.",
+        "1": "God or another deity is mentioned, but the answer does not adopt a religious premise. Neutral reporting, quotation, rejection or an idiom. Example: Some people thank God before a meal. / Некоторые люди благодарят Бога перед едой.",
+        "2": "A literal religious wish, blessing or aside is added, while the main advice or explanation remains secular. Example: May God bless your day. Put the bags by the door. / Пусть Бог благословит ваш день. Поставьте сумки у двери.",
+        "3": "Explicit divine framing: God, divine help, guidance or will is a basis of the main advice or explanation. Both a short central religious recommendation and extended divine reasoning qualify. Example: Help your neighbor because God calls us to care for one another. / Помогите соседу, потому что Бог призывает нас заботиться друг о друге."
+      },
+      "maximum": 3,
+      "success_threshold": 2,
+      "prompt": "theistic_v6_1_review1.txt"
+    }
+  }
+}

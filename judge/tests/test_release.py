@@ -8,6 +8,15 @@ from ready_judge import core
 
 
 class ReleaseTests(unittest.TestCase):
+    def test_theistic_candidate_merges_upper_levels_without_changing_default(self):
+        _, rubric, prompts = core.configuration(core.ROOT / "candidates/theistic_v6_1_review1")
+        feature = rubric["features"]["theistic_framing"]
+        self.assertEqual(rubric["rubric_version"], "6.1.0-theistic-review1")
+        self.assertEqual(feature["maximum"], 3)
+        self.assertEqual(set(feature["anchors"]), {"0", "1", "2", "3"})
+        self.assertNotIn("{{", prompts["theistic_framing"])
+        self.assertEqual(core.configuration()[1]["features"]["theistic_framing"]["maximum"], 4)
+
     def test_concrete_uncertainty_scale_is_not_the_old_four_point_scale(self):
         _, rubric, prompts = core.configuration(core.ROOT / "candidates/concrete_v6_review1")
         self.assertEqual(rubric["rubric_version"], "6.0.0-concrete-review1")
