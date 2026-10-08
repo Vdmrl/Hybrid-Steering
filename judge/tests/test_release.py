@@ -15,7 +15,7 @@ class ReleaseTests(unittest.TestCase):
         self.assertEqual(feature["maximum"], 3)
         self.assertEqual(set(feature["anchors"]), {"0", "1", "2", "3"})
         self.assertNotIn("{{", prompts["theistic_framing"])
-        self.assertEqual(core.configuration()[1]["features"]["theistic_framing"]["maximum"], 3)
+        self.assertEqual(core.configuration()[1]["features"]["theistic_framing"]["maximum"], 2)
 
     def test_current_uncertainty_scale_is_not_the_old_four_point_scale(self):
         _, rubric, prompts = core.configuration(core.ROOT / "candidates/concrete_v6_review1")
@@ -62,7 +62,7 @@ class ReleaseTests(unittest.TestCase):
             self.assertEqual(manifest["identity"]["rubric"], rubric)
             with self.assertRaisesRegex(ValueError, "Resume rejected"):
                 core.evaluate(source, path / "scores", ["complexity"])
-        self.assertEqual(core.configuration()[1]["rubric_version"], "6.1.0-unified-review1")
+        self.assertEqual(core.configuration()[1]["rubric_version"], "6.2.0-religious-review1")
 
     def test_frozen_resources_and_scales(self):
         _, rubric, prompts = core.configuration(core.ROOT)
