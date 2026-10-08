@@ -8,6 +8,18 @@ from ready_judge import core
 
 
 class ReleaseTests(unittest.TestCase):
+    def test_concrete_uncertainty_scale_is_not_the_old_four_point_scale(self):
+        _, rubric, prompts = core.configuration(core.ROOT / "candidates/concrete_v6_review1")
+        self.assertEqual(rubric["rubric_version"], "6.0.0-concrete-review1")
+        self.assertEqual(set(rubric["features"]), {"complexity", "probabilistic_framing"})
+        for feature in rubric["features"].values():
+            self.assertEqual(feature["maximum"], 3)
+            self.assertEqual(set(feature["anchors"]), {"0", "1", "2", "3"})
+        self.assertNotIn("{{", prompts["probabilistic_framing"])
+        with self.assertRaises(ValueError):
+            core.parse_choice({"finish_reason": "stop", "message": {"content": "4"}}, 3)
+        self.assertEqual(core.configuration()[1]["features"]["probabilistic_framing"]["maximum"], 4)
+
     def test_explicit_candidate_resources_and_resume_isolation(self):
         for version in ("review1", "review2"):
             _, registry, templates = core.configuration(
