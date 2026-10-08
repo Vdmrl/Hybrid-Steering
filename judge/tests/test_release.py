@@ -62,7 +62,22 @@ class ReleaseTests(unittest.TestCase):
             self.assertEqual(manifest["identity"]["rubric"], rubric)
             with self.assertRaisesRegex(ValueError, "Resume rejected"):
                 core.evaluate(source, path / "scores", ["complexity"])
-        self.assertEqual(core.configuration()[1]["rubric_version"], "6.2.0-religious-review1")
+        self.assertEqual(core.configuration()[1]["rubric_version"], "6.3.0-multilingual-complexity-review1")
+
+    def test_multilingual_complexity_change_is_isolated_and_old_registry_preserved(self):
+        old_config, old_registry, old_prompts = core.configuration(core.ROOT / "current_v6_2")
+        config, registry, prompts = core.configuration()
+        self.assertEqual(config, old_config)
+        self.assertEqual(old_registry["rubric_version"], "6.2.0-religious-review1")
+        for name in old_registry["features"]:
+            if name != "complexity":
+                self.assertEqual(registry["features"][name], old_registry["features"][name])
+                self.assertEqual(prompts[name], old_prompts[name])
+        self.assertIn("correspond to anchor2", prompts["complexity"])
+        self.assertIn("including French", prompts["complexity"])
+        self.assertNotIn("{{", prompts["complexity"])
+        self.assertEqual(registry["features"]["complexity"]["maximum"], 3)
+        self.assertEqual(registry["features"]["complexity"]["success_threshold"], 2)
 
     def test_frozen_resources_and_scales(self):
         _, rubric, prompts = core.configuration(core.ROOT)
