@@ -207,10 +207,10 @@ def request_score(task, config, prompt, feature, secret, output):
     raise RuntimeError('Request failed; score remains missing')
 
 
-def evaluate(input_path, output, selected, run=False, workers=4, secret=None):
+def evaluate(input_path, output, selected, run=False, workers=4, secret=None, resources=None):
     if not 1 <= workers <= 16:
         raise ValueError('workers must be1-16')
-    config, rubric, prompts = configuration()
+    config, rubric, prompts = configuration(ROOT if resources is None else Path(resources))
     if len(set(selected)) != len(selected) or any(f not in rubric['features'] for f in selected):
         raise ValueError('Unknown or duplicate feature')
     rows = input_rows(input_path)

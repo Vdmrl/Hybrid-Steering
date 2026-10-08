@@ -1,0 +1,3 @@
+# Preserve the exact bytes used by candidate calibration manifests.
+judge/ready_judge/resources/candidates/** -text whitespace=cr-at-eol
+judge/calibration/technical_v5_2_2_review1/*.json* -text whitespace=cr-at-eol

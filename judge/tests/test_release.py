@@ -1,11 +1,48 @@
 import hashlib
 import json
+import tempfile
 import unittest
+from pathlib import Path
 
 from ready_judge import core
 
 
 class ReleaseTests(unittest.TestCase):
+    def test_explicit_candidate_resources_and_resume_isolation(self):
+        for version in ("review1", "review2"):
+            _, registry, templates = core.configuration(
+                core.ROOT / ("candidates/technical_v5_2_2_" + version)
+            )
+            self.assertEqual(registry["rubric_version"], "5.2.2-technical-" + version)
+            self.assertNotIn("{{", templates["complexity"])
+        candidate = core.ROOT / "candidates/technical_v5_2_2_review1"
+        _, rubric, prompts = core.configuration(candidate)
+        self.assertEqual(rubric["rubric_version"], "5.2.2-technical-review1")
+        self.assertEqual(set(rubric["features"]), {"complexity"})
+        self.assertEqual(rubric["features"]["complexity"]["maximum"], 3)
+        self.assertNotIn("{{concept}}", prompts["complexity"])
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory)
+            source = path / "input.jsonl"
+            source.write_text(
+                json.dumps(
+                    {
+                        "prompt_id": "p",
+                        "answer_id": "a",
+                        "scenario": "Explain.",
+                        "text": "Ice melts.",
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            core.evaluate(source, path / "scores", ["complexity"], resources=candidate)
+            manifest = json.loads((path / "scores/manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["identity"]["rubric"], rubric)
+            with self.assertRaisesRegex(ValueError, "Resume rejected"):
+                core.evaluate(source, path / "scores", ["complexity"])
+        self.assertEqual(core.configuration()[1]["rubric_version"], "5.2.1-review1")
+
     def test_frozen_resources_and_scales(self):
         _, rubric, prompts = core.configuration()
         self.assertEqual(rubric["rubric_version"], "5.2.1-review1")

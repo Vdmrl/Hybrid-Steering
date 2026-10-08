@@ -47,4 +47,6 @@ For these fixtures use explicit `--input` and `--features` with `python -m ready
 
 ## Human review
 
+Technical boundary candidates `5.2.2-technical-review1` and `review2` live in separate resource directories. Select one explicitly with `--resources ready_judge/resources/candidates/technical_v5_2_2_review2 --features complexity` and a new output directory. The default frozen registry and historical scores remain unchanged. Candidate review2 adds parallel Russian/English examples: ordinary causal explanations remain0; dense connected technical vocabulary can reach3 without an arbitrary length requirement. See `calibration/technical_v5_2_2_review1/README.md` for unsuccessful cases and limitations. These candidates are development checks, not human-calibrated releases.
+
 Review scales and thresholds, have independent humans label the blind calibration fixtures and representative real answers, resolve disagreements, and freeze the rubric. These scales break the historical 1–5 contract; do not mix historical evaluations with this version. Never reinterpret old scores under this version. Do not silently modify the preserved fairy-tale v4 prompt.
