@@ -1,14 +1,16 @@
 """Additive residual-stream steering at one decoder layer.
 
 The direction is the mean last-token residual of the target text minus the
-source text, one vector per layer. Generation adds ``scale`` times that vector
-on every token. There is no norm matching and no clamp.
+source text, one vector per layer. Generation applies it on every token.
+``add`` writes ``scale`` times the raw vector. ``clamp`` replaces the
+projection on that direction with the same vector.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import random
 from pathlib import Path
 
 import torch
@@ -22,6 +24,7 @@ from hybrid_steering.direction import (
     read_pairs,
     target_and_source,
 )
+from hybrid_steering.mamba import _restore_sequence_axis
 from hybrid_steering.models import DirectionManifest
 from hybrid_steering.runtime import batched, chat_prompts, read_jsonl
 from hybrid_steering.scoring import repetition
@@ -34,6 +37,23 @@ def hidden_size(model) -> int:
         if size:
             return int(size)
     raise ValueError("model config has no hidden size")
+
+
+def token_mask(hidden: torch.Tensor, args, kwargs) -> torch.Tensor | None:
+    """Return a 2D padding mask aligned with ``hidden``, ignoring causal masks."""
+    candidates = []
+    if kwargs:
+        for key in ("mamba_attention_mask", "attention_mask"):
+            mask = kwargs.get(key)
+            if torch.is_tensor(mask):
+                candidates.append(mask)
+    for value in args:
+        if torch.is_tensor(value):
+            candidates.append(value)
+    for candidate in candidates:
+        if candidate.ndim == 2 and tuple(candidate.shape) == tuple(hidden.shape[:2]):
+            return candidate
+    return None
 
 
 def decoder_layers(model):
@@ -50,8 +70,11 @@ def last_layer_states(model, tokenizer, texts: list[str]) -> dict[int, torch.Ten
     """Last real token of each decoder layer, shape ``[batch, hidden]``."""
     encoded = tokenizer(texts, add_special_tokens=False, padding=True, return_tensors="pt")
     encoded = encoded.to(next(model.parameters()).device)
+    positions = (encoded.attention_mask.long().cumsum(-1) - 1).clamp_min(0)
     with torch.inference_mode():
-        output = model(**encoded, output_hidden_states=True, use_cache=False)
+        output = model(
+            **encoded, position_ids=positions, output_hidden_states=True, use_cache=False
+        )
     hidden = output.hidden_states
     if not hidden or len(hidden) < 2:
         raise RuntimeError("model did not return decoder hidden states")
@@ -106,13 +129,112 @@ def write_residual(
     )
 
 
-class ResidualRunner:
-    """Add one residual vector on every token of one decoder layer."""
+def residual_delta(
+    hidden: torch.Tensor, vector: torch.Tensor, scale: float, mode: str
+) -> torch.Tensor:
+    """Per-token update along ``vector``.
 
-    def __init__(self, model, tokenizer, vector: torch.Tensor, layer: int) -> None:
+    ``add`` is ``scale * v``. ``clamp`` removes the projection on the unit
+    direction and writes ``scale * v``: ``x - (x·û) û + scale * v``.
+    """
+    if mode not in {"add", "clamp"}:
+        raise ValueError("residual mode must be add or clamp")
+    flat = vector.detach().float().reshape(-1)
+    if mode == "add":
+        return (flat * scale).to(dtype=hidden.dtype)
+    unit = flat / flat.norm().clamp_min(1e-8)
+    coeff = (hidden.float() * unit).sum(dim=-1, keepdim=True)
+    return (scale * flat - coeff * unit).to(dtype=hidden.dtype)
+
+
+def install_falcon_norm_hook(model) -> None:
+    """Keep a one-token decode from collapsing to ``[batch, hidden]``.
+
+    Falcon's gated norm squeezes that token. Adding the result to attention
+    then broadcasts the batch axis into the sequence axis.
+    """
+    for layer in decoder_layers(model):
+        mixer = getattr(layer, "mamba", None)
+        if (
+            mixer is None
+            or not getattr(mixer, "mamba_rms_norm", False)
+            or getattr(mixer, "_hybrid_norm_hook", False)
+        ):
+            continue
+        mixer.norm.register_forward_hook(_restore_sequence_axis)
+        mixer._hybrid_norm_hook = True
+
+
+def falcon_greedy(model, tokenizer, texts: list[str], max_new_tokens: int) -> torch.Tensor:
+    """Batched greedy decode with an explicit left-pad mask.
+
+    ``model.generate`` builds a causal mask that Falcon's SDPA rejects when a
+    batch mixes sequence lengths. The returned tensor is padded to
+    ``max_new_tokens``.
+    """
+    install_falcon_norm_hook(model)
+    device = next(model.parameters()).device
+    tokenizer.padding_side = "left"
+    encoded = tokenizer(texts, add_special_tokens=False, padding=True, return_tensors="pt").to(
+        device
+    )
+    ids, mask = encoded.input_ids, encoded.attention_mask
+    if (mask.sum(-1) < 2).any():
+        raise ValueError("Falcon prompts need at least two tokens")
+    positions = (mask.long().cumsum(-1) - 1).clamp_min(0)
+    cache = None
+    if ids.shape[1] > 1:
+        cache = model(
+            input_ids=ids[:, :-1],
+            attention_mask=mask[:, :-1],
+            position_ids=positions[:, :-1],
+            use_cache=True,
+            logits_to_keep=1,
+        ).past_key_values
+    out = model(
+        input_ids=ids[:, -1:],
+        attention_mask=mask,
+        position_ids=positions[:, -1:],
+        past_key_values=cache,
+        use_cache=True,
+        logits_to_keep=1,
+    )
+    cache, logits = out.past_key_values, out.logits[:, -1]
+    pad = tokenizer.pad_token_id
+    eos = model.generation_config.eos_token_id or tokenizer.eos_token_id
+    eos_ids = torch.as_tensor(eos if isinstance(eos, list) else [eos], device=device)
+    generated = torch.full((len(texts), max_new_tokens), pad, device=device, dtype=torch.long)
+    finished = torch.zeros(len(texts), dtype=torch.bool, device=device)
+    for step in range(max_new_tokens):
+        token = torch.where(finished, pad, logits.argmax(-1))
+        generated[:, step] = token
+        finished |= torch.isin(token, eos_ids)
+        if finished.all() or step + 1 == max_new_tokens:
+            break
+        mask = torch.cat((mask, torch.ones_like(mask[:, :1])), dim=1)
+        out = model(
+            input_ids=token[:, None],
+            attention_mask=mask,
+            position_ids=(mask.long().sum(-1) - 1)[:, None],
+            past_key_values=cache,
+            use_cache=True,
+            logits_to_keep=1,
+        )
+        cache, logits = out.past_key_values, out.logits[:, -1]
+    return generated
+
+
+class ResidualRunner:
+    """Steer one residual vector on every token of one decoder layer."""
+
+    def __init__(
+        self, model, tokenizer, vector: torch.Tensor, layer: int, mode: str = "add"
+    ) -> None:
         layers = decoder_layers(model)
         if layer < 0 or layer >= len(layers):
             raise ValueError(f"layer {layer} is outside 0..{len(layers) - 1}")
+        if mode not in {"add", "clamp"}:
+            raise ValueError("residual mode must be add or clamp")
         flat = vector.detach().float().reshape(-1)
         if flat.numel() != hidden_size(model):
             raise ValueError("residual vector does not match the model hidden size")
@@ -120,6 +242,7 @@ class ResidualRunner:
         self.tokenizer = tokenizer
         self.layer = layer
         self.vector = flat
+        self.mode = mode
         tokenizer.padding_side = "left"
 
     def generate(
@@ -136,27 +259,18 @@ class ResidualRunner:
 
         def hook(_module, args, kwargs, output):
             hidden = output[0] if isinstance(output, tuple) else output
-            mask = kwargs.get("attention_mask")
-            if mask is None:
-                mask = next(
-                    (
-                        value
-                        for value in args
-                        if torch.is_tensor(value)
-                        and value.ndim == 2
-                        and value.shape[:2] == hidden.shape[:2]
-                    ),
-                    None,
-                )
-            delta = vector.to(dtype=hidden.dtype)
-            if mask is not None and tuple(mask.shape[:2]) == tuple(hidden.shape[:2]):
+            delta = residual_delta(hidden, vector, scale, self.mode)
+            mask = token_mask(hidden, args, kwargs)
+            if mask is not None:
                 delta = delta * mask.to(dtype=hidden.dtype).unsqueeze(-1)
-            hidden.add_(delta * scale)
+            hidden.add_(delta)
             return output
 
         handle = None if scale == 0 else module.register_forward_hook(hook, with_kwargs=True)
         try:
             with torch.inference_mode():
+                if getattr(self.model.config, "model_type", None) == "falcon_h1":
+                    return falcon_greedy(self.model, self.tokenizer, texts, max_new_tokens).cpu()
                 sequences = self.model.generate(
                     **encoded,
                     max_new_tokens=max_new_tokens,
@@ -274,6 +388,164 @@ def pick_main(args) -> None:
     print(json.dumps(chosen), flush=True)
 
 
+PROBE_QUESTIONS = 30
+PROBE_SCALE = 0.25
+PROBE_HEADER = (
+    "Answer the question below. The text after it is unrelated background; ignore it.\n\n"
+)
+
+
+def middle_layers(count: int) -> list[int]:
+    """A few decoder layers across the middle half, not the ends."""
+    if count < 1:
+        raise ValueError("model has no decoder layers")
+    start, stop = count // 4, (3 * count) // 4
+    step = max(1, (stop - start) // 4)
+    layers = list(range(start, stop + 1, step))
+    return layers or [count // 2]
+
+
+def matched_delta(vector: torch.Tensor, scale: float, activation_norm: float) -> torch.Tensor:
+    """``scale * ||h|| * v / ||v||``, the forgetting residual probe."""
+    flat = vector.detach().float().reshape(-1)
+    return scale * activation_norm * flat / flat.norm().clamp_min(1e-8)
+
+
+def _probe_questions(path: Path) -> list[str]:
+    """First 30 of the forgetting tune split: seed 20261002, tune size 50."""
+    rows = read_jsonl(path)
+    if len(rows) <= 50:
+        raise SystemExit(f"{path} has {len(rows)} questions, need more than 50")
+    tune = random.Random(20261002).sample(rows, len(rows))[:50]
+    return [row["question"] for row in tune[:PROBE_QUESTIONS]]
+
+
+def _probe_prompt(tokenizer, question: str) -> str:
+    return tokenizer.apply_chat_template(
+        [{"role": "user", "content": PROBE_HEADER + question}],
+        tokenize=False,
+        add_generation_prompt=True,
+        enable_thinking=False,
+    )
+
+
+def _activation_norms(model, tokenizer, texts: list[str], layers: list[int]) -> dict[int, float]:
+    tokenizer.padding_side = "left"
+    encoded = tokenizer(texts, add_special_tokens=False, padding=True, return_tensors="pt")
+    encoded = encoded.to(next(model.parameters()).device)
+    positions = (encoded.attention_mask.long().cumsum(-1) - 1).clamp_min(0)
+    with torch.inference_mode():
+        output = model(
+            **encoded, position_ids=positions, output_hidden_states=True, use_cache=False
+        )
+    hidden = output.hidden_states
+    if not hidden or len(hidden) < 2:
+        raise RuntimeError("model did not return decoder hidden states")
+    index = encoded.attention_mask.sum(-1) - 1
+    rows = torch.arange(index.shape[0], device=index.device)
+    norms = {}
+    for layer in layers:
+        states = hidden[layer + 1][rows, index].float()
+        norms[layer] = float(states.norm(dim=-1).mean())
+    return norms
+
+
+def probe_main(args) -> None:
+    """Pick a middle layer the way the forgetting residual probe does.
+
+    Thirty tune questions, scale 0.25, the norm-matched vector on every token.
+    The winner is the highest Lingua rate, then the lower repetition, then the
+    layer closer to the middle of the network.
+    """
+    choice = args.output / "layer.json"
+    if choice.exists():
+        print(json.dumps(json.loads(choice.read_text(encoding="utf-8"))), flush=True)
+        return
+    direction, _manifest, _, _ = load_direction(args.direction)
+    questions = _probe_questions(args.questions)
+    model, tokenizer = load_runtime(args.model)
+    layers = decoder_layers(model)
+    probed = [layer for layer in middle_layers(len(layers)) if layer in direction]
+    if not probed:
+        raise SystemExit("direction has none of the middle layers")
+    texts = [_probe_prompt(tokenizer, question) for question in questions]
+    norms = _activation_norms(model, tokenizer, texts, probed)
+    detector = concept_detector(args.feature)
+    cells = []
+    for layer in probed:
+        delta = matched_delta(direction[layer], PROBE_SCALE, norms[layer])
+        module = layers[layer]
+        device = next(model.parameters()).device
+        encoded = tokenizer(texts, add_special_tokens=False, padding=True, return_tensors="pt")
+        encoded = encoded.to(device)
+        pads = (encoded.attention_mask == 0).sum(1).tolist()
+
+        def hook(_module, _args, _kwargs, output, delta=delta.to(device), pads=pads):
+            hidden = output[0] if isinstance(output, tuple) else output
+            update = delta.to(dtype=hidden.dtype)
+            if hidden.shape[1] == 1:
+                hidden.add_(update)
+                return output
+            mask = hidden.new_ones(hidden.shape[0], hidden.shape[1])
+            for row, pad in enumerate(pads):
+                mask[row, :pad] = 0
+            hidden.add_(update * mask.unsqueeze(-1))
+            return output
+
+        handle = module.register_forward_hook(hook, with_kwargs=True)
+        try:
+            with torch.inference_mode():
+                if getattr(model.config, "model_type", None) == "falcon_h1":
+                    fresh = falcon_greedy(model, tokenizer, texts, args.max_new_tokens)
+                else:
+                    sequences = model.generate(
+                        **encoded,
+                        max_new_tokens=args.max_new_tokens,
+                        do_sample=False,
+                        pad_token_id=tokenizer.pad_token_id,
+                        eos_token_id=tokenizer.eos_token_id,
+                    )
+                    fresh = sequences[:, encoded.input_ids.shape[1] :]
+        finally:
+            handle.remove()
+        concepts, reps = [], []
+        for token_row in fresh.detach().cpu():
+            ids = [int(token) for token in token_row if int(token) != tokenizer.pad_token_id]
+            concepts.append(int(detector.detects(tokenizer.decode(ids, skip_special_tokens=True))))
+            reps.append(repetition(ids))
+        concept, rep = sum(concepts) / len(concepts), sum(reps) / len(reps)
+        cells.append(
+            {
+                "layer": layer,
+                "scale": PROBE_SCALE,
+                "where": "all",
+                "activation_norm": norms[layer],
+                "concept": concept,
+                "repetition": rep,
+            }
+        )
+        print(f"layer {layer}: concept={concept:.3f} rep={rep:.3f}", flush=True)
+    centre = len(layers) / 2
+    winner = max(
+        cells,
+        key=lambda cell: (cell["concept"], -cell["repetition"], -abs(cell["layer"] - centre)),
+    )
+    if winner["concept"] <= 0:
+        raise SystemExit("concept stays at 0 on every probed layer")
+    payload = {
+        "layer": winner["layer"],
+        "scale": PROBE_SCALE,
+        "where": "all",
+        "activation_norm": winner["activation_norm"],
+        "concept": winner["concept"],
+        "questions": len(questions),
+        "cells": cells,
+    }
+    args.output.mkdir(parents=True, exist_ok=True)
+    choice.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps({"layer": winner["layer"], "concept": winner["concept"]}), flush=True)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -298,6 +570,14 @@ def main() -> None:
     pick.add_argument("--max-new-tokens", type=int, default=96)
     pick.add_argument("--judge-config", type=Path)
     pick.set_defaults(func=pick_main)
+    probe = sub.add_parser("probe")
+    probe.add_argument("--output", type=Path, required=True)
+    probe.add_argument("--model", default="Qwen/Qwen3.5-9B")
+    probe.add_argument("--direction", type=Path, required=True)
+    probe.add_argument("--feature", required=True)
+    probe.add_argument("--questions", type=Path, required=True)
+    probe.add_argument("--max-new-tokens", type=int, default=128)
+    probe.set_defaults(func=probe_main)
     args = parser.parse_args()
     args.func(args)
 

@@ -14,6 +14,7 @@ from evaluate import humaneval, ifeval
 from report import build_report
 
 from hybrid_steering import Runner, gdn_layers, load_direction, load_runtime
+from hybrid_steering.detect import concept_detector, is_language
 from hybrid_steering.mamba import MambaRunner
 from hybrid_steering.runtime import batched, chat_prompts, write_jsonl
 from hybrid_steering.scoring import choose, repetition, score, summarize
@@ -113,6 +114,7 @@ def load_plan(path: Path) -> tuple[dict, dict[str, list[dict]]]:
             "mamba_add",
             "mamba_clamp",
             "residual_add",
+            "residual_clamp",
         }:
             raise ValueError(f"unknown method: {condition['method']}")
         if not condition.get("scales") or any(
@@ -127,10 +129,10 @@ def load_plan(path: Path) -> tuple[dict, dict[str, list[dict]]]:
             raise ValueError("baseline must use only scale 0")
         if condition["method"] != "baseline" and not condition.get("direction"):
             raise ValueError("steered conditions need a direction path")
-        if condition["method"] == "residual_add" and (
+        if condition["method"] in {"residual_add", "residual_clamp"} and (
             type(condition.get("layer")) is not int or condition["layer"] < 0
         ):
-            raise ValueError("residual_add needs a non-negative integer layer")
+            raise ValueError("residual steering needs a non-negative integer layer")
         gain = condition.get("gain", 1)
         if type(gain) not in (int, float) or not math.isfinite(gain) or gain <= 0:
             raise ValueError("gain must be a positive finite number")
@@ -183,7 +185,10 @@ def run_directory(config_file: Path, plan: dict, data: list[dict], role: str, ou
 def _runner(model, tokenizer, condition: dict, config_file: Path, model_id: str):
     method = condition["method"]
     falcon = getattr(model.config, "model_type", None) == "falcon_h1"
-    if method not in {"baseline", "residual_add"} and method.startswith("mamba_") != falcon:
+    if (
+        method not in {"baseline", "residual_add", "residual_clamp"}
+        and method.startswith("mamba_") != falcon
+    ):
         raise ValueError("Mamba methods need Falcon-H1; GDN methods need Qwen3.5")
     if method == "baseline":
         return (
@@ -194,11 +199,17 @@ def _runner(model, tokenizer, condition: dict, config_file: Path, model_id: str)
     direction, manifest, target, _ = load_direction(resolved(config_file, condition["direction"]))
     if manifest.model_id not in {"unknown", model_id}:
         raise ValueError("direction model differs from config")
-    if method == "residual_add":
+    if method in {"residual_add", "residual_clamp"}:
         layer = int(condition["layer"])
         if layer not in direction:
             raise ValueError(f"residual direction has no layer {layer}")
-        return ResidualRunner(model, tokenizer, direction[layer], layer)
+        return ResidualRunner(
+            model,
+            tokenizer,
+            direction[layer],
+            layer,
+            mode="clamp" if method == "residual_clamp" else "add",
+        )
     rank = condition.get("rank")
     normalize = condition.get("normalize", False)
     intervention = "clamp" if method.endswith("clamp") else "add"
@@ -301,6 +312,47 @@ def generate(
     return saved
 
 
+def _score_language(answers: list[dict], output: Path, plan: dict) -> bool:
+    """Concept hit from Lingua. Language runs do not call the judge model."""
+    detector = concept_detector(plan["judge"]["feature"])
+    rated = []
+    for row in answers:
+        concept = int(detector.detects(row["response"]))
+        rated.append({**row, "question": row["prompt"], "concept_score": concept, "hit": concept})
+    write_jsonl(output / "judge_scores.jsonl", rated)
+    (output / "judge_score_manifest.json").write_text(
+        json.dumps(
+            {"answers": digest(output / "answers.jsonl"), "feature": plan["judge"]["feature"]}
+        )
+        + "\n"
+    )
+    cells = summarize(rated)
+    methods = {
+        case["name"]: case.get("rank")
+        for case in plan["conditions"]
+        if case["method"] != "baseline"
+    }
+    chosen = (
+        choose(cells, methods=methods)
+        if any(case["method"] == "baseline" for case in plan["conditions"])
+        else {}
+    )
+
+    def clean(value):
+        if isinstance(value, float) and not math.isfinite(value):
+            return None
+        if isinstance(value, dict):
+            return {key: clean(item) for key, item in value.items()}
+        if isinstance(value, list):
+            return [clean(item) for item in value]
+        return value
+
+    (output / "sweep_summary.json").write_text(
+        json.dumps(clean({"cells": cells, "chosen": chosen}), indent=2, allow_nan=False) + "\n"
+    )
+    return True
+
+
 def prepare_judge(rows: list[dict], output: Path) -> None:
     tasks, bindings = {}, []
     for row in rows:
@@ -371,6 +423,8 @@ def evaluate(
         benchmark_manifest.write_text(json.dumps({"answers": answers_sha}) + "\n")
     if role != "judge":
         return True
+    if is_language(plan["judge"]["feature"]):
+        return _score_language(answers, output, plan)
     prepare_judge(answers, output)
     judge = plan["judge"]
     settings = resolved(config_file, judge["config"])

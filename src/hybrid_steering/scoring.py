@@ -90,7 +90,9 @@ def summarize(rows: list[dict]) -> list[dict]:
     summary = []
     for (method, scale), items in sorted(cells.items(), key=lambda item: (item[0][0], item[0][1])):
         hits = [row["hit"] for row in items if row["hit"] is not None]
-        quality = [row["content_quality"] for row in items if row["content_quality"] is not None]
+        quality = [
+            row["content_quality"] for row in items if row.get("content_quality") is not None
+        ]
         low, high = wilson(sum(hits), len(hits))
         summary.append(
             {

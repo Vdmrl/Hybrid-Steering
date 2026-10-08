@@ -177,6 +177,58 @@ def test_pipeline_plan_hash_and_method_validation(tmp_path: Path):
         module.load_plan(config)
 
 
+def test_residual_ignores_causal_attention_mask():
+    import importlib.util
+
+    directory = Path(__file__).resolve().parents[1] / "experiments/pipeline"
+    spec = importlib.util.spec_from_file_location("pipeline_residual", directory / "residual.py")
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    hidden = torch.zeros(2, 3, 4)
+    causal = torch.zeros(2, 1, 3, 8)
+    padding = torch.tensor([[1, 1, 0], [0, 1, 1]])
+    assert module.token_mask(hidden, (), {"attention_mask": causal}) is None
+    assert torch.equal(module.token_mask(hidden, (causal, padding), {}), padding)
+
+
+def test_middle_layers_cover_the_middle_half():
+    import importlib.util
+
+    directory = Path(__file__).resolve().parents[1] / "experiments/pipeline"
+    spec = importlib.util.spec_from_file_location("pipeline_residual", directory / "residual.py")
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    assert module.middle_layers(32) == [8, 12, 16, 20, 24]
+    assert module.middle_layers(44) == [11, 16, 21, 26, 31]
+
+
+def test_summarize_tolerates_lingua_rows_without_quality():
+    from hybrid_steering.scoring import summarize
+
+    cells = summarize([{"method": "add", "scale": 1.0, "hit": 1, "repetition": 0.0}])
+    assert cells[0]["concept_rate"] == 1
+    assert cells[0]["quality"] != cells[0]["quality"]
+
+
+def test_residual_clamp_replaces_the_projection():
+    import importlib.util
+
+    directory = Path(__file__).resolve().parents[1] / "experiments/pipeline"
+    spec = importlib.util.spec_from_file_location("pipeline_residual", directory / "residual.py")
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    hidden = torch.tensor([[[3.0, 1.0]]])
+    vector = torch.tensor([1.0, 0.0])
+    updated = hidden + module.residual_delta(hidden, vector, 4.0, "clamp")
+    assert torch.allclose(updated, torch.tensor([[[4.0, 1.0]]]))
+    raw = torch.tensor([2.0, 0.0])
+    updated = hidden + module.residual_delta(hidden, raw, 4.0, "clamp")
+    assert torch.allclose(updated, torch.tensor([[[8.0, 1.0]]]))
+
+
 def test_residual_add_on_tiny_model():
     import importlib.util
 
