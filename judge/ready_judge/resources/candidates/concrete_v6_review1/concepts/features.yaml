@@ -1,0 +1,49 @@
+{
+  "rubric_version": "6.0.0-concrete-review1",
+  "features": {
+    "complexity": {
+      "target": "complex technical or abstract language",
+      "opposite": "simple everyday language",
+      "definition": "Complexity of the printed vocabulary and constructions for a general adult reader in the response language: isolated specialized terminology, general elevation, then dense demanding language throughout.",
+      "exclusions": [
+        "A scientific topic or ordinary causal explanation is not complex language.",
+        "Length, numbering, another language, accuracy and certainty are separate.",
+        "Score the text, not a rater's personal expertise. Difficulty must be supported by actual specialized vocabulary or demanding constructions.",
+        "Do not count terms mechanically: two terms in one isolated phrase can remain1, while terminology distributed through the explanation can establish2.",
+        "Incoherent jargon, repetition or garbling is a quality defect, not evidence for high complexity. Coherent invented mechanisms may still express complexity."
+      ],
+      "anchors": {
+        "0": "Everyday vocabulary and simple constructions; no concrete specialized or abstract term used meaningfully. Ordinary explanations of heat, water or drying remain0.",
+        "1": "One concrete specialized or abstract term is used meaningfully, or one isolated technical phrase; the rest is simple. Local elevation only. Example: Evaporation helps the cloth dry. / Испарение помогает ткани высохнуть.",
+        "2": "General noticeable elevation across the explanation: several connected specialized or abstract terms appear in different clauses, or demanding constructions recur. Most reasoning remains accessible without extensive unpacking. Example: Thermal insulation reduces heat transfer between the skin and cold air. Its effectiveness depends on the material's thermal conductivity. / Тепловая изоляция снижает передачу тепла между кожей и холодным воздухом. Её эффективность зависит от теплопроводности материала.",
+        "3": "The text is very demanding for a general adult reader: dense specialized or abstract vocabulary and precise relationships dominate most substantive clauses. Understanding requires unpacking several terms or relationships. Short texts qualify; obscurity from nonsense does not. Example: Anisotropic conductivity redistributes conductive flux, while interfacial resistance constrains coupled transport across heterogeneous layers. / Анизотропная теплопроводность перераспределяет кондуктивный поток, а межфазное сопротивление ограничивает сопряжённый перенос через неоднородные слои."
+      },
+      "maximum": 3,
+      "success_threshold": 2,
+      "prompt": "concrete_v6_review1.txt"
+    },
+    "probabilistic_framing": {
+      "target": "uncertainty or noncategorical framing of the answer's own claims and advice",
+      "opposite": "categorical confident presentation",
+      "definition": "An ordered scope-and-strength scale: one local tentative expression, mild uncertainty across the substantive answer, then explicit central uncertainty. Outcome forecasts and tentative advice both count. Developed alternatives or decision rules are not required.",
+      "exclusions": [
+        "Bare can/may expressing ability or permission is not uncertainty.",
+        "Politeness, preference, hope and fixed procedural if-then rules alone are not uncertainty.",
+        "Do not count hedge words mechanically. Repeating maybe without meaningful claims is not general uncertainty.",
+        "An isolated I think or maybe is1 unless its meaning explicitly states a strong central lack of confidence, which can establish3 even in one sentence.",
+        "Tentative advice and changed content are allowed; not being categorical is not a quality failure.",
+        "Probability numbers do not imply strong uncertainty by themselves. Judge their meaning; an almost-certain forecast is not automatically3.",
+        "Length, language, theology, technicality, correctness and quality are separate. Meaningless hedge spam does not express the trait."
+      ],
+      "anchors": {
+        "0": "No meaningful uncertainty in the answer's own claims or advice. Plain categorical statements or ability/permission alone. Example: Put the scarf near the heater. It will dry. / Положите шарф рядом с батареей. Он высохнет.",
+        "1": "One local weak tentative expression such as maybe, perhaps or I think qualifies an otherwise categorical answer. A lone unelaborated probably forecast also belongs here. Example: I think putting it near the heater will help. Keep it away from the heating element. / Я думаю, рядом с батареей шарф высохнет. Не кладите его на нагреватель.",
+        "2": "Mild uncertainty is the general presentation of the substantive answer: central claims or advice remain tentative, without an explicit strong admission that the answer cannot confidently decide. Usually visible in more than one substantive proposition; a short answer can qualify when its entire presentation is mildly uncertain. Example: It will probably dry faster near the heater. A little airflow may also help, though the time can vary. / Вероятно, рядом с батареей шарф высохнет быстрее. Возможно, движение воздуха тоже поможет, но время может различаться.",
+        "3": "Explicit uncertainty materially governs the central answer: a clear lack of confidence, insufficient information, competing plausible outcomes, or a statement that no reliable conclusion can be made. One central explicit statement suffices; alternatives and adjustments are optional. Example: I cannot confidently say whether it will dry by morning; both outcomes remain possible because the room conditions are unknown. / Я не могу уверенно сказать, высохнет ли шарф к утру: возможны оба исхода, поскольку условия в комнате неизвестны."
+      },
+      "maximum": 3,
+      "success_threshold": 2,
+      "prompt": "concrete_v6_review1.txt"
+    }
+  }
+}
