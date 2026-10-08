@@ -12,7 +12,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import ProxyHandler, Request, build_opener
 
 ROOT = Path(__file__).resolve().parent / 'resources'
-CURRENT_ROOT = ROOT / 'current_v6_2'
+CURRENT_ROOT = ROOT / 'current_v6_3'
 
 
 def fingerprint(value):
