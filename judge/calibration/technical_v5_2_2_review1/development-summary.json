@@ -1,0 +1,812 @@
+{
+  "scope": "Development check only; authored challenge labels are not human ground truth.",
+  "methods": {
+    "original": {
+      "parts": {
+        "human-development": {
+          "cases": 5,
+          "judgments": 15,
+          "agreement_pct": 60.0,
+          "mae_percentage_points": 13.333333333333334
+        },
+        "independent-challenge": {
+          "cases": 20,
+          "judgments": 60,
+          "agreement_pct": 50.0,
+          "mae_percentage_points": 16.666666666666668
+        }
+      },
+      "cost_usd": 0.00302774,
+      "cases": [
+        {
+          "answer_id": "boundary-00",
+          "expected": 0,
+          "part": "independent-challenge",
+          "scores": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "answer_id": "boundary-01",
+          "expected": 0,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-02",
+          "expected": 0,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-03",
+          "expected": 1,
+          "part": "independent-challenge",
+          "scores": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "answer_id": "boundary-04",
+          "expected": 1,
+          "part": "independent-challenge",
+          "scores": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "answer_id": "boundary-05",
+          "expected": 2,
+          "part": "independent-challenge",
+          "scores": [
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "answer_id": "boundary-06",
+          "expected": 2,
+          "part": "independent-challenge",
+          "scores": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "answer_id": "boundary-07",
+          "expected": 3,
+          "part": "independent-challenge",
+          "scores": [
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "answer_id": "boundary-08",
+          "expected": 3,
+          "part": "independent-challenge",
+          "scores": [
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "answer_id": "boundary-09",
+          "expected": 3,
+          "part": "independent-challenge",
+          "scores": [
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "answer_id": "boundary-10",
+          "expected": 0,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-11",
+          "expected": 0,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-12",
+          "expected": 0,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-13",
+          "expected": 1,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-14",
+          "expected": 1,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-15",
+          "expected": 2,
+          "part": "independent-challenge",
+          "scores": [
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "answer_id": "boundary-16",
+          "expected": 2,
+          "part": "independent-challenge",
+          "scores": [
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "answer_id": "boundary-17",
+          "expected": 3,
+          "part": "independent-challenge",
+          "scores": [
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "answer_id": "boundary-18",
+          "expected": 3,
+          "part": "independent-challenge",
+          "scores": [
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "answer_id": "boundary-19",
+          "expected": 3,
+          "part": "independent-challenge",
+          "scores": [
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "answer_id": "cd0bd33a5812e04b6f9ebb89",
+          "expected": 1,
+          "part": "human-development",
+          "scores": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "answer_id": "04ddc8e902ac53ae01ef4172",
+          "expected": 0,
+          "part": "human-development",
+          "scores": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "answer_id": "d0b1090f4c7763fb38b5d6d1",
+          "expected": 0,
+          "part": "human-development",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "ed4a03f3f080ab09e661668b",
+          "expected": 2,
+          "part": "human-development",
+          "scores": [
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "answer_id": "516e49a32374fe44b11a1292",
+          "expected": 3,
+          "part": "human-development",
+          "scores": [
+            2,
+            2,
+            2
+          ]
+        }
+      ]
+    },
+    "candidate": {
+      "parts": {
+        "human-development": {
+          "cases": 5,
+          "judgments": 15,
+          "agreement_pct": 86.66666666666667,
+          "mae_percentage_points": 4.444444444444445
+        },
+        "independent-challenge": {
+          "cases": 20,
+          "judgments": 60,
+          "agreement_pct": 50.0,
+          "mae_percentage_points": 17.22222222222222
+        }
+      },
+      "cost_usd": 0.005583259999999998,
+      "cases": [
+        {
+          "answer_id": "boundary-00",
+          "expected": 0,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-01",
+          "expected": 0,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-02",
+          "expected": 0,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-03",
+          "expected": 1,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-04",
+          "expected": 1,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-05",
+          "expected": 2,
+          "part": "independent-challenge",
+          "scores": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "answer_id": "boundary-06",
+          "expected": 2,
+          "part": "independent-challenge",
+          "scores": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "answer_id": "boundary-07",
+          "expected": 3,
+          "part": "independent-challenge",
+          "scores": [
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "answer_id": "boundary-08",
+          "expected": 3,
+          "part": "independent-challenge",
+          "scores": [
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "answer_id": "boundary-09",
+          "expected": 3,
+          "part": "independent-challenge",
+          "scores": [
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "answer_id": "boundary-10",
+          "expected": 0,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-11",
+          "expected": 0,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-12",
+          "expected": 0,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-13",
+          "expected": 1,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-14",
+          "expected": 1,
+          "part": "independent-challenge",
+          "scores": [
+            1,
+            1,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-15",
+          "expected": 2,
+          "part": "independent-challenge",
+          "scores": [
+            2,
+            2,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-16",
+          "expected": 2,
+          "part": "independent-challenge",
+          "scores": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "answer_id": "boundary-17",
+          "expected": 3,
+          "part": "independent-challenge",
+          "scores": [
+            3,
+            3,
+            3
+          ]
+        },
+        {
+          "answer_id": "boundary-18",
+          "expected": 3,
+          "part": "independent-challenge",
+          "scores": [
+            3,
+            3,
+            3
+          ]
+        },
+        {
+          "answer_id": "boundary-19",
+          "expected": 3,
+          "part": "independent-challenge",
+          "scores": [
+            3,
+            2,
+            3
+          ]
+        },
+        {
+          "answer_id": "cd0bd33a5812e04b6f9ebb89",
+          "expected": 1,
+          "part": "human-development",
+          "scores": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "answer_id": "04ddc8e902ac53ae01ef4172",
+          "expected": 0,
+          "part": "human-development",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "d0b1090f4c7763fb38b5d6d1",
+          "expected": 0,
+          "part": "human-development",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "ed4a03f3f080ab09e661668b",
+          "expected": 2,
+          "part": "human-development",
+          "scores": [
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "answer_id": "516e49a32374fe44b11a1292",
+          "expected": 3,
+          "part": "human-development",
+          "scores": [
+            2,
+            3,
+            2
+          ]
+        }
+      ]
+    },
+    "candidate2": {
+      "parts": {
+        "human-development": {
+          "cases": 5,
+          "judgments": 15,
+          "agreement_pct": 93.33333333333333,
+          "mae_percentage_points": 2.2222222222222223
+        },
+        "independent-challenge": {
+          "cases": 20,
+          "judgments": 60,
+          "agreement_pct": 68.33333333333333,
+          "mae_percentage_points": 10.555555555555555
+        }
+      },
+      "cost_usd": 0.005913540000000002,
+      "cases": [
+        {
+          "answer_id": "boundary-00",
+          "expected": 0,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-01",
+          "expected": 0,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-02",
+          "expected": 0,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-03",
+          "expected": 1,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-04",
+          "expected": 1,
+          "part": "independent-challenge",
+          "scores": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "answer_id": "boundary-05",
+          "expected": 2,
+          "part": "independent-challenge",
+          "scores": [
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "answer_id": "boundary-06",
+          "expected": 2,
+          "part": "independent-challenge",
+          "scores": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "answer_id": "boundary-07",
+          "expected": 3,
+          "part": "independent-challenge",
+          "scores": [
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "answer_id": "boundary-08",
+          "expected": 3,
+          "part": "independent-challenge",
+          "scores": [
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "answer_id": "boundary-09",
+          "expected": 3,
+          "part": "independent-challenge",
+          "scores": [
+            3,
+            3,
+            2
+          ]
+        },
+        {
+          "answer_id": "boundary-10",
+          "expected": 0,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-11",
+          "expected": 0,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-12",
+          "expected": 0,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-13",
+          "expected": 1,
+          "part": "independent-challenge",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "boundary-14",
+          "expected": 1,
+          "part": "independent-challenge",
+          "scores": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "answer_id": "boundary-15",
+          "expected": 2,
+          "part": "independent-challenge",
+          "scores": [
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "answer_id": "boundary-16",
+          "expected": 2,
+          "part": "independent-challenge",
+          "scores": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "answer_id": "boundary-17",
+          "expected": 3,
+          "part": "independent-challenge",
+          "scores": [
+            3,
+            3,
+            3
+          ]
+        },
+        {
+          "answer_id": "boundary-18",
+          "expected": 3,
+          "part": "independent-challenge",
+          "scores": [
+            3,
+            3,
+            3
+          ]
+        },
+        {
+          "answer_id": "boundary-19",
+          "expected": 3,
+          "part": "independent-challenge",
+          "scores": [
+            3,
+            3,
+            3
+          ]
+        },
+        {
+          "answer_id": "cd0bd33a5812e04b6f9ebb89",
+          "expected": 1,
+          "part": "human-development",
+          "scores": [
+            1,
+            1,
+            1
+          ]
+        },
+        {
+          "answer_id": "04ddc8e902ac53ae01ef4172",
+          "expected": 0,
+          "part": "human-development",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "d0b1090f4c7763fb38b5d6d1",
+          "expected": 0,
+          "part": "human-development",
+          "scores": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "answer_id": "ed4a03f3f080ab09e661668b",
+          "expected": 2,
+          "part": "human-development",
+          "scores": [
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "answer_id": "516e49a32374fe44b11a1292",
+          "expected": 3,
+          "part": "human-development",
+          "scores": [
+            3,
+            2,
+            3
+          ]
+        }
+      ]
+    }
+  }
+}

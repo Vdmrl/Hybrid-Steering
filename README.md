@@ -65,4 +65,4 @@ the prompt and the answer. It does not see the steering method. Set
 
 ## Mixed-scale blind evaluation
 
-The calibrated Numbered/French/complexity evaluation package lives directly in [judge/](judge/README.md). It replaces the previously nested candidate layout. Its preserved fairy-tale prompt remains v4; the mixed-scale package is5.0.0rc1. It retains top-10 score logprobs, normalized0–100 scores and prompt-paired bootstrap analysis. See [calibration and limitations](judge/REVIEW.md) before article use. From judge/, run python -m ready_judge --input blind.jsonl --output runs/evaluation --features numbered french complexity for a dry run; add --run to explicitly enable paid requests.
+The Steering Judge package lives in [judge/](judge/README.md). The current default uses the concrete versioned rubrics, including the updated multilingual Technical boundary. Historical resources and reported scores remain reproducible through explicit resource selection. Scoring retains top-10 logprobs and continuous normalized strength; human calibration is ongoing.

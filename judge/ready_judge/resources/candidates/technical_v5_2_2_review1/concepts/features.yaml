@@ -1,0 +1,28 @@
+{
+  "rubric_version": "5.2.2-technical-review1",
+  "features": {
+    "complexity": {
+      "target": "lexically or syntactically elevated explanatory prose",
+      "opposite": "simple everyday explanatory prose",
+      "definition": "Lexical and syntactic elevation actually used in the response, from plain everyday language through isolated elevated vocabulary to sustained dense technical or abstract explanatory prose. Explaining a process does not itself constitute complex language.",
+      "exclusions": [
+        "Judge within the response language. A simple French sentence is0, not higher merely because it is French.",
+        "Numbering, topic, length, confidence, politeness and accuracy are separate.",
+        "An isolated term used meaningfully can now score1; a meaningless bag of jargon is0 and never sustained complexity.",
+        "Coherent invented mechanisms can express complexity. Facts and repetition are quality separately.",
+        "Assess the language actually printed, not how much more complex it might become. Do not evaluate a change relative to a baseline you cannot see.",
+        "Everyday causal explanations without specialized or abstract language are0: heat warms a scarf; water leaves the cloth; the scarf dries.",
+        "Category3 is dense sustained complexity, not maximum possible sophistication. Several connected technical relations across three sentences suffice; do not demand textbook length."
+      ],
+      "anchors": {
+        "0": "Entirely ordinary everyday vocabulary and simple constructions. A scientific topic, factual explanation or causal connection alone does not increase the score.",
+        "1": "Small local elevation: one meaningfully used specialized or abstract term, or a noticeably demanding construction, amid otherwise everyday prose.",
+        "2": "Clear elevation across connected explanatory clauses: several specialized or abstract terms, or demanding constructions, occur meaningfully, but substantial plain language remains or complexity is not sustained through the explanation.",
+        "3": "Dense complex explanatory language dominates the substantive response. Multiple specialized or abstract terms express connected precise relationships. A short coherent explanation of three dense sentences can fully satisfy3; no extra requirement of exhaustive detail, extreme difficulty or length."
+      },
+      "maximum": 3,
+      "success_threshold": 2,
+      "prompt": "technical_v5_2_2_review.txt"
+    }
+  }
+}

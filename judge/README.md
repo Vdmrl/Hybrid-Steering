@@ -1,50 +1,22 @@
-# Hybrid Judge — 5.2.1rc1
+# Steering Judge
 
-Variable-scale Judge promoted from the reviewed candidate by explicit user request. This directory contains only the new package; the removed v3 remains available in Git history. Python 3.10+, standard library only at runtime. The resource files are the source of truth for definitions, anchors, prompts and provider settings.
+The current default is6.3.0-multilingual-complexity-review1 in ready_judge/resources/current_v6_3. Technical and uncertainty use0–3; religious framing uses0–2, with the concrete definitions requested by the user. Numbered remains0–4; French remains0–3; fairy-tale remains0–4. Definitions and exclusions are the source of truth in the versioned concepts/features.yaml.
 
-| Feature ID | Scale | Meaning | Presence endpoint |
-|---|---|---|---|
-| numbered | 0–4 | 0 prose; 1 inline enumeration; 2 bullets/letters; 3 incomplete/inconsistent numeric structure; 4 at least three distinct complete numeric items | score = 4 |
-| french | 0–3 | 0 other language; 1 substantial mixture; 2 predominantly French with small intrusions; 3 French throughout | score ≥ 2 |
-| complexity | 0–3 | 0 simple; 1 small local elevation; 2 clear elevation; 3 sustained dense complexity | score ≥ 2 |
-| theistic_framing | 0–4 | 0 absent; 1 deity mention; 2 literal pious aside; 3 central divine premise; 4 connected divine reasoning | score ≥ 3 |
-| probabilistic_framing | 0–4 | 0 absent; 1 weak hedge; 2 outcome hedge; 3 explicit alternative; 4 uncertainty-guided reasoning | score ≥ 2 |
-| fairy_tale | 0–4 | Original supplied Concept-strength Judge v4 and fairy-tale guide, preserved | score ≥ 3 |
+Technical:0 everyday language;1 one local specialized term/phrase;2 general elevation;3 dense demanding language. Uncertainty:0 absent;1 isolated tentative expression;2 generally mild uncertainty;3 explicit central uncertainty. Religious framing:0 absent;1 mere deity mention;2 religious insertion, blessing, advice or explanation adopted by the answer. Peripheral and central religious text both receive2.
 
-French grammar mistakes alone do not lower language strength. Science topic, numbered format and French language alone do not establish complexity. Factual correctness, repetition, instruction following and answer quality are separate outcomes. Numbered 4 means strong structure, **not perfect overall answer quality**. A repeated/unfinished suffix does not erase three already complete distinct numbered items. Read the full anchors in `ready_judge/resources/concepts/features.yaml` before approving.
+The renderer and Judge must load the same resource registry. Normalize strength as100*score/maximum, without substituting binary thresholds. Old0–4 uncertainty/theistic scores cannot be relabeled or silently rescaled into this version. New human validation is ongoing; this default is not a claim of completed calibration.
 
-## Scores and probabilities
+## Explicit execution
 
-`normalized_score_pct = 100 * raw_score / scale_max`: French or complexity 1 → 33.33, numbered 3 → 75. These percentages are normalized ordinal strength, not probabilities and not the fraction of successful answers. Equal percentages across different traits are not empirically equivalent strength. To summarize a composition continuously, average the normalized strengths of its active traits; e.g. 1/2 and 0/2 gives 25%. The legacy presence endpoint above is optional and must not replace continuous strength in the percentage graphs.
+From judge/: python -m ready_judge --input blind.jsonl --output new-results --features numbered complexity probabilistic_framing theistic_framing. This is a dry run. Add --run --prompt-key to make authorized paid calls; credentials are never saved. OPENROUTER_API_KEY can be read from the environment. Temperature0, logprobs top10, reasoning disabled and fixed provider settings remain unchanged.
 
-The provider request uses `logprobs=true`, `top_logprobs=10`, reasoning disabled, temperature 0, and fixed CoreWeave routing for `deepseek/deepseek-v4.1-flash`. We retain observed label logprobs and absolute probabilities even when some labels are absent from the top ten. `available_label_distribution` and `available_expected_normalized_score_pct` renormalize only the visible valid labels. They remain usable descriptive quantities, but missing labels can bias this conditional mean. `complete=false` refers only to distribution coverage: it does **not** invalidate the integer score. Full-distribution expectation is returned only when every valid label was observed. Missing values are never filled with zero. Integer score is primary; logprob expectation is secondary pending human calibration.
+Provider sees only scenario and answer, never method labels or expected/reference scores. Stable IDs, input/config/prompt/code hashes, deterministic shuffle, output locks and missing-only resume are preserved. Quality is separate; content changes and tentative advice are not automatic quality failures. Whole-prompt bootstrap requires matched actual scores; intervals conditional on a Judge are not human validation.
 
-## Run explicitly
+## Historical resources
 
-Input JSONL: `{"prompt_id":"p1","answer_id":"a1","scenario":"Question","text":"Answer"}`. Grouped repository inputs with an `answers` array are also accepted. Provider sees only scenario and answer, never method, condition or references.
+The original resources/concepts/features.yaml and its prompt files remain byte-identical frozen5.2.1. To reproduce that registry explicitly use --resources ready_judge/resources, with the original scorer version from Git when resuming an old output directory. Historical5.0 and versioned review candidates also remain intact. Never overwrite historical results or append a new protocol to an old results directory.
 
-```powershell
-python -m ready_judge --input blind.jsonl --output results --features numbered french complexity
-python -m ready_judge --input blind.jsonl --output results --features numbered french complexity --run --prompt-key
-python -m ready_judge --input blind.jsonl --output five-results --features numbered french complexity theistic_framing probabilistic_framing
-python analysis.py --scores results/scores.jsonl --mapping private.jsonl --output ci.json
-python -m unittest discover -s tests -v
-```
+python -m unittest discover -s tests -v runs offline checks. Main steering evaluation is not authorized by human-audit scoring. Human validation must report prepared diagnostic examples separately from real steering outputs.
 
-First command is a dry run. Only `--run` enables paid calls. Use `OPENROUTER_API_KEY` in the environment or hidden `--prompt-key`; credentials are never persisted. Optional proxy: `OPENROUTER_PROXY`. Stable IDs, input/config/code hashes, deterministic shuffle, output lock and bounded retries protect resume. Do not reuse a results directory after modifying inputs, prompts or configuration.
 
-`prepare_saved.py` converts saved experiment generations into separate blind input and private mapping. Supply `--method-label` if a source lacks method metadata. Keep the private mapping away from raters. Do not concatenate unmatched cohorts or different baselines as one strict comparison.
-
-`analysis.py` bootstraps whole prompt IDs with common resamples and exports cell intervals and paired method differences. It rejects incomplete matched cells. Intervals are exploratory and unadjusted for multiple comparisons. Predefine primary outcomes and comparison family for paper claims. Quality must be scored separately; this candidate does not provide a calibrated quality Judge.
-
-## Version and calibration provenance
-
-The default registry is the byte-identical frozen `5.2.1-review1` used for the latest five-feature evaluation: French uses the language-only 5.2.1 prompt; Numbered, complexity, theistic and probabilistic definitions retain 5.2.0. Runtime configuration and scoring code are unchanged. The supplied fairy-tale v4 prompt remains byte-identical. Historical 5.0 definitions are preserved in `ready_judge/resources/concepts/features_v5_0_0_rc1.yaml`; original prompt files are retained. Historical scores must retain their original versions.
-
-`calibration/five-traits-v52/` contains the 60 Codex-labelled complexity/theistic/probabilistic cases and pilot summary (85%/95%/95% exact agreement, 5/5 repeats per feature). `calibration/french-v521/` preserves the 24 language-only cases and summary (24/24 agreement, no English false positives in that fixture). These are LLM pilot checks against agent labels, not independent human validation. The original `calibration/summary.json` describes 5.0 only; its complexity results do not validate the new scale. `calibration/release-5.2.1-provenance.json` pins resource hashes and feature versions. Known missed outcome hedges and under-scored complex prose remain documented; no claim of perfect calibration is made.
-
-For these fixtures use explicit `--input` and `--features` with `python -m ready_judge`; the older `calibration/run.py` targets the historical fixture set. Use a new output directory for each version. Unit tests and release checks make no paid requests.
-
-## Human review
-
-Review scales and thresholds, have independent humans label the blind calibration fixtures and representative real answers, resolve disagreements, and freeze the rubric. These scales break the historical 1–5 contract; do not mix historical evaluations with this version. Never reinterpret old scores under this version. Do not silently modify the preserved fairy-tale v4 prompt.
+Version6.3 makes the Technical boundary explicit in every response language: several connected specialized or abstract terms used meaningfully in different clauses correspond to2 even if the text is accessible;3 still requires dense demanding language. Formal ordinary wording alone is insufficient. Only the complexity prompt and anchor2 wording change. All6.2 resource bytes and prior results remain frozen. The user-selected French final answer motivating this change is a development illustration, not independent calibration; do not use its new score to tune steering or claim improved Judge accuracy.
