@@ -8,16 +8,16 @@ from ready_judge import core
 
 
 class ReleaseTests(unittest.TestCase):
-    def test_theistic_candidate_merges_upper_levels_without_changing_default(self):
+    def test_theistic_candidate_and_current_default_share_the_three_point_scale(self):
         _, rubric, prompts = core.configuration(core.ROOT / "candidates/theistic_v6_1_review1")
         feature = rubric["features"]["theistic_framing"]
         self.assertEqual(rubric["rubric_version"], "6.1.0-theistic-review1")
         self.assertEqual(feature["maximum"], 3)
         self.assertEqual(set(feature["anchors"]), {"0", "1", "2", "3"})
         self.assertNotIn("{{", prompts["theistic_framing"])
-        self.assertEqual(core.configuration()[1]["features"]["theistic_framing"]["maximum"], 4)
+        self.assertEqual(core.configuration()[1]["features"]["theistic_framing"]["maximum"], 3)
 
-    def test_concrete_uncertainty_scale_is_not_the_old_four_point_scale(self):
+    def test_current_uncertainty_scale_is_not_the_old_four_point_scale(self):
         _, rubric, prompts = core.configuration(core.ROOT / "candidates/concrete_v6_review1")
         self.assertEqual(rubric["rubric_version"], "6.0.0-concrete-review1")
         self.assertEqual(set(rubric["features"]), {"complexity", "probabilistic_framing"})
@@ -27,7 +27,7 @@ class ReleaseTests(unittest.TestCase):
         self.assertNotIn("{{", prompts["probabilistic_framing"])
         with self.assertRaises(ValueError):
             core.parse_choice({"finish_reason": "stop", "message": {"content": "4"}}, 3)
-        self.assertEqual(core.configuration()[1]["features"]["probabilistic_framing"]["maximum"], 4)
+        self.assertEqual(core.configuration()[1]["features"]["probabilistic_framing"]["maximum"], 3)
 
     def test_explicit_candidate_resources_and_resume_isolation(self):
         for version in ("review1", "review2"):
@@ -62,10 +62,10 @@ class ReleaseTests(unittest.TestCase):
             self.assertEqual(manifest["identity"]["rubric"], rubric)
             with self.assertRaisesRegex(ValueError, "Resume rejected"):
                 core.evaluate(source, path / "scores", ["complexity"])
-        self.assertEqual(core.configuration()[1]["rubric_version"], "5.2.1-review1")
+        self.assertEqual(core.configuration()[1]["rubric_version"], "6.1.0-unified-review1")
 
     def test_frozen_resources_and_scales(self):
-        _, rubric, prompts = core.configuration()
+        _, rubric, prompts = core.configuration(core.ROOT)
         self.assertEqual(rubric["rubric_version"], "5.2.1-review1")
         scales = {
             "numbered": 4,
@@ -89,7 +89,7 @@ class ReleaseTests(unittest.TestCase):
         self.assertIn("small LOCAL".lower(), prompts["complexity"].lower())
 
     def test_calibration_fixtures_fit_actual_scales(self):
-        _, rubric, _ = core.configuration()
+        _, rubric, _ = core.configuration(core.ROOT)
         calibration = core.ROOT.parents[1] / "calibration"
         for directory in ("five-traits-v52", "french-v521"):
             cases = json.loads(
