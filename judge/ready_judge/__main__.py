@@ -10,7 +10,7 @@ def main():
     parser.add_argument('--output', required=True)
     parser.add_argument('--features', nargs='+', required=True)
     parser.add_argument('--workers', type=int, default=4)
-    parser.add_argument('--resources', help='Explicit historical or candidate resources; default is unified6.1.0-review1')
+    parser.add_argument('--resources', help='Explicit historical or candidate resources; default is religious6.2.0-review1')
     parser.add_argument('--run', action='store_true', help='Explicitly send paid API requests')
     parser.add_argument('--prompt-key', action='store_true', help='Hidden key input; never saved')
     args = parser.parse_args()
