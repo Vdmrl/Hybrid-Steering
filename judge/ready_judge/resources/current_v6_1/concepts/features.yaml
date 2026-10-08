@@ -1,0 +1,136 @@
+{
+  "rubric_version": "6.1.0-unified-review1",
+  "features": {
+    "numbered": {
+      "target": "numeric list structure",
+      "opposite": "plain unenumerated prose",
+      "definition": "Visible progression from inline enumeration to separated bullet/letter lists and substantive numeric list items.",
+      "exclusions": [
+        "Dates, quantities, equations and numbers in prose are not list markers.",
+        "A bullet '-' or '*' is never a numeric marker.",
+        "Correctness, language, jargon and length are independent of list structure.",
+        "Count actual printed numeric markers, never mentally renumber bullets.",
+        "Lists can start at any integer. Introductory and closing prose are allowed.",
+        "A cut-off suffix after at least three complete distinct numeric points does not erase the existing list; flag truncation separately.",
+        "Do not count repeating the same point with different numbers as distinct substantive items."
+      ],
+      "anchors": {
+        "0": "Plain prose without inline enumeration or separated list markers. Newlines alone and transition words first/then/finally do not make a list.",
+        "1": "Inline enumeration inside running prose, e.g. (1) wash, (2) dry, (3) store; no separated list items.",
+        "2": "At least two separated bullet or lettered list items, but no numeric item markers. A perfect three-item bullet list is2, not4.",
+        "3": "Numeric list markers occur, but fewer than three complete distinct readable substantive items, or printed numbers repeat or are inconsistent. Empty/garbled items do not count as complete points.",
+        "4": "At least three complete distinct readable substantive list items with consistent increasing numeric markers. Arbitrary starting number is allowed. False claims or another language do not lower the structure score. Later repetition, an unfinished suffix or an unfinished extra item is a separate quality defect if the three complete distinct points already exist."
+      },
+      "maximum": 4,
+      "success_threshold": 4,
+      "prompt": "trait_v5.txt"
+    },
+    "french": {
+      "target": "French as the language of substantive answer content",
+      "opposite": "non-French answer",
+      "definition": "How consistently the substantive response is expressed in recognizable French, independent of topic, grammatical polish, correctness and lexical complexity.",
+      "exclusions": [
+        "French proper names, cognates, loanwords or quoted expressions explained by a non-French narrator do not establish French substantive content.",
+        "Minor grammatical/spelling errors alone do not introduce another language and do not lower a wholly recognizable French answer.",
+        "Ignore digits, list markers, formulas and code when judging the language of prose.",
+        "Do not infer French from malformed English words or elaborate vocabulary.",
+        "An unfinished ending does not change the language of the readable text."
+      ],
+      "anchors": {
+        "0": "Substantive answer consistently in another language, or empty/unintelligible. Isolated names, loanwords and quotations do not count.",
+        "1": "Some real French content but substantial non-French remains: isolated French sentences in an otherwise non-French answer or a genuinely mixed answer where French is not clearly predominant.",
+        "2": "French clearly predominates, with a minor non-French clause/sentence or recurring small foreign-language intrusions. An English opening followed by several substantial French sentences is2.",
+        "3": "All substantive readable prose is recognizably French. Ordinary French grammar errors, technical language, numbering and false statements alone do not lower the language score."
+      },
+      "maximum": 3,
+      "success_threshold": 2,
+      "prompt": "french_language_v5_2_1_review.txt"
+    },
+    "complexity": {
+      "target": "complex technical or abstract language",
+      "opposite": "simple everyday language",
+      "definition": "Complexity of the printed vocabulary and constructions for a general adult reader in the response language: isolated specialized terminology, general elevation, then dense demanding language throughout.",
+      "exclusions": [
+        "A scientific topic or ordinary causal explanation is not complex language.",
+        "Length, numbering, another language, accuracy and certainty are separate.",
+        "Score the text, not a rater's personal expertise. Difficulty must be supported by actual specialized vocabulary or demanding constructions.",
+        "Do not count terms mechanically: two terms in one isolated phrase can remain1, while terminology distributed through the explanation can establish2.",
+        "Incoherent jargon, repetition or garbling is a quality defect, not evidence for high complexity. Coherent invented mechanisms may still express complexity."
+      ],
+      "anchors": {
+        "0": "Everyday vocabulary and simple constructions; no concrete specialized or abstract term used meaningfully. Ordinary explanations of heat, water or drying remain0.",
+        "1": "One concrete specialized or abstract term is used meaningfully, or one isolated technical phrase; the rest is simple. Local elevation only. Example: Evaporation helps the cloth dry. / Испарение помогает ткани высохнуть.",
+        "2": "General noticeable elevation across the explanation: several connected specialized or abstract terms appear in different clauses, or demanding constructions recur. Most reasoning remains accessible without extensive unpacking. Example: Thermal insulation reduces heat transfer between the skin and cold air. Its effectiveness depends on the material's thermal conductivity. / Тепловая изоляция снижает передачу тепла между кожей и холодным воздухом. Её эффективность зависит от теплопроводности материала.",
+        "3": "The text is very demanding for a general adult reader: dense specialized or abstract vocabulary and precise relationships dominate most substantive clauses. Understanding requires unpacking several terms or relationships. Short texts qualify; obscurity from nonsense does not. Example: Anisotropic conductivity redistributes conductive flux, while interfacial resistance constrains coupled transport across heterogeneous layers. / Анизотропная теплопроводность перераспределяет кондуктивный поток, а межфазное сопротивление ограничивает сопряжённый перенос через неоднородные слои."
+      },
+      "maximum": 3,
+      "success_threshold": 2,
+      "prompt": "concrete_v6_review1.txt"
+    },
+    "fairy_tale": {
+      "target": "recognizable fairy-tale, storybook or folkloric narrative voice",
+      "opposite": "ordinary non-folkloric prose",
+      "definition": "Preserved supplied fairy-tale guide and Concept-strength Judge v4 prompt without edits.",
+      "exclusions": [
+        "Mentioning fairies or wizards alone is insufficient.",
+        "Magic and a complete story are not required."
+      ],
+      "anchors": {
+        "0": "The target concept is absent, including an empty or wholly unintelligible answer.",
+        "1": "Faint or isolated signs.",
+        "2": "Clear signs in a substantial but limited part of the answer.",
+        "3": "Clear and sustained expression across most of the answer.",
+        "4": "Unmistakable, strong expression throughout the answer."
+      },
+      "maximum": 4,
+      "success_threshold": 3,
+      "prompt": "judge_v4_original.txt",
+      "guide": "fairytale_original.txt"
+    },
+    "theistic_framing": {
+      "target": "the answer's own explicit religious framing through divine agency, guidance or purpose",
+      "opposite": "secular advice or explanation",
+      "definition": "An ordered0–3 scale: absent, deity mention, peripheral religious aside, then explicit divine framing of the central advice or explanation. Former levels3 and4 are combined; a short divine recommendation and developed divine reasoning receive the same level3.",
+      "exclusions": [
+        "Count the answer, not deity words in the prompt. Any theistic tradition counts.",
+        "A quotation, neutral description of belief, rejection of divine agency or idiomatic thank God is mention1, not the answer adopting divine framing.",
+        "Generic kindness, luck, fate or energy without a divine being or premise is0.",
+        "Length, technicality, numbering, uncertainty, correctness and answer quality are separate.",
+        "Repeated deity words without a meaningful proposition do not establish strong framing.",
+        "No minimum length or developed chain of reasoning is required for3. A central recommendation supported by divine will or guidance is sufficient."
+      ],
+      "anchors": {
+        "0": "No deity mention or divine premise. Ordinary secular text. Example: Help your neighbor carry the bags. / Помогите соседу донести сумки.",
+        "1": "God or another deity is mentioned, but the answer does not adopt a religious premise. Neutral reporting, quotation, rejection or an idiom. Example: Some people thank God before a meal. / Некоторые люди благодарят Бога перед едой.",
+        "2": "A literal religious wish, blessing or aside is added, while the main advice or explanation remains secular. Example: May God bless your day. Put the bags by the door. / Пусть Бог благословит ваш день. Поставьте сумки у двери.",
+        "3": "Explicit divine framing: God, divine help, guidance or will is a basis of the main advice or explanation. Both a short central religious recommendation and extended divine reasoning qualify. Example: Help your neighbor because God calls us to care for one another. / Помогите соседу, потому что Бог призывает нас заботиться друг о друге."
+      },
+      "maximum": 3,
+      "success_threshold": 3,
+      "prompt": "theistic_v6_1_review1.txt"
+    },
+    "probabilistic_framing": {
+      "target": "uncertainty or noncategorical framing of the answer's own claims and advice",
+      "opposite": "categorical confident presentation",
+      "definition": "An ordered scope-and-strength scale: one local tentative expression, mild uncertainty across the substantive answer, then explicit central uncertainty. Outcome forecasts and tentative advice both count. Developed alternatives or decision rules are not required.",
+      "exclusions": [
+        "Bare can/may expressing ability or permission is not uncertainty.",
+        "Politeness, preference, hope and fixed procedural if-then rules alone are not uncertainty.",
+        "Do not count hedge words mechanically. Repeating maybe without meaningful claims is not general uncertainty.",
+        "An isolated I think or maybe is1 unless its meaning explicitly states a strong central lack of confidence, which can establish3 even in one sentence.",
+        "Tentative advice and changed content are allowed; not being categorical is not a quality failure.",
+        "Probability numbers do not imply strong uncertainty by themselves. Judge their meaning; an almost-certain forecast is not automatically3.",
+        "Length, language, theology, technicality, correctness and quality are separate. Meaningless hedge spam does not express the trait."
+      ],
+      "anchors": {
+        "0": "No meaningful uncertainty in the answer's own claims or advice. Plain categorical statements or ability/permission alone. Example: Put the scarf near the heater. It will dry. / Положите шарф рядом с батареей. Он высохнет.",
+        "1": "One local weak tentative expression such as maybe, perhaps or I think qualifies an otherwise categorical answer. A lone unelaborated probably forecast also belongs here. Example: I think putting it near the heater will help. Keep it away from the heating element. / Я думаю, рядом с батареей шарф высохнет. Не кладите его на нагреватель.",
+        "2": "Mild uncertainty is the general presentation of the substantive answer: central claims or advice remain tentative, without an explicit strong admission that the answer cannot confidently decide. Usually visible in more than one substantive proposition; a short answer can qualify when its entire presentation is mildly uncertain. Example: It will probably dry faster near the heater. A little airflow may also help, though the time can vary. / Вероятно, рядом с батареей шарф высохнет быстрее. Возможно, движение воздуха тоже поможет, но время может различаться.",
+        "3": "Explicit uncertainty materially governs the central answer: a clear lack of confidence, insufficient information, competing plausible outcomes, or a statement that no reliable conclusion can be made. One central explicit statement suffices; alternatives and adjustments are optional. Example: I cannot confidently say whether it will dry by morning; both outcomes remain possible because the room conditions are unknown. / Я не могу уверенно сказать, высохнет ли шарф к утру: возможны оба исхода, поскольку условия в комнате неизвестны."
+      },
+      "maximum": 3,
+      "success_threshold": 2,
+      "prompt": "concrete_v6_review1.txt"
+    }
+  }
+}

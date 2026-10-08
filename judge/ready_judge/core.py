@@ -12,6 +12,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import ProxyHandler, Request, build_opener
 
 ROOT = Path(__file__).resolve().parent / 'resources'
+CURRENT_ROOT = ROOT / 'current_v6_1'
 
 
 def fingerprint(value):
@@ -32,7 +33,8 @@ def normalized(score, maximum):
     return 100.0 * score / maximum
 
 
-def configuration(root=ROOT):
+def configuration(root=None):
+    root = CURRENT_ROOT if root is None else Path(root)
     # JSON syntax is a valid YAML subset; no YAML/runtime dependency is needed.
     features = json.loads((root / 'concepts/features.yaml').read_text(encoding='utf-8'))
     config = json.loads((root / 'config/judge.json').read_text(encoding='utf-8'))
@@ -210,7 +212,7 @@ def request_score(task, config, prompt, feature, secret, output):
 def evaluate(input_path, output, selected, run=False, workers=4, secret=None, resources=None):
     if not 1 <= workers <= 16:
         raise ValueError('workers must be1-16')
-    config, rubric, prompts = configuration(ROOT if resources is None else Path(resources))
+    config, rubric, prompts = configuration(resources)
     if len(set(selected)) != len(selected) or any(f not in rubric['features'] for f in selected):
         raise ValueError('Unknown or duplicate feature')
     rows = input_rows(input_path)
