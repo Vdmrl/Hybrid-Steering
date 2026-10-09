@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gdn-steering"
+version = "0.1.0"
+description = "GDN recurrent-state and residual activation steering experiments"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.optional-dependencies]
+gpu = [
+  "torch>=2.5",
+  "transformers>=4.57",
+  "accelerate>=1.0",
+  "flash-linear-attention>=0.5",
+  "langdetect>=1.0.9",
+  "huggingface-hub>=0.25",
+]
+benchmarks = ["absl-py>=2", "immutabledict>=4", "nltk>=3", "emoji>=2", "syllapy>=0.8"]
+dev = ["pytest>=8", "ruff>=0.6"]
+plots = ["matplotlib>=3.8"]
+
+[project.scripts]
+gdn-steering = "hybrid_steering.cli:main"
+gdn-extract = "hybrid_steering.pipelines.extraction:main"
+gdn-benchmark = "hybrid_steering.pipelines.benchmark:main"
+gdn-concept = "hybrid_steering.pipelines.concept:main"
+gdn-judge = "hybrid_steering.judge.__main__:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hybrid_steering"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"

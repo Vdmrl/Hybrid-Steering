@@ -1,0 +1,27 @@
+{
+  "id": "language-pareto-v1",
+  "train_count": 500,
+  "gpu_ids": [0, 1],
+  "max_used_mib": 700,
+  "poll_seconds": 30,
+  "batch_size": 2,
+  "extraction_batch_size": 2,
+  "models": {
+    "qwen": {
+      "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+      "gpu_count": 2,
+      "min_total_mib": 15000,
+      "placement_config": "config/qwen-placement.json"
+    },
+    "falcon": {
+      "revision": "41e72f27effbab80cd45b6e884688452253a3686",
+      "gpu_count": 2,
+      "min_total_mib": 15000,
+      "placement_config": "config/falcon-h1-placement.json"
+    }
+  },
+  "strengths": {
+    "recurrent_state": [0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4],
+    "activation_add": [0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5, 0.55, 0.7]
+  }
+}

@@ -3,3 +3,5 @@ judge/ready_judge/resources/candidates/** -text whitespace=cr-at-eol
 judge/calibration/technical_v5_2_2_review1/*.json* -text whitespace=cr-at-eol
 judge/ready_judge/resources/current_v6_1/** -text whitespace=cr-at-eol
 judge/ready_judge/resources/current_v6_2/** -text whitespace=cr-at-eol
+# This upstream evaluator is SHA-pinned; retain its exact trailing newline.
+benchmark/data/cache/google_research/instruction_following_eval/evaluation_lib.py whitespace=-blank-at-eof

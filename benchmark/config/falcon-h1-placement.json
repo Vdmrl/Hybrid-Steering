@@ -1,0 +1,8 @@
+{
+  "placement": {
+    "transfer_via_cpu": true,
+    "max_memory": {"0": "11GiB", "1": "11GiB"},
+    "device_map": "balanced",
+    "attn_implementation": "sdpa"
+  }
+}

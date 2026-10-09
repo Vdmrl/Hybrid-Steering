@@ -55,6 +55,30 @@ Each steering experiment has `run.py` (generate and score) and `report.py`
 The configured IFEval, HumanEval, and Judge sweep pipeline is described in
 [`experiments/pipeline/README.md`](experiments/pipeline/README.md).
 
+## Language-rate Pareto benchmark handoff
+
+The frozen Russian/French/Arabic study for Qwen3.5-9B and Falcon-H1-7B is in
+[`benchmark/`](benchmark/README.md). It has its own environment because its
+direction extraction and clamp protocol differ from the existing
+`experiments/pipeline` runs. Clone this repository over SSH, obtain the concept
+dataset separately, and start the complete sweep with:
+
+```bash
+git clone git@github.com:Vdmrl/Hybrid-Steering.git
+cd Hybrid-Steering
+git switch --track origin/feature/language-pareto-benchmark
+bash benchmark/run.sh --concept-root /absolute/path/to/hybrid-steering-concepts
+```
+
+For later updates, run `git pull --ff-only` on that branch before restarting
+the launcher.
+
+The launcher sweeps 100 prompts, selects five measured strengths per method,
+then scores the selected settings on independent language prompts, IFEval, and
+HumanEval. It resumes saved answers with the same command. Read the benchmark
+README for GPU prerequisites, exact grids, formulas, output paths, and a prompt
+for Claude. It does not call the Judge API.
+
 ## Judge
 
 Steering runs score non-language concepts with `score_steering`. The judge sees

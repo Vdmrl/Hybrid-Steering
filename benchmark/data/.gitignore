@@ -1,0 +1,13 @@
+/results/
+/concepts/
+/plans/
+/logs/
+/tmp/
+/gpu-locks/
+/cache/huggingface/
+/cache/nltk/
+/cache/torch/
+/cache/triton/
+/cache/torchinductor/
+/cache/nv/
+/cache/matplotlib/
