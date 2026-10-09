@@ -8,6 +8,7 @@ stay near the unsteered baseline.
 
 from __future__ import annotations
 
+import itertools
 import math
 from pathlib import Path
 
@@ -126,3 +127,52 @@ def choose(summary: list[dict], methods: dict = METHODS) -> dict[str, dict]:
                 candidates, key=lambda item: (item["concept_rate"], -item["scale"])
             )
     return chosen
+
+
+def select_pareto_scales(
+    cells: list[dict], targets: tuple[float, ...] = (0.3, 0.5, 0.7, 0.99)
+) -> list[dict]:
+    """Choose distinct positive pre-peak concept levels by absolute target error.
+
+    Each cell has ``scale`` and a mean ``concept_rate`` already normalized to
+    0–1. Quality is deliberately absent: the full benchmarks measure it.
+    """
+    if len(targets) != 4 or tuple(sorted(set(targets))) != targets:
+        raise ValueError("need four increasing concept targets")
+    ordered = sorted(cells, key=lambda row: row["scale"])
+    if len({row["scale"] for row in ordered}) != len(ordered) or any(
+        not math.isfinite(row["scale"])
+        or row["scale"] <= 0
+        or not math.isfinite(row["concept_rate"])
+        or not 0 <= row["concept_rate"] <= 1
+        for row in ordered
+    ):
+        raise ValueError("need distinct positive scales and concept rates in [0, 1]")
+    if not ordered:
+        raise ValueError("no sweep cells")
+    peak = max(ordered, key=lambda row: row["concept_rate"])["scale"]
+    eligible = sorted(
+        (row for row in ordered if row["scale"] <= peak and row["concept_rate"] > 0),
+        key=lambda row: (row["concept_rate"], row["scale"]),
+    )
+    if len({row["concept_rate"] for row in eligible}) < 4:
+        raise ValueError("fewer than four distinct nonzero concept levels before the first peak")
+
+    def criterion(rows):
+        rates = [row["concept_rate"] for row in rows]
+        return (
+            sum(abs(rate - target) for rate, target in zip(rates, targets, strict=True)),
+            -min(right - left for left, right in itertools.pairwise(rates)),
+            tuple(row["scale"] for row in rows),
+        )
+
+    candidates = (
+        rows
+        for rows in itertools.combinations(eligible, 4)
+        if len({row["concept_rate"] for row in rows}) == 4
+    )
+    selected = min(candidates, key=criterion)
+    return [
+        {**row, "target": target, "distance": abs(row["concept_rate"] - target)}
+        for row, target in zip(selected, targets, strict=True)
+    ]

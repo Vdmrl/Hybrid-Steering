@@ -88,3 +88,11 @@ features:
       Target: theistic framing, the answer's own premise that a divine being acts, guides, or gives meaning.
       Look for reasoning that depends on that premise.
       A neutral description of what believers think, or an idiom such as "thank God", is insufficient.
+
+  numbered:
+    guide: |
+      Target: a response organized as a numbered list, with consecutive numeric labels
+      such as "1.", "2.", and "3." introducing substantive items. The numbering
+      should structure the answer rather than appear only in a quotation, example,
+      or isolated phrase. Bullet lists without numeric labels, a single numbered
+      item, and numbers used only as quantities are insufficient.

@@ -1,0 +1,17 @@
+{
+  "models": [
+    {"id": "qwen", "model": "Qwen/Qwen3.5-9B", "family": "gdn", "batch_size": 2},
+    {"id": "falcon", "model": "tiiuae/Falcon-H1-7B-Instruct", "family": "mamba", "batch_size": 2}
+  ],
+  "concepts": [
+    {"id": "numbered", "feature": "numbered", "pairs": "/path/to/hybrid-steering-concepts/concepts/numbered/data/pairs_n256.jsonl", "source": "neutral", "target": "numbered"},
+    {"id": "theistic", "feature": "theistic_framing", "pairs": "/path/to/hybrid-steering-concepts/concepts/atheistic_framing-theistic_framing/data/pairs.jsonl", "source": "atheistic_framing", "target": "theistic_framing"}
+  ],
+  "screen_dataset": {"path": "prompts/screen-50.jsonl"},
+  "confirm_dataset": {"path": "prompts/confirm-50.jsonl"},
+  "benchmarks": [
+    {"name": "ifeval", "path": "/path/to/ifeval/input_data.jsonl", "evaluator": {"root": "/path/to/google-research"}},
+    {"name": "humaneval", "path": "/path/to/HumanEval.jsonl.gz"}
+  ],
+  "judge_config": "../../config/judge.yaml"
+}

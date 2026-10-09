@@ -23,12 +23,20 @@ def mean_interval(values: list[float], *, draws: int = 2000, seed: int = 42) -> 
     }
 
 
-def build_report(judge_dir: Path, benchmark_dir: Path, output: Path) -> Path | None:
+def build_report(
+    judge_dir: Path, benchmark_dir: Path, output: Path, *, two_tier: bool = False
+) -> Path | None:
     judge_file = judge_dir / "judge_scores.jsonl"
     benchmark_file = benchmark_dir / "benchmark_scores.json"
     if not judge_file.exists() or not benchmark_file.exists():
         return None
     judge = [json.loads(line) for line in judge_file.read_text().splitlines() if line]
+    if two_tier:
+        for row in judge:
+            score = row.get("concept_score")
+            if type(score) is not int or not 0 <= score <= 4:
+                raise ValueError("two-tier report needs complete Judge scores in 0–4")
+            row["concept_score"] = 0 if score == 0 else 0.5 if score <= 2 else 1
     benchmark = json.loads(benchmark_file.read_text())
     expected_judge = json.loads((judge_dir / "manifest.json").read_text())["n_tasks"]
     grouped = defaultdict(list)
@@ -86,7 +94,8 @@ def build_report(judge_dir: Path, benchmark_dir: Path, output: Path) -> Path | N
                 "benchmark_n": benchmark_ci["n"],
             }
         )
-    report_dir = output / "reports" / f"{judge_dir.name}-{benchmark_dir.name}"
+    suffix = "-two-tier" if two_tier else ""
+    report_dir = output / "reports" / f"{judge_dir.name}-{benchmark_dir.name}{suffix}"
     report_dir.mkdir(parents=True, exist_ok=True)
     rows.sort(key=lambda row: (row["condition"], row["scale"]))
     with (report_dir / "rates.csv").open("w", newline="") as stream:
@@ -98,6 +107,7 @@ def build_report(judge_dir: Path, benchmark_dir: Path, output: Path) -> Path | N
             {
                 "judge_manifest": json.loads((judge_dir / "manifest.json").read_text()),
                 "benchmark_manifest": json.loads((benchmark_dir / "manifest.json").read_text()),
+                "concept_scale": "0, 0.5, 1 from Judge 0–4" if two_tier else "Judge 0–4",
                 "intervals": "95% prompt bootstrap for Judge mean and paired delta; Wilson for binary benchmark rate",
                 "report_code_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                 "rows": rows,

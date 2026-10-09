@@ -64,3 +64,36 @@ bootstrap; binary IFEval prompt and HumanEval rates use 95% Wilson intervals;
 IFEval instruction rates use a prompt-cluster bootstrap. These marginal
 intervals do not establish significance for differences between conditions.
 Set Judge API credentials in the environment; do not put them in JSON.
+
+## Four-point Pareto sweep
+
+`pareto.py` is a thin coordinator for the pipeline above. Copy
+`pareto.example.json`, set the concept pair paths and the existing IFEval and
+HumanEval dataset paths, then run:
+
+```bash
+uv sync --extra dev --extra benchmarks
+uv run python experiments/pipeline/pareto.py \
+  --config experiments/pipeline/pareto.example.json \
+  --output runs/pareto --run-judge
+```
+
+The script calls the existing `hybrid-direction` and residual extraction code,
+then `run.py` for generation, Judge scoring, IFEval, HumanEval, and report
+artifacts. It runs Qwen3.5-9B and Falcon-H1-7B on Numbered and Theistic. For
+each concept and model, rank 1, rank 2, rank 1 clamp, and full rank use scales
+0.75–4 in steps of 0.25. Residual add and clamp use 0.1–0.9 in steps of 0.1
+at L16 and L20. The screen uses 50 answers per condition with a 512-token
+limit. Judge labels 0, 1–2, and 3–4 map to 0, 0.5, and 1. For each method and
+layer, the selector chooses four distinct positive pre-peak means that minimize
+the total absolute distance to 0.3, 0.5, 0.7, and 0.99. It records each
+distance in `selection.json`; if four levels do not exist, the run stops before
+the full benchmarks. The selected scales use an independent 50-prompt Judge
+set and the full IFEval and HumanEval datasets, with a 2048-token limit. The
+two-tier Judge results appear in the existing Pareto report format, while raw
+Judge labels remain in `judge_scores.jsonl`.
+
+The included two 50-prompt files are frozen and disjoint. Input file hashes
+are recorded in the generated plans. `--run-judge` explicitly permits paid
+API calls; without it, generation stops after preparing blinded Judge tasks.
+The original Russian, French, and Arabic detection code is unchanged.
