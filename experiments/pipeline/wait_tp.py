@@ -14,7 +14,11 @@ from pathlib import Path
 
 def gpu_status() -> dict[int, tuple[str, int, int]]:
     output = subprocess.check_output(
-        ["nvidia-smi", "--query-gpu=index,uuid,memory.total,memory.used", "--format=csv,noheader,nounits"],
+        [
+            "nvidia-smi",
+            "--query-gpu=index,uuid,memory.total,memory.used",
+            "--format=csv,noheader,nounits",
+        ],
         text=True,
     )
     result = {}
@@ -54,8 +58,13 @@ def main() -> None:
     locks.mkdir(parents=True, exist_ok=True)
     ids = tuple(args.gpus)
     while True:
-        state = {"state": "waiting", "time": time.time(), "poll_seconds": args.poll_seconds,
-                 "gpus": ids, "inputs_ready": args.ready.is_file()}
+        state = {
+            "state": "waiting",
+            "time": time.time(),
+            "poll_seconds": args.poll_seconds,
+            "gpus": ids,
+            "inputs_ready": args.ready.is_file(),
+        }
         try:
             pair = free_pair(gpu_status(), ids) if state["inputs_ready"] else None
             if pair:
@@ -67,13 +76,19 @@ def main() -> None:
                     except BlockingIOError:
                         pair = None
                     if pair and free_pair(gpu_status(), ids) == pair:
-                        env = {**os.environ, "CUDA_VISIBLE_DEVICES": ",".join(pair),
-                               "CUDA_DEVICE_ORDER": "PCI_BUS_ID"}
+                        env = {
+                            **os.environ,
+                            "CUDA_VISIBLE_DEVICES": ",".join(pair),
+                            "CUDA_DEVICE_ORDER": "PCI_BUS_ID",
+                        }
                         state.update(state="running", gpu_uuids=pair, command=command)
                         status_file.write_text(json.dumps(state, indent=2) + "\n")
                         code = subprocess.call(command, env=env)
-                        state.update(state="complete" if code == 0 else "failed",
-                                     exit_code=code, time=time.time())
+                        state.update(
+                            state="complete" if code == 0 else "failed",
+                            exit_code=code,
+                            time=time.time(),
+                        )
                         status_file.write_text(json.dumps(state, indent=2) + "\n")
                         raise SystemExit(code)
         except (OSError, subprocess.SubprocessError, ValueError) as error:

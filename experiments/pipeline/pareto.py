@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def _gpu_call(command: list[str], model: dict) -> None:
-    backend = "tp" if model["family"] == "gdn" else "layers"
+    backend = model.get("parallel_backend", "tp" if model["family"] == "gdn" else "layers")
     prefix = [sys.executable]
     if backend == "tp":
         prefix += ["-m", "torch.distributed.run", "--standalone", "--nproc-per-node=2"]
@@ -93,7 +93,13 @@ def _directions(config: Path, model: dict, concept: dict, output: Path) -> tuple
     pairs = _path(config, concept["pairs"])
     if not pairs.is_file():
         raise FileNotFoundError(pairs)
-    identity = [model["model"], _sha(pairs), concept["source"], concept["target"]]
+    identity = [
+        model["model"],
+        model.get("revision"),
+        _sha(pairs),
+        concept["source"],
+        concept["target"],
+    ]
     key = hashlib.sha256(json.dumps(identity).encode()).hexdigest()[:16]
     base = output / "directions" / model["id"] / concept["id"] / key
     common = [
@@ -177,7 +183,9 @@ def _plan(
             "screen_batch_size" if tokens == 512 else "full_batch_size",
             model.get("batch_size", 1),
         ),
-        "parallel_backend": "tp" if model["family"] == "gdn" else "layers",
+        "parallel_backend": model.get(
+            "parallel_backend", "tp" if model["family"] == "gdn" else "layers"
+        ),
         "max_new_tokens": tokens,
         "conditions": cases,
         "judge": {"feature": concept["feature"], "config": str(judge_config), "batch_size": 8},
@@ -200,7 +208,13 @@ def _run_role(
     _gpu_call(
         [
             str(ROOT / "experiments/pipeline/run.py"),
-            "generate", "--config", str(path), "--output", str(output), "--role", role,
+            "generate",
+            "--config",
+            str(path),
+            "--output",
+            str(output),
+            "--role",
+            role,
         ],
         model,
     )

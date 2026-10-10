@@ -3,3 +3,14 @@ judge/ready_judge/resources/candidates/** -text whitespace=cr-at-eol
 judge/calibration/technical_v5_2_2_review1/*.json* -text whitespace=cr-at-eol
 judge/ready_judge/resources/current_v6_1/** -text whitespace=cr-at-eol
 judge/ready_judge/resources/current_v6_2/** -text whitespace=cr-at-eol
+
+# Preserve the release 5.2.1 bytes referenced by its original hashes.
+judge/ready_judge/resources/concepts/features.yaml -text whitespace=cr-at-eol
+judge/ready_judge/resources/config/judge.json -text whitespace=cr-at-eol
+judge/ready_judge/resources/prompts/fairytale_original.txt -text whitespace=cr-at-eol
+judge/ready_judge/resources/prompts/french_language_v5_2_1_review.txt -text whitespace=cr-at-eol
+judge/ready_judge/resources/prompts/judge_v4_original.txt -text whitespace=cr-at-eol
+judge/ready_judge/resources/prompts/trait_v5.txt -text whitespace=cr-at-eol
+judge/ready_judge/resources/prompts/trait_v5_1_rp_review.txt -text whitespace=cr-at-eol
+judge/ready_judge/resources/prompts/trait_v5_2_review.txt -text whitespace=cr-at-eol
+experiments/pipeline/vendor/** whitespace=-blank-at-eof

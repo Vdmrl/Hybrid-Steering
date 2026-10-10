@@ -9,13 +9,13 @@
     "probabilistic_framing": "5.2.0-review1"
   },
   "resources_sha256": {
-    "concepts\\features.yaml": "9d24dc4057695ab1760cc3b1a59f2553233f8cbd8e6db96c87fe77c52723ca69",
-    "config\\judge.json": "731c0bc8a43f5d982db98981e0dce03d74f3b460c4258f97035f25b898689594",
-    "prompts\\fairytale_original.txt": "4fa83f94ea8264ef5a1d4570aa19b5a5aa642146a0347e599d95ad68cb7d971f",
-    "prompts\\french_language_v5_2_1_review.txt": "7c57dad7bb58e7a81618638bd3586e5356d0f95d8be059d04282fa8452ba8645",
-    "prompts\\judge_v4_original.txt": "d814b66ac7a24b627fb757692b7c1b81346eba6958f2a519191aa06a2c0a7e2c",
-    "prompts\\trait_v5.txt": "a97ed87bb3555c7b4150a5e48d322076867fc9b65854390bded592d38dde37d1",
-    "prompts\\trait_v5_1_rp_review.txt": "204fed42fa5d7cde44d3240c591124b364a172e9cbd52889d117bf3186ffc751",
-    "prompts\\trait_v5_2_review.txt": "c5023b8ca6e4d7cb9dc9fe9d1889dd3e4afa5bd485c06a030e86cb4d72296505"
+    "concepts/features.yaml": "9d24dc4057695ab1760cc3b1a59f2553233f8cbd8e6db96c87fe77c52723ca69",
+    "config/judge.json": "731c0bc8a43f5d982db98981e0dce03d74f3b460c4258f97035f25b898689594",
+    "prompts/fairytale_original.txt": "4fa83f94ea8264ef5a1d4570aa19b5a5aa642146a0347e599d95ad68cb7d971f",
+    "prompts/french_language_v5_2_1_review.txt": "7c57dad7bb58e7a81618638bd3586e5356d0f95d8be059d04282fa8452ba8645",
+    "prompts/judge_v4_original.txt": "d814b66ac7a24b627fb757692b7c1b81346eba6958f2a519191aa06a2c0a7e2c",
+    "prompts/trait_v5.txt": "a97ed87bb3555c7b4150a5e48d322076867fc9b65854390bded592d38dde37d1",
+    "prompts/trait_v5_1_rp_review.txt": "204fed42fa5d7cde44d3240c591124b364a172e9cbd52889d117bf3186ffc751",
+    "prompts/trait_v5_2_review.txt": "c5023b8ca6e4d7cb9dc9fe9d1889dd3e4afa5bd485c06a030e86cb4d72296505"
   }
 }

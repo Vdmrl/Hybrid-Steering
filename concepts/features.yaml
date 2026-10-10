@@ -96,3 +96,17 @@ features:
       should structure the answer rather than appear only in a quotation, example,
       or isolated phrase. Bullet lists without numeric labels, a single numbered
       item, and numbers used only as quantities are insufficient.
+
+  french_expression:
+    guide: |
+      Target: the answer is written in French throughout its substantive prose.
+      Grade actual language expression, not whether France is mentioned.
+      Isolated French words, quoted examples or names do not imply sustained French.
+      Empty or unintelligible answers do not express the concept.
+
+  arabic_expression:
+    guide: |
+      Target: the answer is written in Arabic throughout its substantive prose.
+      Grade actual language expression, not whether Arabic culture is mentioned.
+      Isolated Arabic words, quotations or names do not imply sustained Arabic.
+      Empty or unintelligible answers do not express the concept.

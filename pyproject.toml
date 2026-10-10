@@ -62,6 +62,7 @@ target-version = "py312"
 src = ["src", "tests", "experiments"]
 extend-exclude = [
   "experiments/archive",
+  "experiments/pipeline/vendor",
   "experiments/steering-reports",
 ]
 

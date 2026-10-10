@@ -142,7 +142,8 @@ def load_runtime(model_name: str, *, dtype: torch.dtype = torch.bfloat16) -> tup
         return build_tiny()
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    revision = os.environ.get("HYBRID_MODEL_REVISION")
+    tokenizer = AutoTokenizer.from_pretrained(model_name, revision=revision)
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token = tokenizer.eos_token
     backend = os.environ.get("HYBRID_PARALLEL_BACKEND", "single")
@@ -154,7 +155,7 @@ def load_runtime(model_name: str, *, dtype: torch.dtype = torch.bfloat16) -> tup
             rank = int(os.environ["LOCAL_RANK"])
             torch.cuda.set_device(rank)
             dist.init_process_group("nccl", device_id=torch.device("cuda", rank))
-        config = AutoConfig.from_pretrained(model_name)
+        config = AutoConfig.from_pretrained(model_name, revision=revision)
         if getattr(config, "model_type", None) != "qwen3_5":
             raise ValueError("the TP backend requires Qwen3.5")
         # The proven two-A4000 backend shards attention and MLP projections;
@@ -166,19 +167,21 @@ def load_runtime(model_name: str, *, dtype: torch.dtype = torch.bfloat16) -> tup
         }
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
+            revision=revision,
             dtype=dtype,
             distributed_config=DistributedConfig(tp_size=dist.get_world_size(), tp_plan=plan),
         ).eval()
     elif backend == "layers":
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
+            revision=revision,
             dtype=dtype,
             device_map="balanced",
             max_memory={index: "14GiB" for index in range(torch.cuda.device_count())},
         ).eval()
     elif backend == "single":
         model = AutoModelForCausalLM.from_pretrained(
-            model_name, dtype=dtype, device_map="cuda"
+            model_name, revision=revision, dtype=dtype, device_map="cuda"
         ).eval()
     else:
         raise ValueError(f"unknown parallel backend: {backend}")

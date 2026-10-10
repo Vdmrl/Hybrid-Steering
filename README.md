@@ -1,5 +1,16 @@
 # Hybrid Steering
 
+## Latest experiment: language sweep first
+
+**Priority 1:** run the [Arabic/French language experiment](experiments/pipeline/LANGUAGE.md) on Qwen3.5-9B and Falcon-H1-7B. Use **independent single-GPU workers, no TP**, with automatic measured batching on the available H100-class GPUs.
+
+```bash
+bash experiments/pipeline/run_latest.sh
+```
+
+The command prepares inputs, screens the exact 134 strengths on 50 neutral prompts, freezes four selected scales per method, then runs full IFEval. Judge expression is scored through the existing Judge; the command explicitly enables API requests using existing credentials. Results: **Pareto PNG/SVG and CSV for every measurement** under `runs/language-priority/`. Read [the complete procedure and Claude prompt](experiments/pipeline/LANGUAGE.md). Run this before the older Numbered/Theistic TP workflow.
+
+
 One package for steering hybrid language models through their Gated DeltaNet
 recurrent state, then scoring the result.
 

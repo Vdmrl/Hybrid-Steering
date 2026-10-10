@@ -1,5 +1,10 @@
 # Configured benchmark and Judge runs
 
+## Current priority: language experiment, no TP
+
+Run [LANGUAGE.md](LANGUAGE.md) first with `bash experiments/pipeline/run_latest.sh`. It uses the exact Arabic/French grids, independent GPU workers and adaptive batch sizes, then exports Pareto PNG/SVG and complete CSV tables. The Numbered/Theistic four-point study below remains a separate, lower-priority protocol.
+
+
 This experiment reuses `hybrid-direction`, Qwen's `Runner`, the shared recurrent
 state math, and the repository's Judge. One JSON plan names a `judge_dataset`
 and a `bench_dataset` (IFEval or HumanEval), plus the model and steering

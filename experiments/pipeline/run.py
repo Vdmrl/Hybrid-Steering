@@ -11,6 +11,7 @@ import re
 from pathlib import Path
 
 import torch.distributed as dist
+from batching import adaptive_batches
 from evaluate import humaneval, ifeval
 from humaneval_protocol import prompt as humaneval_prompt
 from report import build_report
@@ -18,7 +19,7 @@ from report import build_report
 from hybrid_steering import Runner, gdn_layers, load_direction, load_runtime
 from hybrid_steering.detect import concept_detector, is_language
 from hybrid_steering.mamba import MambaRunner
-from hybrid_steering.runtime import batched, chat_prompts, write_jsonl
+from hybrid_steering.runtime import chat_prompts, write_jsonl
 from hybrid_steering.scoring import choose, repetition, score, summarize
 from residual import ResidualRunner
 
@@ -154,12 +155,15 @@ def identity(config_file: Path, plan: dict, data: list[dict], role: str) -> dict
             directions[str(path)] = {file.name: digest(file) for file in files}
     return {
         "model": plan["model"],
+        "model_revision": plan.get("model_revision"),
         "parallel_backend": plan.get("parallel_backend", "single"),
         "role": role,
         "dataset": plan["judge_dataset"] if role == "judge" else plan["bench_dataset"],
         "n_tasks": len(data),
         "conditions": plan["conditions"],
         "batch_size": plan.get("batch_size", 1),
+        "auto_batch": plan.get("auto_batch"),
+        "expression_metric": plan.get("judge", {}).get("metric"),
         "max_new_tokens": plan["max_new_tokens"],
         "thinking": False,
         "directions": directions,
@@ -167,6 +171,7 @@ def identity(config_file: Path, plan: dict, data: list[dict], role: str) -> dict
             name: digest(ROOT / name)
             for name in (
                 "experiments/pipeline/run.py",
+                "experiments/pipeline/batching.py",
                 "experiments/pipeline/evaluate.py",
                 "experiments/pipeline/humaneval_protocol.py",
                 "experiments/pipeline/residual.py",
@@ -279,8 +284,9 @@ def generate(
             missing = [
                 item for item in data if (case["name"], float(scale), item["_key"]) not in by_key
             ]
-            for batch in batched(missing, width):
-                tokens = runner.generate(
+
+            def generate_batch(batch):
+                return runner.generate(
                     _texts(
                         tokenizer,
                         batch,
@@ -290,6 +296,45 @@ def generate(
                     prompt_position=case.get("prompt_position", -1),
                     max_new_tokens=plan["max_new_tokens"],
                 )
+
+            def memory_fraction():
+                import torch
+
+                if not torch.cuda.is_available():
+                    return 1.0
+                return (
+                    torch.cuda.max_memory_allocated()
+                    / torch.cuda.get_device_properties(0).total_memory
+                )
+
+            def reset_memory():
+                import gc
+
+                import torch
+
+                gc.collect()
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                    torch.cuda.reset_peak_memory_stats()
+
+            settings = plan.get("auto_batch", {})
+            if settings and dist.is_initialized():
+                raise ValueError("automatic batching is for single-GPU workers, not TP")
+            missing.sort(key=lambda item: len(item["prompt"]), reverse=True)
+            for batch, tokens, event in adaptive_batches(
+                missing,
+                width,
+                generate_batch,
+                maximum=settings.get("maximum", width),
+                target_fraction=settings.get("memory_fraction", 0.85),
+                memory_fraction=memory_fraction,
+                reset_memory=reset_memory,
+            ):
+                if not dist.is_initialized() or dist.get_rank() == 0:
+                    with (output / "batch-profile.jsonl").open("a") as stream:
+                        stream.write(
+                            json.dumps({"condition": case["name"], "scale": scale, **event}) + "\n"
+                        )
                 additions = []
                 for item, token_row in zip(batch, tokens, strict=True):
                     ids = [
@@ -451,7 +496,7 @@ def evaluate(
         benchmark_manifest.write_text(json.dumps(benchmark_score_id) + "\n")
     if role != "judge":
         return True
-    if is_language(plan["judge"]["feature"]):
+    if is_language(plan["judge"]["feature"]) and plan["judge"].get("metric") != "judge_expression":
         return _score_language(answers, output, plan)
     prepare_judge(answers, output)
     judge = plan["judge"]
@@ -478,9 +523,35 @@ def evaluate(
         rated = read_lines(scores_file)
     else:
         rated = [{**row, "question": row["prompt"]} for row in answers]
-        score(rated, judge["feature"], judge.get("batch_size", 8), settings_path=settings)
+        if judge.get("metric") == "judge_expression":
+            from hybrid_steering.judge import score_steering
+
+            judgments = score_steering(
+                [(r["question"], r["response"]) for r in rated],
+                judge["feature"],
+                batch_size=judge.get("batch_size", 8),
+                settings_path=settings,
+            )
+            for row, judgment in zip(rated, judgments, strict=True):
+                row.update(
+                    concept_score=judgment.concept_score if judgment else None,
+                    content_quality=judgment.content_quality if judgment else None,
+                    evaluable=judgment.evaluable if judgment else None,
+                    flags=list(judgment.flags) if judgment else [],
+                    hit=0
+                    if judgment and not judgment.evaluable
+                    else int(judgment.concept_score >= 2)
+                    if judgment
+                    else None,
+                )
+        else:
+            score(rated, judge["feature"], judge.get("batch_size", 8), settings_path=settings)
         write_jsonl(scores_file, rated)
-        if any(row.get("concept_score") is None for row in rated):
+        if any(
+            row.get("concept_score") is None
+            and not (judge.get("metric") == "judge_expression" and row.get("evaluable") is False)
+            for row in rated
+        ):
             raise ValueError("Judge returned incomplete scores; inspect judge_scores.jsonl")
         score_manifest.write_text(json.dumps(score_id, indent=2) + "\n")
     cells = summarize(rated)

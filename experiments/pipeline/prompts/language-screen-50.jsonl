@@ -1,0 +1,50 @@
+{"id":"neutral50_001","domain":"household","prompt":"Why can a room feel stuffy even when its temperature is comfortable?"}
+{"id":"neutral50_002","domain":"household","prompt":"What makes a towel dry more slowly indoors than outdoors?"}
+{"id":"neutral50_003","domain":"household","prompt":"How can someone make a small desk more comfortable for everyday use?"}
+{"id":"neutral50_004","domain":"household","prompt":"Why does condensation sometimes appear on the inside of a window?"}
+{"id":"neutral50_005","domain":"household","prompt":"What should someone consider when choosing where to put a reading lamp?"}
+{"id":"neutral50_006","domain":"food","prompt":"Why does freshly baked bread become firm as it sits?"}
+{"id":"neutral50_007","domain":"food","prompt":"How does the shape of pasta affect the way it holds sauce?"}
+{"id":"neutral50_008","domain":"food","prompt":"Why can the same fruit taste different when served cold and at room temperature?"}
+{"id":"neutral50_009","domain":"food","prompt":"What happens to vegetables when they are roasted instead of boiled?"}
+{"id":"neutral50_010","domain":"food","prompt":"Why does stirring a hot drink help it cool?"}
+{"id":"neutral50_011","domain":"nature","prompt":"Why do some trees lose their leaves while others remain green?"}
+{"id":"neutral50_012","domain":"nature","prompt":"How does a pond change after several days of heavy rain?"}
+{"id":"neutral50_013","domain":"nature","prompt":"Why do shadows look sharper on some days than on others?"}
+{"id":"neutral50_014","domain":"nature","prompt":"What causes the smell that people notice after rain falls on dry ground?"}
+{"id":"neutral50_015","domain":"nature","prompt":"Why can a beach contain both smooth pebbles and rough stones?"}
+{"id":"neutral50_016","domain":"everyday_science","prompt":"Why does a metal spoon feel colder than a wooden spoon in the same room?"}
+{"id":"neutral50_017","domain":"everyday_science","prompt":"How does a thermos slow down the cooling of a hot drink?"}
+{"id":"neutral50_018","domain":"everyday_science","prompt":"Why does a wet shirt sometimes look darker than a dry one?"}
+{"id":"neutral50_019","domain":"everyday_science","prompt":"What makes a soap bubble show different colors?"}
+{"id":"neutral50_020","domain":"everyday_science","prompt":"Why does an empty room sound different after furniture is added?"}
+{"id":"neutral50_021","domain":"learning","prompt":"How can someone review a book after finishing it without rereading the whole thing?"}
+{"id":"neutral50_022","domain":"learning","prompt":"Why can explaining an idea to another person reveal gaps in understanding?"}
+{"id":"neutral50_023","domain":"learning","prompt":"What makes a useful note different from a copied passage?"}
+{"id":"neutral50_024","domain":"learning","prompt":"How can someone return to a hobby after a long break?"}
+{"id":"neutral50_025","domain":"learning","prompt":"What can help a beginner practice a difficult skill without becoming frustrated?"}
+{"id":"neutral50_026","domain":"planning","prompt":"How can someone decide what to pack for a short trip when luggage space is limited?"}
+{"id":"neutral50_027","domain":"planning","prompt":"What makes a daily routine easier to maintain when plans change unexpectedly?"}
+{"id":"neutral50_028","domain":"planning","prompt":"How can someone prepare for moving a collection of books to a new room?"}
+{"id":"neutral50_029","domain":"planning","prompt":"What should a host consider when arranging seating for a small gathering?"}
+{"id":"neutral50_030","domain":"planning","prompt":"How can someone estimate how long a household project will take?"}
+{"id":"neutral50_031","domain":"crafts","prompt":"Why does paper curl after one side becomes wet?"}
+{"id":"neutral50_032","domain":"crafts","prompt":"How does the choice of fabric affect the usefulness of a reusable shopping bag?"}
+{"id":"neutral50_033","domain":"crafts","prompt":"What should a beginner look for when choosing a sketchbook?"}
+{"id":"neutral50_034","domain":"crafts","prompt":"Why might a painted surface look different after the paint dries?"}
+{"id":"neutral50_035","domain":"crafts","prompt":"How can someone keep a jigsaw puzzle organized while working on it over several days?"}
+{"id":"neutral50_036","domain":"communication","prompt":"What makes a written set of directions easy to follow?"}
+{"id":"neutral50_037","domain":"communication","prompt":"How can someone ask for clarification when an explanation is confusing?"}
+{"id":"neutral50_038","domain":"communication","prompt":"What information helps a lost-item notice be useful to the person who finds the item?"}
+{"id":"neutral50_039","domain":"communication","prompt":"How can someone describe a familiar place to a person who has never visited it?"}
+{"id":"neutral50_040","domain":"communication","prompt":"What makes feedback on a piece of writing helpful to its author?"}
+{"id":"neutral50_041","domain":"objects","prompt":"Why do wheels make a suitcase easier to move?"}
+{"id":"neutral50_042","domain":"objects","prompt":"What makes a zipper get stuck, and how can its movement be made smoother?"}
+{"id":"neutral50_043","domain":"objects","prompt":"How does the size of an umbrella affect its usefulness in windy weather?"}
+{"id":"neutral50_044","domain":"objects","prompt":"Why might two chairs that look similar feel different to sit in?"}
+{"id":"neutral50_045","domain":"objects","prompt":"What helps a cardboard box keep its shape when it carries a heavy object?"}
+{"id":"neutral50_046","domain":"observation","prompt":"What can someone learn by watching how sunlight moves across a room during the day?"}
+{"id":"neutral50_047","domain":"observation","prompt":"Why does a familiar walking route sometimes feel shorter on the return journey?"}
+{"id":"neutral50_048","domain":"observation","prompt":"How can someone notice details in a photograph that they overlooked at first?"}
+{"id":"neutral50_049","domain":"observation","prompt":"What changes in the sounds of a neighborhood between early morning and evening?"}
+{"id":"neutral50_050","domain":"observation","prompt":"Why can rearranging the same objects make a shelf look more crowded or more spacious?"}
