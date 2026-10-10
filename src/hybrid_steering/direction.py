@@ -12,6 +12,8 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+import torch.distributed as dist
+
 from .artifacts import save_direction
 from .cache import gdn_layers
 from .extract import CollectedDirection, collect_direction
@@ -122,8 +124,11 @@ def main(argv: list[str] | None = None) -> None:
         model, tokenizer, [target_and_source(row) for row in rows], args.batch_size
     )
     directory = args.output / "direction"
-    write_direction(directory, args.model, target, source, rows, collected)
-    print(f"wrote {directory}", flush=True)
+    if not dist.is_initialized() or dist.get_rank() == 0:
+        write_direction(directory, args.model, target, source, rows, collected)
+        print(f"wrote {directory}", flush=True)
+    if dist.is_initialized():
+        dist.barrier()
 
 
 if __name__ == "__main__":

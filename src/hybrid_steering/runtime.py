@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 from collections.abc import Callable, Iterable
 from pathlib import Path
 from types import SimpleNamespace
@@ -144,7 +145,43 @@ def load_runtime(model_name: str, *, dtype: torch.dtype = torch.bfloat16) -> tup
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token = tokenizer.eos_token
-    model = AutoModelForCausalLM.from_pretrained(model_name, dtype=dtype, device_map="cuda").eval()
+    backend = os.environ.get("HYBRID_PARALLEL_BACKEND", "single")
+    if backend == "tp":
+        import torch.distributed as dist
+        from transformers import AutoConfig, DistributedConfig
+
+        if not dist.is_initialized():
+            rank = int(os.environ["LOCAL_RANK"])
+            torch.cuda.set_device(rank)
+            dist.init_process_group("nccl", device_id=torch.device("cuda", rank))
+        config = AutoConfig.from_pretrained(model_name)
+        if getattr(config, "model_type", None) != "qwen3_5":
+            raise ValueError("the TP backend requires Qwen3.5")
+        # The proven two-A4000 backend shards attention and MLP projections;
+        # GDN projections and their recurrent states remain replicated.
+        plan = {
+            "model." + key: value
+            for key, value in config.text_config.base_model_tp_plan.items()
+            if ".linear_attn." not in key
+        }
+        model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            dtype=dtype,
+            distributed_config=DistributedConfig(tp_size=dist.get_world_size(), tp_plan=plan),
+        ).eval()
+    elif backend == "layers":
+        model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            dtype=dtype,
+            device_map="balanced",
+            max_memory={index: "14GiB" for index in range(torch.cuda.device_count())},
+        ).eval()
+    elif backend == "single":
+        model = AutoModelForCausalLM.from_pretrained(
+            model_name, dtype=dtype, device_map="cuda"
+        ).eval()
+    else:
+        raise ValueError(f"unknown parallel backend: {backend}")
     return model, tokenizer
 
 

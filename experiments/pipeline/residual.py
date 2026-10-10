@@ -139,7 +139,7 @@ def residual_delta(
     """
     if mode not in {"add", "clamp"}:
         raise ValueError("residual mode must be add or clamp")
-    flat = vector.detach().float().reshape(-1)
+    flat = vector.detach().to(device=hidden.device, dtype=torch.float32).reshape(-1)
     if mode == "add":
         return (flat * scale).to(dtype=hidden.dtype)
     unit = flat / flat.norm().clamp_min(1e-8)
@@ -199,7 +199,7 @@ def falcon_greedy(model, tokenizer, texts: list[str], max_new_tokens: int) -> to
         use_cache=True,
         logits_to_keep=1,
     )
-    cache, logits = out.past_key_values, out.logits[:, -1]
+    cache, logits = out.past_key_values, out.logits[:, -1].to(device)
     pad = tokenizer.pad_token_id
     eos = model.generation_config.eos_token_id or tokenizer.eos_token_id
     eos_ids = torch.as_tensor(eos if isinstance(eos, list) else [eos], device=device)
@@ -220,7 +220,7 @@ def falcon_greedy(model, tokenizer, texts: list[str], max_new_tokens: int) -> to
             use_cache=True,
             logits_to_keep=1,
         )
-        cache, logits = out.past_key_values, out.logits[:, -1]
+        cache, logits = out.past_key_values, out.logits[:, -1].to(device)
     return generated
 
 
@@ -306,10 +306,13 @@ def extract_main(args) -> None:
         model, tokenizer, [target_and_source(row) for row in rows], args.batch_size
     )
     directory = args.output / "direction"
-    write_residual(directory, args.model, target, source, rows, vectors)
-    norms = {str(layer): float(vector.norm()) for layer, vector in sorted(vectors.items())}
-    (args.output / "residual_norms.json").write_text(json.dumps(norms, indent=2) + "\n")
-    print(f"wrote {directory}", flush=True)
+    if not torch.distributed.is_initialized() or torch.distributed.get_rank() == 0:
+        write_residual(directory, args.model, target, source, rows, vectors)
+        norms = {str(layer): float(vector.norm()) for layer, vector in sorted(vectors.items())}
+        (args.output / "residual_norms.json").write_text(json.dumps(norms, indent=2) + "\n")
+        print(f"wrote {directory}", flush=True)
+    if torch.distributed.is_initialized():
+        torch.distributed.barrier()
 
 
 def _concept_score(rows: list[dict], feature: str, settings: Path | None) -> None:

@@ -6,6 +6,7 @@ import argparse
 import copy
 import hashlib
 import json
+import os
 import subprocess
 import sys
 from collections import defaultdict
@@ -20,6 +21,15 @@ from hybrid_steering.scoring import injected_norm, select_pareto_scales
 GDN_SCALES = [0.75 + 0.25 * index for index in range(14)]
 RESIDUAL_SCALES = [0.1 * index for index in range(1, 10)]
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def _gpu_call(command: list[str], model: dict) -> None:
+    backend = "tp" if model["family"] == "gdn" else "layers"
+    prefix = [sys.executable]
+    if backend == "tp":
+        prefix += ["-m", "torch.distributed.run", "--standalone", "--nproc-per-node=2"]
+    env = {**os.environ, "HYBRID_PARALLEL_BACKEND": backend}
+    subprocess.run([*prefix, *command], check=True, cwd=ROOT, env=env)
 
 
 def _sha(path: Path) -> str:
@@ -101,16 +111,14 @@ def _directions(config: Path, model: dict, concept: dict, output: Path) -> tuple
         str(model.get("batch_size", 1)),
     ]
     for kind, command in (
-        ("recurrent", [sys.executable, "-m", "hybrid_steering.direction"]),
-        ("residual", [sys.executable, str(ROOT / "experiments/pipeline/residual.py"), "extract"]),
+        ("recurrent", ["-m", "hybrid_steering.direction"]),
+        ("residual", [str(ROOT / "experiments/pipeline/residual.py"), "extract"]),
     ):
         target = base / kind / "direction"
         if not all(
             (target / name).is_file() for name in ("direction.json", "direction.safetensors")
         ):
-            subprocess.run(
-                [*command, "--output", str(target.parent), *common], check=True, cwd=ROOT
-            )
+            _gpu_call([*command, "--output", str(target.parent), *common], model)
     return base / "recurrent/direction", base / "residual/direction"
 
 
@@ -165,7 +173,11 @@ def _plan(
         "model": model["model"],
         "judge_dataset": judge_dataset,
         "bench_dataset": benchmark,
-        "batch_size": model.get("batch_size", 1),
+        "batch_size": model.get(
+            "screen_batch_size" if tokens == 512 else "full_batch_size",
+            model.get("batch_size", 1),
+        ),
+        "parallel_backend": "tp" if model["family"] == "gdn" else "layers",
         "max_new_tokens": tokens,
         "conditions": cases,
         "judge": {"feature": concept["feature"], "config": str(judge_config), "batch_size": 8},
@@ -179,11 +191,19 @@ def _write_plan(path: Path, plan: dict) -> None:
     path.write_text(json.dumps(plan, indent=2) + "\n")
 
 
-def _run_role(path: Path, output: Path, role: str, run_judge: bool) -> tuple[Path, bool]:
+def _run_role(
+    path: Path, output: Path, role: str, run_judge: bool, model: dict
+) -> tuple[Path, bool]:
     plan, datasets = pipeline.load_plan(path)
     data = datasets[role]
     directory = pipeline.run_directory(path, plan, data, role, output)
-    pipeline.generate(path, plan, data, directory, role)
+    _gpu_call(
+        [
+            str(ROOT / "experiments/pipeline/run.py"),
+            "generate", "--config", str(path), "--output", str(output), "--role", role,
+        ],
+        model,
+    )
     scored = pipeline.evaluate(path, plan, data, directory, role, run_judge=run_judge)
     return directory, scored
 
@@ -232,7 +252,7 @@ def run_study(
     cases = _conditions(model, recurrent, residual)
     screen_plan = folder / "screen.json"
     _write_plan(screen_plan, _plan(model, concept, screen, benchmarks[0], judge_config, cases, 512))
-    screen_dir, ready = _run_role(screen_plan, folder / "screen", "judge", run_judge)
+    screen_dir, ready = _run_role(screen_plan, folder / "screen", "judge", run_judge, model)
     if not ready:
         print(f"Judge tasks prepared at {screen_dir}; resume with --run-judge", flush=True)
         return
@@ -248,11 +268,11 @@ def run_study(
         _write_plan(
             final_plan, _plan(model, concept, confirm, benchmark, judge_config, choices, 2048)
         )
-        final_dir, ready = _run_role(final_plan, folder / "full", "judge", run_judge)
+        final_dir, ready = _run_role(final_plan, folder / "full", "judge", run_judge, model)
         if not ready:
             print(f"Judge tasks prepared at {final_dir}; resume with --run-judge", flush=True)
             return
-        benchmark_dir, _ = _run_role(final_plan, folder / "full", "benchmark", run_judge)
+        benchmark_dir, _ = _run_role(final_plan, folder / "full", "benchmark", run_judge, model)
         build_report(final_dir, benchmark_dir, folder / "full", two_tier=True)
     print(f"complete: {folder}", flush=True)
 

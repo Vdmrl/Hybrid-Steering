@@ -129,7 +129,7 @@ class MambaRunner:
             logits_to_keep=1,
         )
         cache = out.past_key_values
-        logits = out.logits[:, -1]
+        logits = out.logits[:, -1].to(device)
         pad = self.tokenizer.pad_token_id
         eos = self.model.generation_config.eos_token_id or self.tokenizer.eos_token_id
         eos_ids = torch.as_tensor(eos if isinstance(eos, list) else [eos], device=device)
@@ -152,5 +152,5 @@ class MambaRunner:
                 use_cache=True,
                 logits_to_keep=1,
             )
-            cache, logits = out.past_key_values, out.logits[:, -1]
+            cache, logits = out.past_key_values, out.logits[:, -1].to(device)
         return generated

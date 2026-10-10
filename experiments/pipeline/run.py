@@ -10,6 +10,7 @@ import math
 import re
 from pathlib import Path
 
+import torch.distributed as dist
 from evaluate import humaneval, ifeval
 from report import build_report
 
@@ -152,6 +153,7 @@ def identity(config_file: Path, plan: dict, data: list[dict], role: str) -> dict
             directions[str(path)] = {file.name: digest(file) for file in files}
     return {
         "model": plan["model"],
+        "parallel_backend": plan.get("parallel_backend", "single"),
         "role": role,
         "dataset": plan["judge_dataset"] if role == "judge" else plan["bench_dataset"],
         "n_tasks": len(data),
@@ -167,6 +169,7 @@ def identity(config_file: Path, plan: dict, data: list[dict], role: str) -> dict
                 "experiments/pipeline/evaluate.py",
                 "experiments/pipeline/residual.py",
                 "src/hybrid_steering/mamba.py",
+                "src/hybrid_steering/runtime.py",
                 "src/hybrid_steering/runner.py",
                 "src/hybrid_steering/state.py",
                 "src/hybrid_steering/cache.py",
@@ -242,7 +245,7 @@ def generate(
     if manifest_file.exists():
         if json.loads(manifest_file.read_text()) != manifest:
             raise ValueError("existing output has a different config, dataset, direction, or code")
-    else:
+    elif not dist.is_initialized() or dist.get_rank() == 0:
         manifest_file.write_text(json.dumps(manifest, indent=2) + "\n")
     answer_file = output / "answers.jsonl"
     saved = read_lines(answer_file) if answer_file.exists() and answer_file.stat().st_size else []
@@ -302,9 +305,19 @@ def generate(
                             **({"task_id": item["task_id"]} if "task_id" in item else {}),
                         }
                     )
-                with answer_file.open("a", encoding="utf-8") as stream:
-                    for row in additions:
-                        stream.write(json.dumps(row, ensure_ascii=False) + "\n")
+                if dist.is_initialized():
+                    hashes = [None] * dist.get_world_size()
+                    dist.all_gather_object(
+                        hashes, hashlib.sha256(json.dumps(additions).encode()).hexdigest()
+                    )
+                    if len(set(hashes)) != 1:
+                        raise ValueError("TP ranks disagree on generated answers")
+                if not dist.is_initialized() or dist.get_rank() == 0:
+                    with answer_file.open("a", encoding="utf-8") as stream:
+                        for row in additions:
+                            stream.write(json.dumps(row, ensure_ascii=False) + "\n")
+                if dist.is_initialized():
+                    dist.barrier()
                 saved.extend(additions)
                 by_key.update(
                     {(row["condition"], row["scale"], row["key"]): row for row in additions}
@@ -488,9 +501,12 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--config", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--run-judge", action="store_true", help="Allow paid Judge API requests")
+    parser.add_argument("--role", choices=("judge", "benchmark"))
     args = parser.parse_args(argv)
     config_file, output = args.config.resolve(), args.output.resolve()
     plan, datasets = load_plan(config_file)
+    if args.role:
+        datasets = {args.role: datasets[args.role]}
     directories = {
         role: run_directory(config_file, plan, data, role, output)
         for role, data in datasets.items()
