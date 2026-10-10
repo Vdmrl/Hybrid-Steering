@@ -67,6 +67,27 @@ Set Judge API credentials in the environment; do not put them in JSON.
 
 ## Four-point Pareto sweep
 
+### **Зафиксированная сетка сил для Numbered и Theistic**
+
+> [!IMPORTANT]
+> **Свипать всю сетку отдельно для каждого концепта, модели и метода.**
+> Исторические силы из датасета не сокращают эту сетку. Нулевая сила —
+> отдельный baseline. После свипа выбирать четыре *разные ненулевые* силы
+> по близости `|concept_rate − target|` к **0.3, 0.5, 0.7, 0.99**.
+
+| Концепт | Рекуррентные методы | Residual add и residual clamp |
+| --- | --- | --- |
+| **Numbered** | **0.75, 1.00, 1.25, 1.50, 1.75, 2.00, 2.25, 2.50, 2.75, 3.00, 3.25, 3.50, 3.75, 4.00** | **0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9** на **L16 и L20** |
+| **Theistic** | **0.75, 1.00, 1.25, 1.50, 1.75, 2.00, 2.25, 2.50, 2.75, 3.00, 3.25, 3.50, 3.75, 4.00** | **0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9** на **L16 и L20** |
+
+Для Qwen рекуррентные методы — GDN `rank1`, `rank2`, `clamp_rank1`,
+`full`; для Falcon — соответствующие Mamba-методы. **У каждого метода своя
+четвёрка выбранных сил**: выбор Numbered не переносится на Theistic, выбор
+одной модели или слоя не переносится на другую модель или слой. На каждую
+точку свипа приходится **50 Judge-ответов**, максимум **512 новых токенов**.
+Выбранные точки идут на отдельные **50 Judge-промптов** и полные IFEval и
+HumanEval с лимитом **2048 новых токенов**.
+
 `pareto.py` is a thin coordinator for the pipeline above. Copy
 `pareto.example.json`, set the concept pair paths and the existing IFEval and
 HumanEval dataset paths, then run:
@@ -230,6 +251,8 @@ new results are not mixed.
 > under the wrong condition, the 50+50 Judge splits and extraction pairs do
 > not overlap, `target − source` has the intended sign, residual clamp matches
 > the equation above, GDN rank normalization and clamp timing are preserved,
+> the candidate strengths match the highlighted Numbered/Theistic table
+> exactly (including both residual layers),
 > and the selected four strengths really minimize absolute error to
 > 0.3/0.5/0.7/0.99 under the stated constraints. Check that code blocks and
 > unfinished/truncated answers do not create misleading Theistic/Numbered
