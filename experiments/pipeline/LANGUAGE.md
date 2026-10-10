@@ -101,7 +101,22 @@ condition and is 1 for fullrank; `normalize=false` means no state-norm matching.
 Falcon's per-head unit direction inside its clamp is part of that formula.
 Do not transfer coefficient interpretation from experiments with another norm.
 
-## Deliverables
+## Reuse existing code (including the corrected HumanEval)
+
+Use `src/hybrid_steering/runtime.py` for model loading, `runner.py` for Qwen,
+and `mamba.py` for Falcon. `experiments/pipeline/run.py` already calls these
+implementations; do not copy model loading or generation into another script.
+The language coordinator only prepares plans, selects scales and collects outputs.
+
+For HumanEval, reuse `run.py` with `bench_dataset.name="humaneval"` and
+`evaluate.py`. The user's full-function correction is already merged:
+`humaneval_protocol.py` asks for the complete function including `def`, removes
+only an enclosing code fence, and preserves the generated code. The existing
+sandbox executor separates hidden tests with a newline. Keep this protocol;
+do not substitute a function-body prompt. HumanEval is separate from this
+language IFEval campaign.
+
+## Result files
 
 Default output: `runs/language-priority/`. Its `README.md` links the four
 completed studies and `all-measurements.csv`. Each model/language folder has:
