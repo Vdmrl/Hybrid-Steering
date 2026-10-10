@@ -50,8 +50,13 @@ IFEval requires Google's `instruction_following_eval` checkout in
 `benchmark.evaluator.root` and its `evaluation_lib.py` SHA-256. HumanEval uses
 the repository's small executor inside Bubblewrap (`bwrap`) with network and
 host writes disabled. Its input is the standard HumanEval JSONL or JSONL.gz.
-HumanEval prompts are raw code prefixes; IFEval and Judge prompts use the
-model's chat template with thinking disabled.
+HumanEval uses the saved `chat-full-function-v1` protocol: ask for the complete
+function including its `def` line, render that request with the model's chat
+template and thinking disabled, then prepend the dataset's original function
+stub to the normalized completion for execution. IFEval and Judge prompts also
+use the model's chat template with thinking disabled. The historical Qwen 9B
+run used 1024 output tokens; this Pareto pipeline keeps its configured 2048
+output tokens, so its scores have a distinct run identity.
 
 `score` writes blinded `judge_tasks.jsonl` and separate
 `judge_bindings.jsonl`. With `--run-judge`, it reads `judge.config`, runs the

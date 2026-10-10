@@ -12,6 +12,7 @@ from pathlib import Path
 
 import torch.distributed as dist
 from evaluate import humaneval, ifeval
+from humaneval_protocol import prompt as humaneval_prompt
 from report import build_report
 
 from hybrid_steering import Runner, gdn_layers, load_direction, load_runtime
@@ -167,6 +168,7 @@ def identity(config_file: Path, plan: dict, data: list[dict], role: str) -> dict
             for name in (
                 "experiments/pipeline/run.py",
                 "experiments/pipeline/evaluate.py",
+                "experiments/pipeline/humaneval_protocol.py",
                 "experiments/pipeline/residual.py",
                 "src/hybrid_steering/mamba.py",
                 "src/hybrid_steering/runtime.py",
@@ -233,7 +235,9 @@ def _runner(model, tokenizer, condition: dict, config_file: Path, model_id: str)
 
 def _texts(tokenizer, data: list[dict], benchmark: str) -> list[str]:
     prompts = [row["prompt"] for row in data]
-    return prompts if benchmark == "humaneval" else chat_prompts(tokenizer, prompts)
+    if benchmark == "humaneval":
+        prompts = [humaneval_prompt(stub) for stub in prompts]
+    return chat_prompts(tokenizer, prompts)
 
 
 def generate(
@@ -409,10 +413,21 @@ def evaluate(
     benchmark_scores = output / "benchmark_scores.json"
     benchmark_manifest = output / "benchmark_score_manifest.json"
     answers_sha = digest(output / "answers.jsonl")
+    benchmark_score_id = None
+    if role == "benchmark":
+        benchmark_score_id = {
+            "answers": answers_sha,
+            "scorer": digest(ROOT / "experiments/pipeline/evaluate.py"),
+            "evaluator": (
+                digest(ROOT / "experiments/pipeline/humaneval_execute_one.py")
+                if name == "humaneval"
+                else plan["bench_dataset"]["evaluator"]["evaluation_lib_sha256"]
+            ),
+        }
     benchmark_cached = (
         benchmark_scores.exists()
         and benchmark_manifest.exists()
-        and json.loads(benchmark_manifest.read_text()) == {"answers": answers_sha}
+        and json.loads(benchmark_manifest.read_text()) == benchmark_score_id
     )
     if role == "benchmark" and not benchmark_cached:
         metrics = {}
@@ -433,7 +448,7 @@ def evaluate(
                 else:
                     metrics[f"{case['name']}:{scale}"] = humaneval(selected, data)
         benchmark_scores.write_text(json.dumps(metrics, indent=2) + "\n")
-        benchmark_manifest.write_text(json.dumps({"answers": answers_sha}) + "\n")
+        benchmark_manifest.write_text(json.dumps(benchmark_score_id) + "\n")
     if role != "judge":
         return True
     if is_language(plan["judge"]["feature"]):

@@ -51,6 +51,44 @@ def test_falcon_direction_and_cache_update():
     assert torch.equal(model.seen[-2], torch.tensor([[[[expected]]]]))
 
 
+def test_humaneval_tests_start_on_a_new_line():
+    import importlib.util
+    import sys
+
+    directory = Path(__file__).resolve().parents[1] / "experiments/pipeline"
+    executor = directory / "humaneval_execute_one.py"
+    spec = importlib.util.spec_from_file_location("humaneval_execute_one", executor)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    sys.path.insert(0, str(directory))
+    try:
+        from humaneval_protocol import completion, prompt
+
+        stub = 'def f():\n    """Return one."""\n'
+        assert prompt(stub).startswith("Solve this Python task.")
+        assert "including its def line" in prompt(stub)
+        assert prompt(stub).endswith(stub)
+        assert completion("```python\ndef f():\n    return 1\n```") == (
+            "\n\ndef f():\n    return 1\n"
+        )
+        payload = {
+            "prompt": stub,
+            "completion": completion("def f():\n    return 1"),
+            "test": "def check(candidate):\n    assert candidate() == 1\n",
+            "entry_point": "f",
+        }
+        source = module.build_source(payload)
+        assert "return 1\ndef check" in source
+        exec(compile(source, "<HumanEval test>", "exec"), {})
+        # The executor also keeps the test on a new line for an unnormalized answer.
+        assert "return 1\ndef check" in module.build_source(
+            {**payload, "completion": "    return 1"}
+        )
+    finally:
+        sys.path.pop(0)
+
+
 def test_pipeline_plan_hash_and_method_validation(tmp_path: Path):
     import importlib.util
     import sys

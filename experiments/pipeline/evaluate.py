@@ -9,6 +9,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from humaneval_protocol import completion
 from intervals import bootstrap_ratio
 
 from hybrid_steering.scoring import wilson
@@ -127,7 +128,7 @@ def humaneval(answers: list[dict], dataset: list[dict]) -> dict:
     for row in answers:
         task = tasks[row["task_id"]]
         payload = {key: task[key] for key in ("prompt", "test", "entry_point")}
-        payload["completion"] = row["response"]
+        payload["completion"] = completion(row["response"])
         try:
             done = subprocess.run(
                 command, input=json.dumps(payload), text=True, capture_output=True, timeout=10

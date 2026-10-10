@@ -7,18 +7,26 @@ import resource
 import sys
 
 
-def main() -> None:
-    payload = json.load(sys.stdin)
-    resource.setrlimit(resource.RLIMIT_CPU, (4, 4))
-    resource.setrlimit(resource.RLIMIT_FSIZE, (1024 * 1024, 1024 * 1024))
-    source = (
+def build_source(payload: dict) -> str:
+    """Append the hidden tests after a complete Python line."""
+    completion = payload["completion"]
+    separator = "" if completion.endswith("\n") else "\n"
+    return (
         payload["prompt"]
-        + payload["completion"]
+        + completion
+        + separator
         + payload["test"]
         + "\ncheck("
         + payload["entry_point"]
         + ")\n"
     )
+
+
+def main() -> None:
+    payload = json.load(sys.stdin)
+    resource.setrlimit(resource.RLIMIT_CPU, (4, 4))
+    resource.setrlimit(resource.RLIMIT_FSIZE, (1024 * 1024, 1024 * 1024))
+    source = build_source(payload)
     result = {"passed": False, "error": None}
     try:
         with (
