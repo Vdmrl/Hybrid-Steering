@@ -1,0 +1,37 @@
+{
+  "frozen_config_sha256": "f144de2f8fabab74a1a168a7bbcb36b0a955744c3d3cf2ee57e82de923885408",
+  "core_main": 1024,
+  "core_screen": 992,
+  "appendix_screen": 1536,
+  "total_unique_main": 2560,
+  "baseline_main": 32,
+  "core_controls": {
+    "zero": 10,
+    "replay": 31
+  },
+  "appendix_controls": {
+    "fresh_baseline": 32,
+    "zero": 10,
+    "replay": 48
+  },
+  "task_sha256": {
+    "appendix32.json": "4fdb0c7fa6d1899e3abe94ca7d4f717a34b0d0741b6cd7dcd1f4f7847fcc2d8f",
+    "core32.json": "48abb1ef4ce12a9d922ad74b21f4df7b1d2a5377e355fd54bb02fa9b7e95fa09"
+  },
+  "direction_sha256": {
+    "french": "21cc665e49907065b8a2e0612149a351a2b74bb41bc3634ee673052d11fbb59e",
+    "technical": "738b5dd79a63371138d31e81d05e76059363954f5af07037c1b85ac7c5d1bb5f",
+    "theistic_framing": "b3d7c1c5ac28333ac495f3069e9eeaacda72e87217881d4387cbdeb4640fb7f4",
+    "numbered": "3c319cfd3bd770fca225309cfc240211d38024f55acd3eaca7e970eea08add0b",
+    "probabilistic_framing": "660020062ee2108411f4cc4caa151cfbca82915095462302de4bf383a32a6708"
+  },
+  "figure": {
+    "core_lambda": 1,
+    "prompt_ids": 32,
+    "subsets": 31,
+    "x": "Number of active concepts (1-5)",
+    "y": "Mean active-concept score (anchored 1-5)",
+    "aggregation": "For each feature and k: equal average across matched32 prompts and all subsets of size k containing that feature; macro average over the five feature means. Keep singleton reference k=1. Compare GDN and CAA only after joining saved blind scores by stable IDs and validating cohorts. No inference of concept rates from regex/EOS. Quality separately.",
+    "scores": "Pending; this package generates responses only, no Judge/API calls. Existing GDN results are retained."
+  }
+}

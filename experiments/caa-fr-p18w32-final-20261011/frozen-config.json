@@ -1,0 +1,78 @@
+{
+  "features": {
+    "french": {
+      "layers": [
+        8
+      ],
+      "gain": 4
+    },
+    "technical": {
+      "layers": [
+        16
+      ],
+      "gain": 8
+    },
+    "theistic_framing": {
+      "layers": [
+        8
+      ],
+      "gain": 12
+    },
+    "numbered": {
+      "layers": [
+        8,
+        16
+      ],
+      "gain": 16,
+      "max_calls": 28
+    },
+    "probabilistic_framing": {
+      "layers": [
+        8
+      ],
+      "gain": 18,
+      "max_calls": 32
+    }
+  },
+  "sources": {
+    "french": {
+      "path": "directions/french.safetensors",
+      "sha256": "21cc665e49907065b8a2e0612149a351a2b74bb41bc3634ee673052d11fbb59e"
+    },
+    "technical": {
+      "path": "directions/technical.safetensors",
+      "sha256": "738b5dd79a63371138d31e81d05e76059363954f5af07037c1b85ac7c5d1bb5f"
+    },
+    "theistic_framing": {
+      "path": "directions/theistic_framing.safetensors",
+      "sha256": "b3d7c1c5ac28333ac495f3069e9eeaacda72e87217881d4387cbdeb4640fb7f4"
+    },
+    "numbered": {
+      "path": "directions/numbered.safetensors",
+      "sha256": "3c319cfd3bd770fca225309cfc240211d38024f55acd3eaca7e970eea08add0b"
+    },
+    "probabilistic_framing": {
+      "path": "directions/probabilistic_framing.safetensors",
+      "sha256": "660020062ee2108411f4cc4caa151cfbca82915095462302de4bf383a32a6708"
+    }
+  },
+  "original_frozen_sha256": "949af76a3b21a5f3358c4b9cee378a27c61580016fadc1948b11e055d8762ddb",
+  "run_id": "caa-fr-p18w32-final-20261011",
+  "model": "Qwen/Qwen3.5-9B",
+  "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+  "selection": "Explicit human final selection P L8gain18first32; no further dev or final/Judge tuning.",
+  "temporal_contract": "Bulk prefill untouched; first28 N and first32 P single-token forwards independently, including final newline bridge; F/T/R continuous.",
+  "training_pair_counts": {
+    "numbered": 256,
+    "probabilistic_framing": 256,
+    "french": 128,
+    "technical": 256,
+    "theistic_framing": 750
+  },
+  "caa_math": "Ordinary additive per-layer unit vectors times gain/sqrt(layer count); lambda applied once; no cross-concept normalization, rank or clamp.",
+  "evidence": {
+    "observed-w16-review.json": "4723eb32da87adbe147ef6c882dc051d7b6b51c4cdf7a783850efe0bfbdf5850",
+    "observed-w32-review.json": "3b20b73781448c27d550d850303e11a47a3eaa12d51387d17155a23ab5079241",
+    "ten-g18-w32-review.json": "6f6091dd51d4ba1b4ba61a82c581fa0f99c9ba39c851789b6d70556fb0e97398"
+  }
+}

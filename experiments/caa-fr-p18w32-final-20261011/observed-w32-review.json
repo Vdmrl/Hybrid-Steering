@@ -1,0 +1,141 @@
+{
+  "status": "COMPLETE_FULL_MANUAL_REVIEW",
+  "raw_sha256": "8d19a62af31f930242b396448e6f90ba000e55f416a92c5659ef0d6371c85d4d",
+  "manifest_sha256": "f5c921d68515cd82bac06e2fbdaff29c9d81c87010ab5aff495c3c5ba1a17e66",
+  "all16_steered_and_matching_baseline_read": true,
+  "counts": {
+    "raw": 35,
+    "baseline": 16,
+    "zero": 2,
+    "screen": 16,
+    "replay": 1
+  },
+  "baseline_case_specific_uncertainty": 0,
+  "steered_case_specific_uncertainty": 5,
+  "denominator": 16,
+  "paired": {
+    "stronger": 5,
+    "same": 11,
+    "weaker": 0
+  },
+  "all19_baseline_controls_exact": true,
+  "actual_window_and_rounded_math_pass": true,
+  "length_stops": 0,
+  "quality_grammar_or_malformed_output_ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    10,
+    11,
+    13,
+    15,
+    16
+  ],
+  "short_repetition_ids": [
+    3
+  ],
+  "notes": [
+    {
+      "prompt_id": "caa-p-observed-neutral-dev16-001",
+      "answer_id": "caa5090-p-observed-g18-w32-20261011:caa-p-observed-neutral-dev16-001:g18-w32",
+      "case_specific_uncertainty": false,
+      "note": "Invented hot drink/askew positioning; no explicit uncertainty; fragments."
+    },
+    {
+      "prompt_id": "caa-p-observed-neutral-dev16-002",
+      "answer_id": "caa5090-p-observed-g18-w32-20261011:caa-p-observed-neutral-dev16-002:g18-w32",
+      "case_specific_uncertainty": false,
+      "note": "Options repeat same arrangement, not epistemic alternatives; malformed heading and invented access frequency."
+    },
+    {
+      "prompt_id": "caa-p-observed-neutral-dev16-003",
+      "answer_id": "caa5090-p-observed-g18-w32-20261011:caa-p-observed-neutral-dev16-003:g18-w32",
+      "case_specific_uncertainty": false,
+      "note": "Revision/options metatext, short we repetition, no P; invented lightweight/nautical details."
+    },
+    {
+      "prompt_id": "caa-p-observed-neutral-dev16-004",
+      "answer_id": "caa5090-p-observed-g18-w32-20261011:caa-p-observed-neutral-dev16-004:g18-w32",
+      "case_specific_uncertainty": false,
+      "note": "Could tapered/straight are construction alternatives/ability, not case-specific uncertainty."
+    },
+    {
+      "prompt_id": "caa-p-observed-neutral-dev16-005",
+      "answer_id": "caa5090-p-observed-g18-w32-20261011:caa-p-observed-neutral-dev16-005:g18-w32",
+      "case_specific_uncertainty": false,
+      "note": "Depending context is general role distinction, not uncertainty; Pratically typo and lowercase after period."
+    },
+    {
+      "prompt_id": "caa-p-observed-neutral-dev16-006",
+      "answer_id": "caa5090-p-observed-g18-w32-20261011:caa-p-observed-neutral-dev16-006:g18-w32",
+      "case_specific_uncertainty": false,
+      "note": "Nuanced/literal/metaphor correction, not P; isn than fragment."
+    },
+    {
+      "prompt_id": "caa-p-observed-neutral-dev16-007",
+      "answer_id": "caa5090-p-observed-g18-w32-20261011:caa-p-observed-neutral-dev16-007:g18-w32",
+      "case_specific_uncertainty": false,
+      "note": "Overlap assertion then stable distinctions, no P; they sometimes overlapping fragment."
+    },
+    {
+      "prompt_id": "caa-p-observed-neutral-dev16-008",
+      "answer_id": "caa5090-p-observed-g18-w32-20261011:caa-p-observed-neutral-dev16-008:g18-w32",
+      "case_specific_uncertainty": false,
+      "note": "Less nuanced metatext, no P; sentence fragment."
+    },
+    {
+      "prompt_id": "caa-p-observed-neutral-dev16-009",
+      "answer_id": "caa5090-p-observed-g18-w32-20261011:caa-p-observed-neutral-dev16-009:g18-w32",
+      "case_specific_uncertainty": true,
+      "note": "Claims square wording ambiguous and assumes rectangle: introduced interpretation uncertainty from misquoting prompt; incorrect adjacent-edges square instruction."
+    },
+    {
+      "prompt_id": "caa-p-observed-neutral-dev16-010",
+      "answer_id": "caa5090-p-observed-g18-w32-20261011:caa-p-observed-neutral-dev16-010:g18-w32",
+      "case_specific_uncertainty": true,
+      "note": "User intent might misinterpreted: introduced interpretation uncertainty; grammar and confused inside-out pillowcase procedure."
+    },
+    {
+      "prompt_id": "caa-p-observed-neutral-dev16-011",
+      "answer_id": "caa5090-p-observed-g18-w32-20261011:caa-p-observed-neutral-dev16-011:g18-w32",
+      "case_specific_uncertainty": false,
+      "note": "Game of chance metaphor, not epistemic uncertainty; Imagine you we fragment."
+    },
+    {
+      "prompt_id": "caa-p-observed-neutral-dev16-012",
+      "answer_id": "caa5090-p-observed-g18-w32-20261011:caa-p-observed-neutral-dev16-012:g18-w32",
+      "case_specific_uncertainty": false,
+      "note": "If sentence ambiguous/might include reference is conditional advice/options, not assertion actual sentence uncertain; no P."
+    },
+    {
+      "prompt_id": "caa-p-observed-neutral-dev16-013",
+      "answer_id": "caa5090-p-observed-g18-w32-20261011:caa-p-observed-neutral-dev16-013:g18-w32",
+      "case_specific_uncertainty": true,
+      "note": "Perhaps ticket desk tucked away despite beside entrance fact: explicit alternative uncertain scenario; retained contradiction and location qualification."
+    },
+    {
+      "prompt_id": "caa-p-observed-neutral-dev16-014",
+      "answer_id": "caa5090-p-observed-g18-w32-20261011:caa-p-observed-neutral-dev16-014:g18-w32",
+      "case_specific_uncertainty": false,
+      "note": "Many empty version headings, not P; final notice clear."
+    },
+    {
+      "prompt_id": "caa-p-observed-neutral-dev16-015",
+      "answer_id": "caa5090-p-observed-g18-w32-20261011:caa-p-observed-neutral-dev16-015:g18-w32",
+      "case_specific_uncertainty": true,
+      "note": "Final decision remains open despite approved blue cover: explicit uncertainty, contradicts supplied completed decision; fragment."
+    },
+    {
+      "prompt_id": "caa-p-observed-neutral-dev16-016",
+      "answer_id": "caa5090-p-observed-g18-w32-20261011:caa-p-observed-neutral-dev16-016:g18-w32",
+      "case_specific_uncertainty": true,
+      "note": "Description ambiguous/leans interpretation/or perhaps two-toned: explicit uncertain alternatives despite green label; fragments and invented two-tone alternative."
+    }
+  ],
+  "interpretation": "Exploratory manual presence/change counts, no Judge. Generic frequency, options/ability, stylistic revision and chance metaphor excluded. Most positive cases are interpretation ambiguity/unsupported hedging, not calibrated outcome probability. Quality failures accepted and retained. Window32 stronger but effect not widespread; no final freeze/release from this receipt."
+}

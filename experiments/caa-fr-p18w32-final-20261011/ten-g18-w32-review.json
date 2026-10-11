@@ -1,0 +1,167 @@
+{
+  "status": "FULL_MANUAL_REVIEW_COMPLETE",
+  "raw_sha256": "6659b90c6a4ecf67d65dd8313b80862312f2bd929655411b3d4aafd8bc2f6de1",
+  "reviewed_baselines": 16,
+  "reviewed_steered": 16,
+  "exact_controls": 3,
+  "uncertainty_opportunity": {
+    "baseline": 5,
+    "steered": 6,
+    "denominator": 12,
+    "advice": 0,
+    "outcome": 6
+  },
+  "determinate_unsupported_uncertainty_or_ambiguity": 4,
+  "grammar_failures": 11,
+  "cycles": 0,
+  "length_stops": 0,
+  "review": [
+    {
+      "prompt_id": "caa-p-neutral-audit-dev16-001",
+      "baseline_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-001:baseline:4984192be3674130bf2796f134c3cc35:0",
+      "steered_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-001:g18-w32",
+      "uncertainty_presence": false,
+      "unsupported_fact_ambiguity": false,
+      "grammar_failure": true,
+      "notes": "Options/organization only; . like fragment/malformed Option; misclassifies spare buttons as electronics accessories."
+    },
+    {
+      "prompt_id": "caa-p-neutral-audit-dev16-002",
+      "baseline_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-002:baseline:4984192be3674130bf2796f134c3cc35:1",
+      "steered_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-002:g18-w32",
+      "uncertainty_presence": false,
+      "unsupported_fact_ambiguity": false,
+      "grammar_failure": false,
+      "notes": "Options only; malformed markdown Option header."
+    },
+    {
+      "prompt_id": "caa-p-neutral-audit-dev16-003",
+      "baseline_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-003:baseline:4984192be3674130bf2796f134c3cc35:2",
+      "steered_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-003:g18-w32",
+      "uncertainty_presence": false,
+      "unsupported_fact_ambiguity": false,
+      "grammar_failure": false,
+      "notes": "Conditional handling instructions, no epistemic uncertainty."
+    },
+    {
+      "prompt_id": "caa-p-neutral-audit-dev16-004",
+      "baseline_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-004:baseline:4984192be3674130bf2796f134c3cc35:3",
+      "steered_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-004:g18-w32",
+      "uncertainty_presence": false,
+      "unsupported_fact_ambiguity": false,
+      "grammar_failure": false,
+      "notes": "Storage alternatives, no epistemic uncertainty."
+    },
+    {
+      "prompt_id": "caa-p-neutral-audit-dev16-005",
+      "baseline_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-005:baseline:4984192be3674130bf2796f134c3cc35:4",
+      "steered_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-005:g18-w32",
+      "uncertainty_presence": false,
+      "unsupported_fact_ambiguity": false,
+      "grammar_failure": false,
+      "notes": "If/could wait are options/contingent advice, not epistemic uncertainty; no clear advice trait."
+    },
+    {
+      "prompt_id": "caa-p-neutral-audit-dev16-006",
+      "baseline_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-006:baseline:4984192be3674130bf2796f134c3cc35:5",
+      "steered_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-006:g18-w32",
+      "uncertainty_presence": false,
+      "unsupported_fact_ambiguity": false,
+      "grammar_failure": false,
+      "notes": "Conditional cleaning advice, no epistemic uncertainty."
+    },
+    {
+      "prompt_id": "caa-p-neutral-audit-dev16-007",
+      "baseline_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-007:baseline:4984192be3674130bf2796f134c3cc35:6",
+      "steered_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-007:g18-w32",
+      "uncertainty_presence": true,
+      "unsupported_fact_ambiguity": false,
+      "grammar_failure": true,
+      "notes": "Depends/may with environmental variability; . but and broken Scenario heading; incorrect towel absorbs water from fabric sentence."
+    },
+    {
+      "prompt_id": "caa-p-neutral-audit-dev16-008",
+      "baseline_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-008:baseline:4984192be3674130bf2796f134c3cc35:7",
+      "steered_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-008:g18-w32",
+      "uncertainty_presence": true,
+      "unsupported_fact_ambiguity": false,
+      "grammar_failure": true,
+      "notes": "Likely scenarios/might/could/likely, more conditional than baseline; . but fragment and questionable cover/damage assertions."
+    },
+    {
+      "prompt_id": "caa-p-neutral-audit-dev16-009",
+      "baseline_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-009:baseline:4984192be3674130bf2796f134c3cc35:8",
+      "steered_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-009:g18-w32",
+      "uncertainty_presence": true,
+      "unsupported_fact_ambiguity": false,
+      "grammar_failure": true,
+      "notes": "Contrasts resilient versus sun-loving species with might/could/likely, clearly stronger condition framing; .heres fragment, ScenarioA/C discontinuity."
+    },
+    {
+      "prompt_id": "caa-p-neutral-audit-dev16-010",
+      "baseline_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-010:baseline:4984192be3674130bf2796f134c3cc35:9",
+      "steered_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-010:g18-w32",
+      "uncertainty_presence": true,
+      "unsupported_fact_ambiguity": false,
+      "grammar_failure": true,
+      "notes": "Explicit optimistic versus more likely damaged scenario, stronger alternative-outcome framing; unsupported typical-shed likelihood; .but fragment."
+    },
+    {
+      "prompt_id": "caa-p-neutral-audit-dev16-011",
+      "baseline_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-011:baseline:4984192be3674130bf2796f134c3cc35:10",
+      "steered_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-011:g18-w32",
+      "uncertainty_presence": true,
+      "unsupported_fact_ambiguity": false,
+      "grammar_failure": true,
+      "notes": "Vanishingly unlikely theft plus likely driver assumption, stronger uncertainty than baseline fixed story; many grammar fragments, invented neighbor story and inconsistent chronology."
+    },
+    {
+      "prompt_id": "caa-p-neutral-audit-dev16-012",
+      "baseline_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-012:baseline:4984192be3674130bf2796f134c3cc35:11",
+      "steered_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-012:g18-w32",
+      "uncertainty_presence": true,
+      "unsupported_fact_ambiguity": false,
+      "grammar_failure": true,
+      "notes": "Alternative insulated/standard cases, might/perhaps/likely temperature estimates, stronger uncertainty; .lets and thoughIless fragments; arbitrary numeric cooling values unsupported."
+    },
+    {
+      "prompt_id": "caa-p-neutral-audit-dev16-013",
+      "baseline_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-013:baseline:4984192be3674130bf2796f134c3cc35:12",
+      "steered_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-013:g18-w32",
+      "uncertainty_presence": true,
+      "unsupported_fact_ambiguity": true,
+      "grammar_failure": true,
+      "notes": "Most likely/trick/hidden balls, strong but unsupported ambiguity; 5or7 then6, internally inconsistent reasoning; grammar fragments."
+    },
+    {
+      "prompt_id": "caa-p-neutral-audit-dev16-014",
+      "baseline_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-014:baseline:4984192be3674130bf2796f134c3cc35:13",
+      "steered_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-014:g18-w32",
+      "uncertainty_presence": true,
+      "unsupported_fact_ambiguity": true,
+      "grammar_failure": true,
+      "notes": "Ambiguous intent/mostlikely/trick on explicit square, false ambiguity; correct8cm; malformed soIwe and fragments."
+    },
+    {
+      "prompt_id": "caa-p-neutral-audit-dev16-015",
+      "baseline_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-015:baseline:4984192be3674130bf2796f134c3cc35:14",
+      "steered_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-015:g18-w32",
+      "uncertainty_presence": true,
+      "unsupported_fact_ambiguity": true,
+      "grammar_failure": true,
+      "notes": "Depends interpretation on fixed hours, false ambiguity; correct8hours; duplicateyou and fragments."
+    },
+    {
+      "prompt_id": "caa-p-neutral-audit-dev16-016",
+      "baseline_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-016:baseline:4984192be3674130bf2796f134c3cc35:15",
+      "steered_answer_id": "caa5090-p-audit-g18-w32-20261011:caa-p-neutral-audit-dev16-016:g18-w32",
+      "uncertainty_presence": true,
+      "unsupported_fact_ambiguity": true,
+      "grammar_failure": true,
+      "notes": "Misleading/metaphor with might, unsupported ambiguity; final topdrawer correct, fragments."
+    }
+  ],
+  "not_judge": true,
+  "not_causal_success_rate": true,
+  "selection_priority": "User accepts unsupported ambiguity and quality failures; trait visibility first, ability/options not counted as trait."
+}
