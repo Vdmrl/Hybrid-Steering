@@ -128,7 +128,9 @@ def _directions(config: Path, model: dict, concept: dict, output: Path) -> tuple
     return base / "recurrent/direction", base / "residual/direction"
 
 
-def _conditions(model: dict, recurrent: Path, residual: Path) -> list[dict]:
+def _conditions(
+    model: dict, recurrent: Path, residual: Path, residual_layers=(16, 20)
+) -> list[dict]:
     method = "gdn" if model["family"] == "gdn" else "mamba"
     direction, *_ = load_direction(recurrent)
     full = injected_norm(direction, None)
@@ -152,7 +154,7 @@ def _conditions(model: dict, recurrent: Path, residual: Path) -> list[dict]:
         if intervention == "add":
             case["prompt_position"] = -1
         cases.append(case)
-    for layer in (16, 20):
+    for layer in residual_layers:
         for name in ("residual_add", "residual_clamp"):
             cases.append(
                 {
@@ -263,7 +265,15 @@ def run_study(
         raise ValueError("need IFEval and HumanEval benchmark datasets")
     judge_config = _path(config, suite["judge_config"])
     recurrent, residual = _directions(config, model, concept, output)
-    cases = _conditions(model, recurrent, residual)
+    residual_layers = (16, 20)
+    if suite.get("residual_layer_search") and concept["id"] in {"numbered", "theistic"}:
+        from residual_layers import search
+
+        chosen_layer = search(config, suite, model, concept, residual, output, run_judge)
+        if chosen_layer is None:
+            return
+        residual_layers = (chosen_layer,)
+    cases = _conditions(model, recurrent, residual, residual_layers)
     screen_plan = folder / "screen.json"
     _write_plan(screen_plan, _plan(model, concept, screen, benchmarks[0], judge_config, cases, 512))
     screen_dir, ready = _run_role(screen_plan, folder / "screen", "judge", run_judge, model)

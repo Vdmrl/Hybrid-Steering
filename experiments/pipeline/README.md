@@ -277,3 +277,32 @@ new results are not mixed.
 > need a protocol decision, and (4) exact resume commands. Do not silently
 > change the metric, rubric, prompt splits, strengths, thinking mode, or
 > already saved answers.
+
+
+## Automatic residual layer selection: Numbered / Theistic
+
+Use `pareto.layer-search.example.json`, set its dataset/concept paths, and run:
+
+```bash
+uv run python experiments/pipeline/pareto.py --config experiments/pipeline/pareto.layer-search.example.json --output runs/numbered-theistic-layer-search --run-judge
+```
+
+This uses the existing model loaders, residual direction extraction, generation,
+resume and Judge. Each model/concept tests L7, L10, L16, L20, L25, L31 at
+0.1, 0.2, 0.3, 0.5, 0.7, 1, 1.5, 2, 3, 4 on the same first 20 screen prompts.
+The example sets `parallel_backend=single`; set CUDA_VISIBLE_DEVICES to an idle GPU.
+`metric_column` explicitly chooses the existing `concept_score` or `hit` metric.
+No fixed maximum of 4 is assumed. All candidate layers must exist in the direction.
+
+Find the global observed maximum M. Choose the layer reaching 95% of M at the
+lowest strength. Ties prefer the higher score there, then higher layer maximum,
+then smaller layer index. If M=0, save `no_expression` and stop instead of
+inventing a winner. Unevaluable answers count as zero; missing API scores fail.
+
+Freeze `residual-layer-search/selected-residual-layer.json` and CSV plus
+`layer-sweep.csv` before the main 50-prompt screen. All subsequent residual add
+and clamp conditions use that selected layer; recurrent-state conditions are
+unchanged. Resume with the same command and output folder. Use a fresh folder
+when changing the grid, prompts, metric or protocol. Existing runs without
+`residual_layer_search` retain their settings. Languages do not use this search;
+Arabic/French residual reruns are on fixed L7.
