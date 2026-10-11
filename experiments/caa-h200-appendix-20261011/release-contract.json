@@ -9,8 +9,8 @@
   "expected_replay_appendix": 48,
   "appendix_fresh_baseline32_are_controls_not_new_main_observations": true,
   "task_sha256": {
-    "appendix32.json": "2e58c9c1b2fe4b620468c73531a8d1010f3a84bada7913d152b378f608d112ee",
-    "core32.json": "50fd2da29da117d519df8c34a1a4b9c24418e8b499c2fa10cde1c8b69757ac0e"
+    "appendix32.json": "b39741ebcb2a96c99968a7eb8f50b8b3271b9884b68ad5ee5c49bbb60fc32af4",
+    "core32.json": "cba356debf71ba8b4cd00e3bc83482424502fa2915b7507ba70db281a88816a3"
   },
   "original_frozen_sha256": "949af76a3b21a5f3358c4b9cee378a27c61580016fadc1948b11e055d8762ddb",
   "selected_P": {
@@ -20,5 +20,6 @@
     "gain": 14,
     "max_calls": 24
   },
-  "no_final_tuning": true
+  "no_final_tuning": true,
+  "frozen_config_sha256": "40f3e13fc3f0d9d934a7c753d9454930575dc07e8fe4ae66d41ae942e5ec02bd"
 }
