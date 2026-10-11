@@ -1,3 +1,5 @@
+> RELEASE ON HOLD: owner requested ten additional neutral Prob dev checks on 11 October. Current P24 config is historical, not the next rental/H200 freeze. Do not launch this appendix until the reviewed release is updated. No new archive is supplied yet.
+
 # Frozen French CAA composition experiment
 
 Run ordinary additive CAA for Qwen/Qwen3.5-9B, pinned revision
