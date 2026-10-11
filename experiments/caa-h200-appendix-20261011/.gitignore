@@ -1,0 +1,5 @@
+directions/
+local/
+__pycache__/
+*.pyc
+*.log

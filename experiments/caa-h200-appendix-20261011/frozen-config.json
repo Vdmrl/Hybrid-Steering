@@ -1,0 +1,992 @@
+{
+  "run_id": "caa5090-fr-matched-20261011",
+  "method": "ordinary_additive_caa",
+  "features": {
+    "french": {
+      "layers": [
+        8
+      ],
+      "gain": 4
+    },
+    "technical": {
+      "layers": [
+        16
+      ],
+      "gain": 8
+    },
+    "theistic_framing": {
+      "layers": [
+        8
+      ],
+      "gain": 12
+    },
+    "numbered": {
+      "layers": [
+        8,
+        16
+      ],
+      "gain": 16,
+      "max_calls": 28
+    },
+    "probabilistic_framing": {
+      "layers": [
+        8
+      ],
+      "gain": 14,
+      "max_calls": 24
+    }
+  },
+  "sources": {
+    "french": {
+      "path": "directions/french.safetensors",
+      "sha256": "21cc665e49907065b8a2e0612149a351a2b74bb41bc3634ee673052d11fbb59e"
+    },
+    "technical": {
+      "path": "directions/technical.safetensors",
+      "sha256": "738b5dd79a63371138d31e81d05e76059363954f5af07037c1b85ac7c5d1bb5f"
+    },
+    "theistic_framing": {
+      "path": "directions/theistic_framing.safetensors",
+      "sha256": "b3d7c1c5ac28333ac495f3069e9eeaacda72e87217881d4387cbdeb4640fb7f4"
+    },
+    "numbered": {
+      "path": "directions/numbered.safetensors",
+      "sha256": "3c319cfd3bd770fca225309cfc240211d38024f55acd3eaca7e970eea08add0b"
+    },
+    "probabilistic_framing": {
+      "path": "directions/probabilistic_framing.safetensors",
+      "sha256": "660020062ee2108411f4cc4caa151cfbca82915095462302de4bf383a32a6708"
+    }
+  },
+  "normalization": "Each direction unit-normalized; gain/sqrt(number of selected layers); no RSS normalization across concepts. Lambda multiplies all active gains.",
+  "temporal_contract": "Bulk prefill untouched. Count single-token forwards including prompt-final newline bridge. N first28/P first24; F/T/R continuous.",
+  "selection": {
+    "full_manual_review": true,
+    "reviewed_screen_counts": [
+      8,
+      8
+    ],
+    "selected_setting": {
+      "layers": [
+        8
+      ],
+      "gain": 14,
+      "max_calls": 24
+    },
+    "decision": "Retain earlier fully reviewed immediate P24. Both delayed variants show4/8 primary outcome uncertainty,0/4 advice primary vs previous P24 advice1/4+outcome3/4. All8 each have punctuation fragments, no cycles/length stops. No demonstrated improvement; not selecting on heldout/final/Judge. Baselines already express outcome uncertainty: these counts are presence, not causal uplift.",
+    "quality_limitations": "Weak advice uncertainty, grammar/fact failures accepted and retained; no claim of optimum.",
+    "variants": [
+      {
+        "skip": 8,
+        "active_calls": 24,
+        "primary": 4,
+        "advice_primary": 0,
+        "outcome_primary": 4,
+        "grammar_fragments": 8,
+        "cycles": 0,
+        "length_stops": 0,
+        "zero_exact": 2,
+        "replay_exact": 1,
+        "raw_sha256": "dc4d81fe69f098869c08c43e7729e13850a3d4b8cd9961228631c262d8fb5ab4",
+        "reviewed_ids": [
+          "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-001:baseline:a2c4c108487448fe9e4afb8b5bb5203e:0",
+          "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-002:baseline:a2c4c108487448fe9e4afb8b5bb5203e:1",
+          "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-003:baseline:a2c4c108487448fe9e4afb8b5bb5203e:2",
+          "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-004:baseline:a2c4c108487448fe9e4afb8b5bb5203e:3",
+          "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-005:baseline:a2c4c108487448fe9e4afb8b5bb5203e:4",
+          "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-006:baseline:a2c4c108487448fe9e4afb8b5bb5203e:5",
+          "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-007:baseline:a2c4c108487448fe9e4afb8b5bb5203e:6",
+          "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-008:baseline:a2c4c108487448fe9e4afb8b5bb5203e:7",
+          "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-001:P-g14-L8-skip8-duration24:zero:a2c4c108487448fe9e4afb8b5bb5203e:8",
+          "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-002:P-g14-L8-skip8-duration24:zero:a2c4c108487448fe9e4afb8b5bb5203e:9",
+          "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-001:P-g14-L8-skip8-duration24",
+          "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-002:P-g14-L8-skip8-duration24",
+          "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-003:P-g14-L8-skip8-duration24",
+          "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-004:P-g14-L8-skip8-duration24",
+          "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-005:P-g14-L8-skip8-duration24",
+          "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-006:P-g14-L8-skip8-duration24",
+          "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-007:P-g14-L8-skip8-duration24",
+          "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-008:P-g14-L8-skip8-duration24",
+          "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-001:replay:a2c4c108487448fe9e4afb8b5bb5203e:18"
+        ],
+        "screen_notes": [
+          {
+            "id": "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-001:P-g14-L8-skip8-duration24",
+            "primary_uncertainty": false,
+            "notes": "Options/ability only. Lowercase like fragment."
+          },
+          {
+            "id": "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-002:P-g14-L8-skip8-duration24",
+            "primary_uncertainty": false,
+            "notes": "Options/scheduling only. Lowercase such as fragment."
+          },
+          {
+            "id": "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-003:P-g14-L8-skip8-duration24",
+            "primary_uncertainty": false,
+            "notes": "Though tricky conditional difficulty weak secondary only, not primary uncertainty. though/so fragments."
+          },
+          {
+            "id": "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-004:P-g14-L8-skip8-duration24",
+            "primary_uncertainty": false,
+            "notes": "Options only. like fragment."
+          },
+          {
+            "id": "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-005:P-g14-L8-skip8-duration24",
+            "primary_uncertainty": true,
+            "notes": "Genuine might/probably outcome uncertainty, contradiction wet doorstep yet stay dry. or/but fragments."
+          },
+          {
+            "id": "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-006:P-g14-L8-skip8-duration24",
+            "primary_uncertainty": true,
+            "notes": "Genuine likely/might outcome uncertainty but categorical opening and exaggerated food safety risk. depending fragment."
+          },
+          {
+            "id": "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-007:P-g14-L8-skip8-duration24",
+            "primary_uncertainty": true,
+            "notes": "Genuine might wind uncertainty already present in baseline. depending fragment."
+          },
+          {
+            "id": "caa5090-p-delayed8-20261011:caa-np-window-balance-dev8-008:P-g14-L8-skip8-duration24",
+            "primary_uncertainty": true,
+            "notes": "Genuine likely/probability spill outcome, invented bowl handle and categorical opening. spilling/or fragments."
+          }
+        ]
+      },
+      {
+        "skip": 16,
+        "active_calls": 24,
+        "primary": 4,
+        "advice_primary": 0,
+        "outcome_primary": 4,
+        "grammar_fragments": 8,
+        "cycles": 0,
+        "length_stops": 0,
+        "zero_exact": 2,
+        "replay_exact": 1,
+        "raw_sha256": "ba6e79a044a81eab17758f4fef121405dd3a410b545065fd35819370a1ba87b3",
+        "reviewed_ids": [
+          "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-001:baseline:8d44399fd9764ef78c232098d0eaeafd:0",
+          "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-002:baseline:8d44399fd9764ef78c232098d0eaeafd:1",
+          "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-003:baseline:8d44399fd9764ef78c232098d0eaeafd:2",
+          "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-004:baseline:8d44399fd9764ef78c232098d0eaeafd:3",
+          "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-005:baseline:8d44399fd9764ef78c232098d0eaeafd:4",
+          "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-006:baseline:8d44399fd9764ef78c232098d0eaeafd:5",
+          "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-007:baseline:8d44399fd9764ef78c232098d0eaeafd:6",
+          "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-008:baseline:8d44399fd9764ef78c232098d0eaeafd:7",
+          "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-001:P-g14-L8-skip16-duration24:zero:8d44399fd9764ef78c232098d0eaeafd:8",
+          "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-002:P-g14-L8-skip16-duration24:zero:8d44399fd9764ef78c232098d0eaeafd:9",
+          "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-001:P-g14-L8-skip16-duration24",
+          "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-002:P-g14-L8-skip16-duration24",
+          "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-003:P-g14-L8-skip16-duration24",
+          "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-004:P-g14-L8-skip16-duration24",
+          "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-005:P-g14-L8-skip16-duration24",
+          "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-006:P-g14-L8-skip16-duration24",
+          "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-007:P-g14-L8-skip16-duration24",
+          "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-008:P-g14-L8-skip16-duration24",
+          "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-001:replay:8d44399fd9764ef78c232098d0eaeafd:18"
+        ],
+        "screen_notes": [
+          {
+            "id": "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-001:P-g14-L8-skip16-duration24",
+            "primary_uncertainty": false,
+            "notes": "Options/ability, no outcome probability. Repeated or fragments."
+          },
+          {
+            "id": "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-002:P-g14-L8-skip16-duration24",
+            "primary_uncertainty": false,
+            "notes": "Options only, might say hypothetical speech not uncertain outcome. like fragment."
+          },
+          {
+            "id": "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-003:P-g14-L8-skip16-duration24",
+            "primary_uncertainty": false,
+            "notes": "Options/ability conditional carefulness, no primary outcome uncertainty; weaker secondary uncertainty. or/depending/and fragments and duplicated you."
+          },
+          {
+            "id": "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-004:P-g14-L8-skip16-duration24",
+            "primary_uncertainty": false,
+            "notes": "Options only. away fragment."
+          },
+          {
+            "id": "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-005:P-g14-L8-skip16-duration24",
+            "primary_uncertainty": true,
+            "notes": "Genuine likely/might wet bag outcomes, baseline already uncertain. especially/but/or fragments."
+          },
+          {
+            "id": "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-006:P-g14-L8-skip16-duration24",
+            "primary_uncertainty": true,
+            "notes": "Genuine likely/could outcomes; incorrectly calls drying oxidation; categorical contamination/unsafe within hours. mostly fragment."
+          },
+          {
+            "id": "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-007:P-g14-L8-skip16-duration24",
+            "primary_uncertainty": true,
+            "notes": "Genuine might/could outcomes already in baseline. depending fragment."
+          },
+          {
+            "id": "caa5090-p-delayed16-20261011:caa-np-window-balance-dev8-008:P-g14-L8-skip16-duration24",
+            "primary_uncertainty": true,
+            "notes": "Genuine might/could tipping outcomes, invented handle and assertion lentils cannot weigh bowl. causing/or fragments."
+          }
+        ]
+      }
+    ]
+  },
+  "quality_limitations": "P sentence fragments and advice weakness; N quality failures; F initial English bridge; T unsupported facts; R derailments/repetitions retained. Not an optimum or quality guarantee.",
+  "evidence": {
+    "LAST_P_COMPLETE_REVIEW_0000.json": {
+      "raw_sha256": "8f21aa1f4668cf368b97b34d157869a410ccf07802a31a9f9317d6e2498b0480",
+      "reviewed_raw_ids": [
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-001:baseline:926398ce712940db99bb09d01c2171e6:0",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-002:baseline:926398ce712940db99bb09d01c2171e6:1",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-003:baseline:926398ce712940db99bb09d01c2171e6:2",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-001:baseline:efbcbce26f1e4ddb9d4d05364ad0f396:3",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-001:baseline:5827a504ebda47fda2a19c45a146a6a4:4",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-002:baseline:5827a504ebda47fda2a19c45a146a6a4:5",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-003:baseline:5827a504ebda47fda2a19c45a146a6a4:6",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-004:baseline:5827a504ebda47fda2a19c45a146a6a4:7",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-005:baseline:5827a504ebda47fda2a19c45a146a6a4:8",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-006:baseline:5827a504ebda47fda2a19c45a146a6a4:9",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-007:baseline:5827a504ebda47fda2a19c45a146a6a4:10",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-008:baseline:5827a504ebda47fda2a19c45a146a6a4:11",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-001:P-L8-g14-window20:zero:5827a504ebda47fda2a19c45a146a6a4:12",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-001:baseline:7249bbeffc0f4612bf4ced14a89adb8e:13",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-002:baseline:7249bbeffc0f4612bf4ced14a89adb8e:14",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-003:baseline:7249bbeffc0f4612bf4ced14a89adb8e:15",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-004:baseline:7249bbeffc0f4612bf4ced14a89adb8e:16",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-005:baseline:7249bbeffc0f4612bf4ced14a89adb8e:17",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-006:baseline:7249bbeffc0f4612bf4ced14a89adb8e:18",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-007:baseline:7249bbeffc0f4612bf4ced14a89adb8e:19",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-008:baseline:7249bbeffc0f4612bf4ced14a89adb8e:20",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-001:P-L8-g14-window20:zero:7249bbeffc0f4612bf4ced14a89adb8e:21",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-002:P-L8-g14-window20:zero:7249bbeffc0f4612bf4ced14a89adb8e:22",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-001:P-L8-g14-window20",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-002:P-L8-g14-window20",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-003:P-L8-g14-window20",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-004:P-L8-g14-window20",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-005:P-L8-g14-window20",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-006:P-L8-g14-window20",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-007:P-L8-g14-window20",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-008:P-L8-g14-window20",
+        "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-001:replay:7249bbeffc0f4612bf4ced14a89adb8e:31"
+      ],
+      "reviewed_screens": [
+        {
+          "answer_id": "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-001:P-L8-g14-window20",
+          "trait_quality_notes": "Primary options/ability, secondary almost-every-time success-frequency statement late in answer; not pervasive epistemic framing. Lowercase depending fragment after full stop. Pencils by sink/cooking inventedcontext; no cycle."
+        },
+        {
+          "answer_id": "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-002:P-L8-g14-window20",
+          "trait_quality_notes": "Primary simple agreement categorical; secondary might-need-coordination weak uncertainty, might-agree/could-designate are options. Lowercase though fragment; stool-size sharing restriction unsupported; no cycle."
+        },
+        {
+          "answer_id": "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-003:P-L8-g14-window20",
+          "trait_quality_notes": "Primary options/context/trade-offs, not probability claim; risk reduction generic, could-help/might-tilt ability/options. Lowercase though fragment; tilting/napkin catching loose grapes/cloth visibility questionablequality; no cycle."
+        },
+        {
+          "answer_id": "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-004:P-L8-g14-window20",
+          "trait_quality_notes": "Options only, no epistemic uncertainty. Lowercase such-as fragment after full stop; coherent remainingadvice/no cycle."
+        },
+        {
+          "answer_id": "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-005:P-L8-g14-window20",
+          "trait_quality_notes": "Primary likely/might/could outcome uncertainty, baseline also uncertain. Sentence fragment depending. Unsupported rapid mold, wet bag blown away by light breeze, pests/slip extrapolations; no cycles."
+        },
+        {
+          "answer_id": "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-006:P-L8-g14-window20",
+          "trait_quality_notes": "Primary might/likely/may/could outcome uncertainty, baseline also uncertain. Sentence fragment depending. Unsupported visible mold within hours and juices breakdown/slime mechanism; no cycles."
+        },
+        {
+          "answer_id": "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-007:P-L8-g14-window20",
+          "trait_quality_notes": "Primary might/could multiple wind outcomes, baseline also uncertain. Sentence fragment or. Window jamming extrapolation; no cycles."
+        },
+        {
+          "answer_id": "caa-p-last-window20-dev8-20261010:caa-np-window-balance-dev8-008:P-L8-g14-window20",
+          "trait_quality_notes": "Primary might spill/depends on tilt/may settle, more conditional than baseline. Sentence fragment depending. No clear major content error, no cycles."
+        }
+      ],
+      "primary_uncertainty": 4,
+      "denominator": 8,
+      "advice_primary": 0,
+      "outcomes_primary": 4,
+      "grammar_fragments": 8,
+      "cycles": 0,
+      "zero_exact": 2,
+      "replay_exact": 1,
+      "complete": true,
+      "decision": "No new dev. Freeze previously reviewed L8 gain14 window24: four primary IDs002/005/006/008; last window20 lost advice002, L16 variants did not improve advice. Explicit imperfect trait and quality accepted by user; no heldout/Judge selection."
+    },
+    "P_ISOLATED_BALANCE_FULL_MANUAL_REVIEW.json": {
+      "review_type": "manual_full_dev_screen_not_independent_not_Judge",
+      "raw_sha256": "d46a8dd0f83fc34b34b445573b4d3907d992eeed3654b018e471495724b16c75",
+      "design_sha256": "8a594ad5187d36f7670cd0959cba1091bcb924adf1ab2a8271c0510c4a9ed6a3",
+      "reviewed_answer_ids": [
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-001:baseline",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-002:baseline",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-003:baseline",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-004:baseline",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-005:baseline",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-006:baseline",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-007:baseline",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-008:baseline",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-001:P-L8-g14-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-002:P-L8-g14-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-003:P-L8-g14-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-004:P-L8-g14-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-005:P-L8-g14-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-006:P-L8-g14-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-007:P-L8-g14-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-008:P-L8-g14-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-001:P-L8-g14-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-002:P-L8-g14-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-003:P-L8-g14-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-004:P-L8-g14-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-005:P-L8-g14-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-006:P-L8-g14-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-007:P-L8-g14-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-008:P-L8-g14-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-001:P-L8-g18-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-002:P-L8-g18-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-003:P-L8-g18-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-004:P-L8-g18-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-005:P-L8-g18-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-006:P-L8-g18-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-007:P-L8-g18-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-008:P-L8-g18-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-001:P-L8-g18-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-002:P-L8-g18-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-003:P-L8-g18-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-004:P-L8-g18-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-005:P-L8-g18-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-006:P-L8-g18-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-007:P-L8-g18-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-008:P-L8-g18-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-001:P-L16-g14-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-002:P-L16-g14-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-003:P-L16-g14-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-004:P-L16-g14-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-005:P-L16-g14-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-006:P-L16-g14-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-007:P-L16-g14-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-008:P-L16-g14-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-001:P-L16-g14-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-002:P-L16-g14-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-003:P-L16-g14-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-004:P-L16-g14-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-005:P-L16-g14-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-006:P-L16-g14-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-007:P-L16-g14-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-008:P-L16-g14-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-001:P-L16-g18-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-002:P-L16-g18-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-003:P-L16-g18-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-004:P-L16-g18-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-005:P-L16-g18-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-006:P-L16-g18-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-007:P-L16-g18-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-008:P-L16-g18-window24",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-001:P-L16-g18-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-002:P-L16-g18-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-003:P-L16-g18-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-004:P-L16-g18-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-005:P-L16-g18-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-006:P-L16-g18-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-007:P-L16-g18-window32",
+        "caa-p-isolated-balance-dev8-20261009:caa-np-window-balance-dev8-008:P-L16-g18-window32"
+      ],
+      "reviewed_baselines": 8,
+      "reviewed_screen": 64,
+      "controls_token_parity": {
+        "zero": 2,
+        "replay": 8,
+        "passed": 10
+      },
+      "raw_records": 82,
+      "unique_raw_answer_ids": 75,
+      "control_id_note": "Eight replays intentionally reuse the replay answer_id; keep controls separate from singleton/steered stable IDs. All72 baseline+screen IDs are unique.",
+      "finish_reasons": {
+        "eos": 82,
+        "length": 0
+      },
+      "max_generated_tokens": 284,
+      "jobs": {
+        "P-L8-g14-window24": {
+          "trait": "Advice: softened/context-dependent wording in001/002/004, risk framing003; could-as-ability/options alone is not uncertainty. Outcomes005/006/008 have likelihood/conditional alternatives;007 says would be blown away categorically, potentially modifies secondary hazard. Not universal uncertainty.",
+          "quality": "All8 have sentence fragments after periods.006 premature spoilage/mold claims;008 questionable side-shape/friction explanation. No long cycles. Provisional best balance of visible P effect and reduced disruption, not frozen."
+        },
+        "P-L8-g14-window32": {
+          "trait": "Similar conditional advice,003 explicitly high chance of dropping. Outcomes005/006/008 uncertain/conditional;007 categorical primary event.",
+          "quality": "All8 fragmented starts;002 implausible sharing restriction and corrupted dash;003 unsupported high chance of dropping;006 inaccurate dependence of oxidation on warmth/airborne particles; longer verbosity."
+        },
+        "P-L8-g18-window24": {
+          "trait": "Advice001 mostly direct options without uncertainty;002 schedules condition;003 could-as-ability/metaphrasing not P by itself;004 alternatives/metaphrasing weak. Outcomes005-008 likelihood/conditionality, often already present in baseline.",
+          "quality": "002 broken isn tricky,003 duplicated you and meta-instructions,004 self-restart,005 invented prior rain framing,006 self-edit/refine scaffolding; no token-limit cycles."
+        },
+        "P-L8-g18-window32": {
+          "trait": "Advice001 ordinary options;002/003/004 conditional branches with ability/metaphrasing mixed. Outcomes005-008 likelihood/conditionality; no guarantee all advice becomes epistemically uncertain.",
+          "quality": "002 broken markdown/grammar,003 duplicated you and contradictory keep level/tilt advice,004 metaphrasing,005 invented premise,006 Final version self-edit and rapid mold claim.008 coherent alternatives."
+        },
+        "P-L16-g14-window24": {
+          "trait": "Advice mostly direct practical options/ability; no clear general increase in uncertainty. Outcomes005-008 uncertain/conditional, similar baseline.",
+          "quality": "Grammatical compared withL8.001 questionable magnetic pencil claim,006 premature mold/safety claim,008 assumes liquid in unspecified lentils; baseline also makes liquid/safety assumptions."
+        },
+        "P-L16-g14-window32": {
+          "trait": "Advice mostly options/ability,002 context condition. Outcomes005-008 uncertain/conditional, similar baseline.",
+          "quality": "No obvious long repeats or fragments.008 liquid assumption. Mostly cleaner but weaker advice P."
+        },
+        "P-L16-g18-window24": {
+          "trait": "Advice options/ability,003 contextual condition; no universal uncertainty. Outcomes005-008 uncertain/conditional, similar baseline.",
+          "quality": "001 questionable magnetic strip claim,003 tilt prevents loss dubious,004 if no wall awkward premise,006 condensation mechanism unsupported,008 liquid assumption."
+        },
+        "P-L16-g18-window32": {
+          "trait": "Advice options/ability,002 categorical sharing works,003 contextcondition,004 options. Outcomes005-008 uncertain/conditional, similar baseline.",
+          "quality": "001 hang by erasers dubious,002 confused turn-taking,006 odor/slimy claims,008 liquid assumption. No long cycles."
+        }
+      },
+      "decision": "Do not freeze yet: second already-authorized P-layer-isolation64 remains pending. No third check/new grid. After its complete manual review select best available P for user-authorized quality-limited final."
+    },
+    "P_LAYER_COMPLETE_REVIEW_1600.json": {
+      "utc": "2026-10-10T11:02:22.201823+00:00",
+      "raw_sha256": "9074f1116df8c770be7115f86428deee071a48a8fd15d112269a3acb754da6c8",
+      "partial_only": true,
+      "decision": "No selection/freeze from unfinished cell; read all remaining jobs and replay when complete. No Judge.",
+      "reviewed_baselines": [
+        "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-001:baseline:b78edb84906f4fc8a7381a6e8c7a615a:0",
+        "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-002:baseline:b78edb84906f4fc8a7381a6e8c7a615a:1",
+        "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-001:baseline:f80c01f8787749a0aa37824bfd64b5b6:2",
+        "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-002:baseline:f80c01f8787749a0aa37824bfd64b5b6:3",
+        "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-003:baseline:f80c01f8787749a0aa37824bfd64b5b6:4",
+        "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-004:baseline:f80c01f8787749a0aa37824bfd64b5b6:5",
+        "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-005:baseline:f80c01f8787749a0aa37824bfd64b5b6:6",
+        "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-006:baseline:f80c01f8787749a0aa37824bfd64b5b6:7",
+        "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-007:baseline:f80c01f8787749a0aa37824bfd64b5b6:8",
+        "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-008:baseline:f80c01f8787749a0aa37824bfd64b5b6:9"
+      ],
+      "reviewed_screens": [
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-001:P-L8-g12-window20",
+          "trait_quality_notes": "Options/ability only; no uncertainty claim. Fluent, no cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-002:P-L8-g12-window20",
+          "trait_quality_notes": "could/might introduce choices, not uncertainty. Fluent, no cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-003:P-L8-g12-window20",
+          "trait_quality_notes": "Explicit less likely to roll out and might spill are secondary risk uncertainty; main advice categorical. Tilting bowl may worsen spills; low-doorway bowl-edge scenario implausible."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-004:P-L8-g12-window20",
+          "trait_quality_notes": "Options only, no uncertainty. Invented slanted-roof umbrella stand detail; no cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-005:P-L8-g12-window20",
+          "trait_quality_notes": "Likely/might/potentially qualify outcomes. Similar uncertainty already in matching baseline; no cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-006:P-L8-g12-window20",
+          "trait_quality_notes": "Categorical primary oxidation/drying with secondary might/could/may outcomes. Condensation causal claim questionable; unconditional safety statement overly broad."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-007:P-L8-g12-window20",
+          "trait_quality_notes": "Primary blown-away claim categorical; might flutter secondary uncertainty. Brief coherent answer; baseline already uncertain."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-008:P-L8-g12-window20",
+          "trait_quality_notes": "Primary likely lose most qualifies amount of loss; also categorical tipping/spilling. Plausible though overconfident mechanism, no grammar loops."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-001:P-L8-g12-window28",
+          "trait_quality_notes": "Options/ability only, no true uncertainty. Coherent, absolute never-search promise also in matching baseline."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-002:P-L8-g12-window28",
+          "trait_quality_notes": "might just ask/could leave are options, could I borrow is request, not epistemic uncertainty. Coherent, no cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-003:P-L8-g12-window28",
+          "trait_quality_notes": "Main advice categorical, might-spill/could-roll secondary risk only. Paper towel assumes juice/open bowl now covered, content changes not sole failure; no fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-004:P-L8-g12-window28",
+          "trait_quality_notes": "Options/context only, no epistemic uncertainty. Coherent, no cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-005:P-L8-g12-window28",
+          "trait_quality_notes": "Primary likely/probably damaged plus uncertain alternatives. Lowercase depending fragment; extra conditional contents/weather detail and condensation claim questionable."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-006:P-L8-g12-window28",
+          "trait_quality_notes": "Primary oxidation/drying categorical; does not necessarily unsafe and risk secondary uncertainty. Broad causal browning-texture claim questionable, no loops/fragments."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-007:P-L8-g12-window28",
+          "trait_quality_notes": "Main blown away categorical; secondary might alternatives including stay-in-place contradict categorical opening. No grammar fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-008:P-L8-g12-window28",
+          "trait_quality_notes": "Primary risk of shift/wobble/spill/tipping hedged, although categorical first sentence conflicts with subsequent might-tip claim. No fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-001:P-L8-g16-window20",
+          "trait_quality_notes": "Options/ability only; try tricks. Lowercase like-this fragment; no cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-002:P-L8-g16-window20",
+          "trait_quality_notes": "Options/ability only; tricky is categorical difficulty, not uncertainty. Lowercase though fragment; unsupported small-stool unsuitability for sharing."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-003:P-L8-g16-window20",
+          "trait_quality_notes": "Options/ability primary, secondary might-leak risk; tricky not uncertainty. Lowercase though fragment; no cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-004:P-L8-g16-window20",
+          "trait_quality_notes": "Depending-on-space context, options, no uncertainty. Lowercase depending fragment; no cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-005:P-L8-g16-window20",
+          "trait_quality_notes": "Primary likely/probably ruin and might/could outcomes. Lowercase depending fragment; no cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-006:P-L8-g16-window20",
+          "trait_quality_notes": "Primary comparative less-likely risk and likely-not-spoil uncertainty. Comparative apples/bananas risk unsupported, lowercase though fragment, overbroad safety suggestion."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-007:P-L8-g16-window20",
+          "trait_quality_notes": "Primary most-likely and alternative might outcomes. Lowercase but fragment; no cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-008:P-L8-g16-window20",
+          "trait_quality_notes": "Primary likely spill plus uncertain alternative; almost certainly lowers uncertainty strength at end. Lowercase but fragment, categorical slides/scatters versus conditional no-spill alternatives inconsistent; no cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-001:P-L8-g16-window28",
+          "trait_quality_notes": "Options maybe for location, not epistemic uncertainty. Lowercase like-this fragment, explicit numerical list despite P-only steering; ordinary answer, no cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-002:P-L8-g16-window28",
+          "trait_quality_notes": "Options/requests/context only. Lowercase though/here fragments, tricky categorical difficulty; no loops."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-003:P-L8-g16-window28",
+          "trait_quality_notes": "Options/could/might tilt only, no true uncertainty claim; should be fine confident. Lowercase though/here fragments, questionable tilting suggestion; no loops."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-004:P-L8-g16-window28",
+          "trait_quality_notes": "Context depending-space/options only, no uncertainty. Lowercase depending/the fragments; no cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-005:P-L8-g16-window28",
+          "trait_quality_notes": "Primary likely puddle or blown away. Grammar depending/but fragments and mostly likely error; unsupported dominant puddle/blown-away prediction, short coherent, no cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-006:P-L8-g16-window28",
+          "trait_quality_notes": "Primary most-probable browning/risk less-likely, secondary might sticky/could shrivel. Unsupported other-fruit risk comparison; lowercase though/the fragments, no loops."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-007:P-L8-g16-window28",
+          "trait_quality_notes": "Primary most-likely/alternative might outcome. Lowercase but fragment, no loops."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-008:P-L8-g16-window28",
+          "trait_quality_notes": "Primary most-likely alternatives/likely tip; conditional scenario uncertainty. Lowercase but fragment. Nonsense lentils bulge bowl, off-prompt seated bowl, spilled yet very full bowl contradiction; no repeated loop."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-001:P-L16-g12-window20",
+          "trait_quality_notes": "Options/could ability only, no primary uncertainty. Coherent no fragments/loops, desk-lamp storage questionable."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-002:P-L16-g12-window20",
+          "trait_quality_notes": "Procedure/ability only, no epistemic uncertainty; coherent no fragments/loops."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-003:P-L16-g12-window20",
+          "trait_quality_notes": "Categorical ordinary advice; no uncertainty. Coherent no fragments/loops."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-004:P-L16-g12-window20",
+          "trait_quality_notes": "Options/ability, no uncertainty. Coherent no fragments/loops; mat right-by-door must not obstruct path."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-005:P-L16-g12-window20",
+          "trait_quality_notes": "Primary likely soggy/probably weak with might tear. Similar uncertainty already baseline; coherent no fragments/loops."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-006:P-L16-g12-window20",
+          "trait_quality_notes": "Main browning/drying categorical; meaningful might-not-dangerous and higher-chance-germs uncertainty on later safety. Unsupported fruit-juices mixing with air mechanism; coherent grammar/no loops."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-007:P-L16-g12-window20",
+          "trait_quality_notes": "Primary likely push-off and might alternatives; coherent, no grammar fragments/cycles. Baseline already uncertain."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-008:P-L16-g12-window20",
+          "trait_quality_notes": "Primary likely tip/spill and secondary might-break. Invents liquid as matching baseline also does; coherent grammar/no cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-001:P-L16-g12-window28",
+          "trait_quality_notes": "Options/ability only; no epistemic uncertainty. Absolute always-know promise, coherent/no fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-002:P-L16-g12-window28",
+          "trait_quality_notes": "might-set-timer options, context live-close, no epistemic uncertainty. Coherent/no fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-003:P-L16-g12-window28",
+          "trait_quality_notes": "Categorical instructions, no uncertainty; watch-path then eyes-on-bowl tension minorquality; no fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-004:P-L16-g12-window28",
+          "trait_quality_notes": "Options/ability only; no uncertainty. Mat right-by-door mustnotobstruct specified; coherent/no fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-005:P-L16-g12-window28",
+          "trait_quality_notes": "Primary likely-soggy/might-damaged outcomes; coherent/no fragments/cycles. Baseline already uncertain."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-006:P-L16-g12-window28",
+          "trait_quality_notes": "Primary likely-dry and might-mushy, secondary risk bacteria; main browning categorical. Juices-separation causal detail questionable, no fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-007:P-L16-g12-window28",
+          "trait_quality_notes": "Primary likely-push/might-alternatives; coherent/no fragments/cycles. Unsupported person-hit extra possibility qualityseparate, baseline already uncertain."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-008:P-L16-g12-window28",
+          "trait_quality_notes": "Primary likely tip/spill; liquid assumption unsupported but also present in matching baseline. Coherent, no fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-001:P-L16-g16-window20",
+          "trait_quality_notes": "Options and could-as-ability only, no uncertainty. Desklamp placement questionable; coherent, no fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-002:P-L16-g16-window20",
+          "trait_quality_notes": "Primary categorical procedure/ability, secondary might-get-lost-or-damaged risk. Coherent, no fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-003:P-L16-g16-window20",
+          "trait_quality_notes": "Primary categorical advice, secondary could-spill risk. Looking down to avoid obstacles questionable; coherent, no fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-004:P-L16-g16-window20",
+          "trait_quality_notes": "Options/context only, no uncertainty; odd if-no-wall condition. Coherent, no fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-005:P-L16-g16-window20",
+          "trait_quality_notes": "Primary likely/probably/might/could uncertain wet-bag outcomes, already present in baseline. Coherent, no fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-006:P-L16-g16-window20",
+          "trait_quality_notes": "Primary browning categorical; secondary might-soften/could-fade texture/flavor uncertainty. Safety claim quality separate; coherent, no fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-007:P-L16-g16-window20",
+          "trait_quality_notes": "Primary likely/might wind outcomes, coherent/no fragments/cycles. Already uncertain in matching nativeTP2 baseline."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-008:P-L16-g16-window20",
+          "trait_quality_notes": "Primary likely tip/spill plus secondary might-break; liquid/broth assumption also in baseline, coherent/no fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-001:P-L16-g16-window28",
+          "trait_quality_notes": "Options and might-as-suggestion only; no primary uncertainty. Film canister dimensions questionable, absolute never-search promise; coherent/no fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-002:P-L16-g16-window28",
+          "trait_quality_notes": "Categorical procedure and scheduling options, no primary uncertainty; coherent/no fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-003:P-L16-g16-window28",
+          "trait_quality_notes": "Categorical advice and might-as-suggestion; no uncertainty. Tilt-bowl to prevent spills if tripping unsupported safety detail; coherent/no fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-004:P-L16-g16-window28",
+          "trait_quality_notes": "Options/context only, no uncertainty. Odd no-wall condition, coherent/no fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-005:P-L16-g16-window28",
+          "trait_quality_notes": "Primary likely/might wet-bag outcomes, present also baseline; coherent/no fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-006:P-L16-g16-window28",
+          "trait_quality_notes": "Primary browning categorical, secondary might-soften texture; contamination safety quality separate; coherent/no fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-007:P-L16-g16-window28",
+          "trait_quality_notes": "Primary likely/might/could wind outcomes, present baseline. Extra window-slam mechanism unsupported; coherent/no fragments/cycles."
+        },
+        {
+          "answer_id": "caa-p-layer-isolation-dev8-20261009:caa-np-window-balance-dev8-008:P-L16-g16-window28",
+          "trait_quality_notes": "Primary likely spill, secondary may-scatter/could-ruin; invented broth/liquid like matching baseline; coherent/no fragments/cycles."
+        }
+      ],
+      "current_load_controls": {
+        "zero_pass": 2,
+        "replay_pass": 5,
+        "exact_token_comparison": true
+      },
+      "completed_settings": {
+        "P-L8-g12-window20": {
+          "reviewed": 8,
+          "primary_uncertainty_ids": [
+            "005",
+            "008"
+          ],
+          "secondary_risk_uncertainty_only_ids": [
+            "003",
+            "006",
+            "007"
+          ],
+          "options_ability_only_ids": [
+            "001",
+            "002",
+            "004"
+          ],
+          "primary_count": 2,
+          "any_true_uncertainty_including_secondary_count": 5,
+          "advice_primary": 0,
+          "outcome_primary": 2,
+          "cycles": 0,
+          "grammar_fragments": 0,
+          "quality_notes": "Questionable bowl-tilt suggestion/umbrella detail/pear condensation and safety claims. Matching baseline already outcome-uncertain; no causal improvement claim."
+        },
+        "P-L8-g12-window28": {
+          "reviewed": 8,
+          "primary_uncertainty_ids": [
+            "005",
+            "008"
+          ],
+          "secondary_only_ids": [
+            "003",
+            "006",
+            "007"
+          ],
+          "options_context_only_ids": [
+            "001",
+            "002",
+            "004"
+          ],
+          "primary_count": 2,
+          "any_true_uncertainty_count": 5,
+          "grammar_fragment_ids": [
+            "005"
+          ],
+          "cycles": 0,
+          "quality_notes": "Contradictory categorical versus conditional endings007/008, questionable browning effect006; no increased primary count overwindow20."
+        },
+        "P-L8-g16-window20": {
+          "reviewed": 8,
+          "primary_uncertainty_ids": [
+            "005",
+            "006",
+            "007",
+            "008"
+          ],
+          "primary_count": 4,
+          "secondary_only_ids": [
+            "003"
+          ],
+          "any_true_uncertainty_count": 5,
+          "advice_primary": 0,
+          "outcome_primary": 4,
+          "grammar_fragment_ids": [
+            "001",
+            "002",
+            "003",
+            "004",
+            "005",
+            "006",
+            "007",
+            "008"
+          ],
+          "cycles": 0,
+          "quality_notes": "Comparative fruit risk006 unsupported; stool-sharing impossibility002 unsupported; conflicting categorical/conditional effects008; equal primary-presence total to baseline, no gain claim."
+        },
+        "P-L8-g16-window28": {
+          "reviewed": 8,
+          "primary_uncertainty_ids": [
+            "005",
+            "006",
+            "007",
+            "008"
+          ],
+          "primary_count": 4,
+          "advice_primary": 0,
+          "outcome_primary": 4,
+          "grammar_fragment_ids": [
+            "001",
+            "002",
+            "003",
+            "004",
+            "005",
+            "006",
+            "007",
+            "008"
+          ],
+          "cycles": 0,
+          "quality_notes": "Fruit comparison006 unsupported; bowl/lentil nonsense and contradictions008. No demonstrated primary-presence gain overbaseline."
+        },
+        "P-L16-g12-window20": {
+          "reviewed": 8,
+          "primary_uncertainty_ids": [
+            "005",
+            "007",
+            "008"
+          ],
+          "primary_count": 3,
+          "secondary_or_later_uncertainty_ids": [
+            "006"
+          ],
+          "any_true_uncertainty_count": 4,
+          "advice_primary": 0,
+          "grammar_fragments": 0,
+          "cycles": 0,
+          "quality_notes": "Pear006 unsupported juice-mixing mechanism; lentils008 assume liquid also inbaseline; grammarkeepscoherent but no primary-presence gain overbaseline."
+        },
+        "P-L16-g12-window28": {
+          "reviewed": 8,
+          "primary_uncertainty_ids": [
+            "005",
+            "006",
+            "007",
+            "008"
+          ],
+          "primary_count": 4,
+          "advice_primary": 0,
+          "grammar_fragments": 0,
+          "cycles": 0,
+          "quality_notes": "No demonstrated primary presence gain over baseline4/8; liquid/causal assumptions separate."
+        },
+        "P-L16-g16-window20": {
+          "reviewed": 8,
+          "primary_uncertainty_ids": [
+            "005",
+            "007",
+            "008"
+          ],
+          "secondary_or_later_uncertainty_ids": [
+            "002",
+            "003",
+            "006"
+          ],
+          "advice_primary": 0,
+          "grammar_fragments": 0,
+          "cycles": 0,
+          "runtime_caveat": "First6 offload, last2 TP2; use matching runtime baselines, no homogeneous aggregate claim."
+        },
+        "P-L16-g16-window28": {
+          "reviewed": 8,
+          "primary_uncertainty_ids": [
+            "005",
+            "007",
+            "008"
+          ],
+          "secondary_or_later_uncertainty_ids": [
+            "006"
+          ],
+          "advice_primary": 0,
+          "grammar_fragments": 0,
+          "cycles": 0,
+          "runtime_mode": "native-tp2"
+        }
+      },
+      "partial_settings": {},
+      "runtime_controls_by_session": {
+        "50959f9f092d4110a3fa2ad5986d6d9b": {
+          "runtime_mode": "single-offload",
+          "baseline": 3,
+          "zero": 0,
+          "replay": 0,
+          "available_exact_parity": true
+        },
+        "b78edb84906f4fc8a7381a6e8c7a615a": {
+          "runtime_mode": "single-offload",
+          "baseline": 2,
+          "zero": 0,
+          "replay": 0,
+          "available_exact_parity": true
+        },
+        "f1ac0d209d364b7ca88847d0010f97ce": {
+          "runtime_mode": "single-offload",
+          "baseline": 2,
+          "zero": 0,
+          "replay": 0,
+          "available_exact_parity": true
+        },
+        "f80c01f8787749a0aa37824bfd64b5b6": {
+          "runtime_mode": "single-offload",
+          "baseline": 8,
+          "zero": 2,
+          "replay": 6,
+          "available_exact_parity": true
+        },
+        "2bd2c347d462427b95383185c1f512f9": {
+          "runtime_mode": "native-tp2",
+          "baseline": 8,
+          "zero": 2,
+          "replay": 8,
+          "available_exact_parity": true
+        }
+      },
+      "cross_load_baseline001_exact": true,
+      "selection_decision": "All64 reviewed. L16 maintains grammar but advice0/4; L8gain16 fragments8/8. Use exactly one last authorized L8gain14window20 case then best available P freeze/full final, no further tuning.",
+      "runtime_caveat": "Offload54 and nativeTP2 last10; native/offload baseline differs, preserve distinct cohorts and matching controls."
+    },
+    "N28_INDEPENDENT_MANUAL_REVIEW.json": {
+      "raw_sha256": "319c6b2d67642683c2646c7b4be19e1d6f0b7a2f0870ff5ff9a8eae4d62a8b19",
+      "reviewed_answer_ids": [
+        "caa-n-window28-independent16:caa-n28-independent16-001:baseline",
+        "caa-n-window28-independent16:caa-n28-independent16-002:baseline",
+        "caa-n-window28-independent16:caa-n28-independent16-003:baseline",
+        "caa-n-window28-independent16:caa-n28-independent16-004:baseline",
+        "caa-n-window28-independent16:caa-n28-independent16-005:baseline",
+        "caa-n-window28-independent16:caa-n28-independent16-006:baseline",
+        "caa-n-window28-independent16:caa-n28-independent16-007:baseline",
+        "caa-n-window28-independent16:caa-n28-independent16-008:baseline",
+        "caa-n-window28-independent16:caa-n28-independent16-009:baseline",
+        "caa-n-window28-independent16:caa-n28-independent16-010:baseline",
+        "caa-n-window28-independent16:caa-n28-independent16-011:baseline",
+        "caa-n-window28-independent16:caa-n28-independent16-012:baseline",
+        "caa-n-window28-independent16:caa-n28-independent16-013:baseline",
+        "caa-n-window28-independent16:caa-n28-independent16-014:baseline",
+        "caa-n-window28-independent16:caa-n28-independent16-015:baseline",
+        "caa-n-window28-independent16:caa-n28-independent16-016:baseline",
+        "caa-n-window28-independent16:caa-n28-independent16-001:numbered-g16-window28",
+        "caa-n-window28-independent16:caa-n28-independent16-002:numbered-g16-window28",
+        "caa-n-window28-independent16:caa-n28-independent16-003:numbered-g16-window28",
+        "caa-n-window28-independent16:caa-n28-independent16-004:numbered-g16-window28",
+        "caa-n-window28-independent16:caa-n28-independent16-005:numbered-g16-window28",
+        "caa-n-window28-independent16:caa-n28-independent16-006:numbered-g16-window28",
+        "caa-n-window28-independent16:caa-n28-independent16-007:numbered-g16-window28",
+        "caa-n-window28-independent16:caa-n28-independent16-008:numbered-g16-window28",
+        "caa-n-window28-independent16:caa-n28-independent16-009:numbered-g16-window28",
+        "caa-n-window28-independent16:caa-n28-independent16-010:numbered-g16-window28",
+        "caa-n-window28-independent16:caa-n28-independent16-011:numbered-g16-window28",
+        "caa-n-window28-independent16:caa-n28-independent16-012:numbered-g16-window28",
+        "caa-n-window28-independent16:caa-n28-independent16-013:numbered-g16-window28",
+        "caa-n-window28-independent16:caa-n28-independent16-014:numbered-g16-window28",
+        "caa-n-window28-independent16:caa-n28-independent16-015:numbered-g16-window28",
+        "caa-n-window28-independent16:caa-n28-independent16-016:numbered-g16-window28"
+      ],
+      "full_baseline_screen_review": true,
+      "controls_token_exact": 3,
+      "controls_total": 3,
+      "decision": "REJECT_FINAL_FREEZE_QUALITY",
+      "trait": "All16 include substantive numbered items, often missing first1;003 brokenopening and verythinresponse. Trait separatequality.",
+      "quality_findings": {
+        "003": "Unfinished To carry a bowl of cherries across a; then Walk to the room despite across-room request; reproduces dev openingdamage.",
+        "004": "Make the mat is big enough grammar error; partly changes avoiddoorway task to cleaning.",
+        "005": "Use The ... Pull capitalization and awkward papermechanics.",
+        "010": "Broken it will The skin sentence; invented blackdots/mold/unsafeafterhours assertion vs baseline no unconditionalsafetyassertion.",
+        "015": "Wettersock/watervapor/puffybag causalstory unsupported; substantialphysicalerror.",
+        "002": "Numberingstarts3, advice includes awkward simultaneouspassing; no longloop.",
+        "007": "Hardbox or bag loosecategory/capitalization."
+      },
+      "length_stops": 0,
+      "long_repetitive_cycles_observed": false,
+      "judge_calls": 0
+    }
+  },
+  "judge_calls": 0,
+  "authorization": "Latest user autonomous final release after at most one extra dev; imperfect P/quality allowed.",
+  "original_frozen_sha256": "949af76a3b21a5f3358c4b9cee378a27c61580016fadc1948b11e055d8762ddb",
+  "runtime_port": "single-native BF16 RTX5090; frozen scientific parameters unchanged; speed/dev only",
+  "cohort": "RTX5090 native BF16 pure torch recurrence, separate from old offload/TP2; no Judge"
+}

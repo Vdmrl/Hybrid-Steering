@@ -1,0 +1,921 @@
+{
+  "id": "caa5090-fr-matched-20261011",
+  "method": "caa",
+  "lane": 0,
+  "priority": 1,
+  "depends_on": [],
+  "max_new_tokens": 4096,
+  "jobs": [
+    {
+      "id": "french",
+      "features": {
+        "french": {
+          "layers": [
+            8
+          ],
+          "gain": 4
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "numbered",
+      "features": {
+        "numbered": {
+          "layers": [
+            8,
+            16
+          ],
+          "gain": 16,
+          "max_calls": 28
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "probabilistic_framing",
+      "features": {
+        "probabilistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 14,
+          "max_calls": 24
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "technical",
+      "features": {
+        "technical": {
+          "layers": [
+            16
+          ],
+          "gain": 8
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "theistic_framing",
+      "features": {
+        "theistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 12
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "french+probabilistic_framing",
+      "features": {
+        "french": {
+          "layers": [
+            8
+          ],
+          "gain": 4
+        },
+        "probabilistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 14,
+          "max_calls": 24
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "french+technical",
+      "features": {
+        "french": {
+          "layers": [
+            8
+          ],
+          "gain": 4
+        },
+        "technical": {
+          "layers": [
+            16
+          ],
+          "gain": 8
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "french+theistic_framing",
+      "features": {
+        "french": {
+          "layers": [
+            8
+          ],
+          "gain": 4
+        },
+        "theistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 12
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "numbered+french",
+      "features": {
+        "numbered": {
+          "layers": [
+            8,
+            16
+          ],
+          "gain": 16,
+          "max_calls": 28
+        },
+        "french": {
+          "layers": [
+            8
+          ],
+          "gain": 4
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "numbered+probabilistic_framing",
+      "features": {
+        "numbered": {
+          "layers": [
+            8,
+            16
+          ],
+          "gain": 16,
+          "max_calls": 28
+        },
+        "probabilistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 14,
+          "max_calls": 24
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "numbered+technical",
+      "features": {
+        "numbered": {
+          "layers": [
+            8,
+            16
+          ],
+          "gain": 16,
+          "max_calls": 28
+        },
+        "technical": {
+          "layers": [
+            16
+          ],
+          "gain": 8
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "numbered+theistic_framing",
+      "features": {
+        "numbered": {
+          "layers": [
+            8,
+            16
+          ],
+          "gain": 16,
+          "max_calls": 28
+        },
+        "theistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 12
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "technical+probabilistic_framing",
+      "features": {
+        "technical": {
+          "layers": [
+            16
+          ],
+          "gain": 8
+        },
+        "probabilistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 14,
+          "max_calls": 24
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "technical+theistic_framing",
+      "features": {
+        "technical": {
+          "layers": [
+            16
+          ],
+          "gain": 8
+        },
+        "theistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 12
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "theistic_framing+probabilistic_framing",
+      "features": {
+        "theistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 12
+        },
+        "probabilistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 14,
+          "max_calls": 24
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "french+technical+probabilistic_framing",
+      "features": {
+        "french": {
+          "layers": [
+            8
+          ],
+          "gain": 4
+        },
+        "technical": {
+          "layers": [
+            16
+          ],
+          "gain": 8
+        },
+        "probabilistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 14,
+          "max_calls": 24
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "french+technical+theistic_framing",
+      "features": {
+        "french": {
+          "layers": [
+            8
+          ],
+          "gain": 4
+        },
+        "technical": {
+          "layers": [
+            16
+          ],
+          "gain": 8
+        },
+        "theistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 12
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "french+theistic_framing+probabilistic_framing",
+      "features": {
+        "french": {
+          "layers": [
+            8
+          ],
+          "gain": 4
+        },
+        "theistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 12
+        },
+        "probabilistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 14,
+          "max_calls": 24
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "numbered+french+probabilistic_framing",
+      "features": {
+        "numbered": {
+          "layers": [
+            8,
+            16
+          ],
+          "gain": 16,
+          "max_calls": 28
+        },
+        "french": {
+          "layers": [
+            8
+          ],
+          "gain": 4
+        },
+        "probabilistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 14,
+          "max_calls": 24
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "numbered+french+technical",
+      "features": {
+        "numbered": {
+          "layers": [
+            8,
+            16
+          ],
+          "gain": 16,
+          "max_calls": 28
+        },
+        "french": {
+          "layers": [
+            8
+          ],
+          "gain": 4
+        },
+        "technical": {
+          "layers": [
+            16
+          ],
+          "gain": 8
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "numbered+french+theistic_framing",
+      "features": {
+        "numbered": {
+          "layers": [
+            8,
+            16
+          ],
+          "gain": 16,
+          "max_calls": 28
+        },
+        "french": {
+          "layers": [
+            8
+          ],
+          "gain": 4
+        },
+        "theistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 12
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "numbered+technical+probabilistic_framing",
+      "features": {
+        "numbered": {
+          "layers": [
+            8,
+            16
+          ],
+          "gain": 16,
+          "max_calls": 28
+        },
+        "technical": {
+          "layers": [
+            16
+          ],
+          "gain": 8
+        },
+        "probabilistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 14,
+          "max_calls": 24
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "numbered+technical+theistic_framing",
+      "features": {
+        "numbered": {
+          "layers": [
+            8,
+            16
+          ],
+          "gain": 16,
+          "max_calls": 28
+        },
+        "technical": {
+          "layers": [
+            16
+          ],
+          "gain": 8
+        },
+        "theistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 12
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "numbered+theistic_framing+probabilistic_framing",
+      "features": {
+        "numbered": {
+          "layers": [
+            8,
+            16
+          ],
+          "gain": 16,
+          "max_calls": 28
+        },
+        "theistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 12
+        },
+        "probabilistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 14,
+          "max_calls": 24
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "technical+theistic_framing+probabilistic_framing",
+      "features": {
+        "technical": {
+          "layers": [
+            16
+          ],
+          "gain": 8
+        },
+        "theistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 12
+        },
+        "probabilistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 14,
+          "max_calls": 24
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "french+technical+theistic_framing+probabilistic_framing",
+      "features": {
+        "french": {
+          "layers": [
+            8
+          ],
+          "gain": 4
+        },
+        "technical": {
+          "layers": [
+            16
+          ],
+          "gain": 8
+        },
+        "theistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 12
+        },
+        "probabilistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 14,
+          "max_calls": 24
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "numbered+french+technical+probabilistic_framing",
+      "features": {
+        "numbered": {
+          "layers": [
+            8,
+            16
+          ],
+          "gain": 16,
+          "max_calls": 28
+        },
+        "french": {
+          "layers": [
+            8
+          ],
+          "gain": 4
+        },
+        "technical": {
+          "layers": [
+            16
+          ],
+          "gain": 8
+        },
+        "probabilistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 14,
+          "max_calls": 24
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "numbered+french+technical+theistic_framing",
+      "features": {
+        "numbered": {
+          "layers": [
+            8,
+            16
+          ],
+          "gain": 16,
+          "max_calls": 28
+        },
+        "french": {
+          "layers": [
+            8
+          ],
+          "gain": 4
+        },
+        "technical": {
+          "layers": [
+            16
+          ],
+          "gain": 8
+        },
+        "theistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 12
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "numbered+french+theistic_framing+probabilistic_framing",
+      "features": {
+        "numbered": {
+          "layers": [
+            8,
+            16
+          ],
+          "gain": 16,
+          "max_calls": 28
+        },
+        "french": {
+          "layers": [
+            8
+          ],
+          "gain": 4
+        },
+        "theistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 12
+        },
+        "probabilistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 14,
+          "max_calls": 24
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "numbered+technical+theistic_framing+probabilistic_framing",
+      "features": {
+        "numbered": {
+          "layers": [
+            8,
+            16
+          ],
+          "gain": 16,
+          "max_calls": 28
+        },
+        "technical": {
+          "layers": [
+            16
+          ],
+          "gain": 8
+        },
+        "theistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 12
+        },
+        "probabilistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 14,
+          "max_calls": 24
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    },
+    {
+      "id": "numbered+french+technical+theistic_framing+probabilistic_framing",
+      "features": {
+        "numbered": {
+          "layers": [
+            8,
+            16
+          ],
+          "gain": 16,
+          "max_calls": 28
+        },
+        "french": {
+          "layers": [
+            8
+          ],
+          "gain": 4
+        },
+        "technical": {
+          "layers": [
+            16
+          ],
+          "gain": 8
+        },
+        "theistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 12
+        },
+        "probabilistic_framing": {
+          "layers": [
+            8
+          ],
+          "gain": 14,
+          "max_calls": 24
+        }
+      },
+      "intervention": "additive",
+      "lambda": 1
+    }
+  ],
+  "prompts": [
+    {
+      "id": "five-plain-heldout-001",
+      "text": "How can I put away a winter scarf so I can find it next year? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-002",
+      "text": "What helps neighbours decide when to water a shared flower pot? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-003",
+      "text": "How can I ask a friend to return my umbrella without sounding cross? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-004",
+      "text": "What can make a bus journey with a child more pleasant? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-005",
+      "text": "How should I choose a place to meet someone when I do not know the area well? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-006",
+      "text": "What can I do if a guest arrives much earlier than I expected? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-007",
+      "text": "How can I keep a small balcony pleasant without filling it with things? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-008",
+      "text": "What helps two people agree on music during a long car ride? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-009",
+      "text": "How can I look after a favourite hat when it is raining? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-010",
+      "text": "What might help someone enjoy eating alone at home? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-011",
+      "text": "How can I help a visitor find a room in an unfamiliar building? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-012",
+      "text": "What should I consider before inviting a new neighbour for tea? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-013",
+      "text": "How can I make a shared coat rack easier for everyone to use? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-014",
+      "text": "What can help someone feel less awkward at a small family gathering? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-015",
+      "text": "How can I choose a simple dessert when I do not know what guests enjoy? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-016",
+      "text": "What helps someone decide whether to keep an old chair? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-017",
+      "text": "How can I make packing for a short trip less stressful? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-018",
+      "text": "What can I do if a planned outdoor lunch might get rained out? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-019",
+      "text": "How can I help a friend who is unsure about joining a local club? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-020",
+      "text": "What helps people take turns when they share a small work table? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-021",
+      "text": "How can I keep a hand-written recipe easy to read and find? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-022",
+      "text": "What can make a visit to an elderly relative feel warm and relaxed? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-023",
+      "text": "How can I choose a walking route when I do not know how tired I will feel? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-024",
+      "text": "What helps someone settle down after an unexpectedly busy afternoon? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-025",
+      "text": "How can I share a family photo with someone who rarely uses a phone? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-026",
+      "text": "What can help two friends agree on how much to spend during a day out? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-027",
+      "text": "How can I make a waiting room visit feel less dull? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-028",
+      "text": "What should I think about before lending a friend my bicycle? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-029",
+      "text": "How can I find a fair way to share the last piece of cake? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-030",
+      "text": "What can help someone welcome a pet into a small home? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-031",
+      "text": "How can I decide whether to repair a torn shopping bag? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    },
+    {
+      "id": "five-plain-heldout-032",
+      "text": "What helps a group stay cheerful when a day trip does not go as planned? Use plain, familiar words and an ordinary, matter-of-fact tone."
+    }
+  ],
+  "sources": {
+    "french": {
+      "path": "directions/french.safetensors",
+      "sha256": "21cc665e49907065b8a2e0612149a351a2b74bb41bc3634ee673052d11fbb59e"
+    },
+    "technical": {
+      "path": "directions/technical.safetensors",
+      "sha256": "738b5dd79a63371138d31e81d05e76059363954f5af07037c1b85ac7c5d1bb5f"
+    },
+    "theistic_framing": {
+      "path": "directions/theistic_framing.safetensors",
+      "sha256": "b3d7c1c5ac28333ac495f3069e9eeaacda72e87217881d4387cbdeb4640fb7f4"
+    },
+    "numbered": {
+      "path": "directions/numbered.safetensors",
+      "sha256": "3c319cfd3bd770fca225309cfc240211d38024f55acd3eaca7e970eea08add0b"
+    },
+    "probabilistic_framing": {
+      "path": "directions/probabilistic_framing.safetensors",
+      "sha256": "660020062ee2108411f4cc4caa151cfbca82915095462302de4bf383a32a6708"
+    }
+  },
+  "system": "Answer the user's request directly and accurately. Preserve supplied facts and do not invent details. Use enough words to complete the task, without padding.",
+  "external_dependencies": [],
+  "final_release": true,
+  "expected_interventions": 992,
+  "canonical_feature_map": {
+    "numbered": "numbered",
+    "probabilistic_framing": "probabilistic_framing",
+    "french": "french",
+    "technical": "technical",
+    "theistic_framing": "theistic_framing"
+  },
+  "bank_sha256": "a520bdddc6758c45cb50c6c17cab34f4224783ff75f30509c2e25d279fbe5633",
+  "resource_class": "final",
+  "frozen_config_sha256": "489fbf69bf1a7cea9d2a94ee514b40baab97890a63a3218157f1d7892f0490a0"
+}
