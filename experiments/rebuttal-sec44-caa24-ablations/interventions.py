@@ -15,6 +15,13 @@ LAYERS = tuple(i for i in range(32) if i % 4 != 3)
 HYS_ALPHA = dict(zip(FEATURES, (2.5, 8.0, 2.0, 4.0, 1.5), strict=True))
 HYS_BETA = dict(zip(FEATURES, (0.25, 0.50, 0.50, 0.50, 0.25), strict=True))
 WINDOWS = {"N": 28, "P": 32}
+LAYER_SETS = {
+    "gdn24": LAYERS,
+    "all32": tuple(range(32)),
+    "mid12_gdn": tuple(i for i in LAYERS if 8 <= i < 24),
+    "mid16_all": tuple(range(8, 24)),
+    "early_mid12_gdn": tuple(i for i in LAYERS if 4 <= i < 20),
+}
 
 
 def rss_sum(pieces, mode="rss"):
@@ -41,25 +48,35 @@ def gamma_stats(gammas):
     }
 
 
-def caa_phases(directions, alphas, strength, norm_mode, composition_mode, use_windows, device):
+def caa_phases(
+    directions,
+    alphas,
+    strength,
+    norm_mode,
+    composition_mode,
+    use_windows,
+    device,
+    layers=LAYERS,
+    windows=WINDOWS,
+):
     pieces = {}
     for m, alpha in alphas.items():
-        per_layer = directions[m]
+        per_layer = {i: directions[m][i] for i in layers}
         if norm_mode == "unit":
             pieces[m] = {
-                i: (v / v.norm()) * (strength * alpha / math.sqrt(len(LAYERS)))
+                i: (v / v.norm()) * (strength * alpha / math.sqrt(len(layers)))
                 for i, v in per_layer.items()
             }
         elif norm_mode == "natural":
             pieces[m] = {i: v * (strength * alpha) for i, v in per_layer.items()}
         else:
             raise ValueError(f"Unknown CAA norm mode: {norm_mode}")
-    starts = [1] + sorted({WINDOWS[m] + 1 for m in alphas if use_windows and m in WINDOWS})
+    starts = [1] + sorted({windows[m] + 1 for m in alphas if use_windows and m in windows})
     phases, stats = {}, []
     for start in starts:
-        members = [m for m in alphas if not use_windows or start <= WINDOWS.get(m, math.inf)]
+        members = [m for m in alphas if not use_windows or start <= windows.get(m, math.inf)]
         offsets, gammas = {}, {}
-        for i in LAYERS:
+        for i in layers:
             offset, gamma = (
                 rss_sum([pieces[m][i] for m in members], composition_mode)
                 if members

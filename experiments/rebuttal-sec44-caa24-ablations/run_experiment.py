@@ -5,6 +5,7 @@ import json
 import math
 import os
 import random
+from contextlib import contextmanager
 from hashlib import sha256
 from pathlib import Path
 
@@ -14,7 +15,9 @@ from interventions import (
     FEATURES,
     HYS_ALPHA,
     HYS_BETA,
+    LAYER_SETS,
     LAYERS,
+    WINDOWS,
     RecurrentWrite,
     caa_phases,
     hys_coefficients,
@@ -24,6 +27,64 @@ from native_runtime import generate, load_model, model_provenance
 MODES = {"caa24": ("rss", "raw"), "hys": ("full", "no_rss", "no_gram", "no_clamp")}
 
 
+def caa_options(config, condition, selected, alpha):
+    opts = {**config, **selected, **condition}
+    layers = opts.get("layers", list(LAYERS))
+    norm = opts["norm_mode"]
+    use_windows = opts["use_windows"]
+    windows = opts.get("windows", WINDOWS if use_windows else {})
+    named = (
+        next((name for name, indices in LAYER_SETS.items() if tuple(layers) == indices), "custom")
+        if isinstance(layers, list)
+        else "invalid"
+    )
+    layer_set = opts.get("layer_set", named)
+    family = opts.get("family", f"{layer_set}_{norm}" + ("_win" if use_windows else ""))
+    if (
+        not isinstance(layers, list)
+        or not layers
+        or any(type(i) is not int or not 0 <= i < 32 for i in layers)
+        or len(set(layers)) != len(layers)
+        or layer_set != named
+        or norm not in ("natural", "unit")
+        or type(use_windows) is not bool
+        or not isinstance(family, str)
+        or not family
+        or not isinstance(windows, dict)
+        or (
+            use_windows
+            and (
+                not windows
+                or any(m not in WINDOWS or type(n) is not int or n <= 0 for m, n in windows.items())
+            )
+        )
+        or (not use_windows and windows)
+    ):
+        raise ValueError(f"Invalid CAA layers, norm or windows: {family}")
+    dose = next(iter(alpha.values())) if len(alpha) == 1 else (alpha or None)
+    if "alpha_or_gain" in condition and condition["alpha_or_gain"] != dose:
+        raise ValueError("CAA dose metadata does not match alpha")
+    return dict(
+        family=family,
+        layer_set=layer_set,
+        layers=layers,
+        norm_mode=norm,
+        use_windows=use_windows,
+        windows=windows,
+        alpha_or_gain=dose,
+    )
+
+
+def scheduled_tasks(config, prompts):
+    all_tasks = {(c["id"], p["id"]): (c, p) for c in config["conditions"] for p in prompts}
+    if "tasks" not in config:
+        return all_tasks
+    tasks = [tuple(pair) for pair in config["tasks"]]
+    if not tasks or len(set(tasks)) != len(tasks) or any(key not in all_tasks for key in tasks):
+        raise ValueError("Shard must contain unique known condition/question pairs")
+    return {key: all_tasks[key] for key in tasks}
+
+
 def resolve_job(config, prompts, gains=None):
     if (
         config["schema_version"] != 1
@@ -31,7 +92,7 @@ def resolve_job(config, prompts, gains=None):
         or len({p["id"] for p in prompts}) != len(prompts)
         or not all(p["id"] and p["text"].strip() for p in prompts)
         or len({c["id"] for c in config["conditions"]}) != len(config["conditions"])
-        or len(config["conditions"]) * len(prompts) != config["expected_answers"]
+        or len(scheduled_tasks(config, prompts)) != config["expected_answers"]
     ):
         raise ValueError("Conditions and prompts must be unique and match expected_answers")
     if (
@@ -41,6 +102,15 @@ def resolve_job(config, prompts, gains=None):
         or type(config["use_windows"]) is not bool
     ):
         raise ValueError("Invalid decoding or CAA options")
+    selected = {}
+    if gains is not None and "values" in gains:
+        required = {"family", "layers", "norm_mode", "use_windows", "windows"}
+        if not required <= gains.keys():
+            raise ValueError("Missing selected CAA family, layers, norm or windows")
+        selected = {k: gains[k] for k in required}
+        gains = gains["values"]
+        if not isinstance(gains, dict):
+            raise ValueError("Selected CAA values must be a feature-to-dose map")
     if gains is not None and (
         set(gains) != set(FEATURES)
         or any(
@@ -65,6 +135,7 @@ def resolve_job(config, prompts, gains=None):
             if "alpha" in c:
                 raise ValueError("HyS Table 4 gains are fixed by the runner")
             alpha = {f: HYS_ALPHA[f] for f in active}
+            options = {}
         else:
             if active and c.get("alpha") is None and gains is None:
                 raise ValueError("Template needs --gains selected on Job 1 before running")
@@ -76,9 +147,11 @@ def resolve_job(config, prompts, gains=None):
                 for x in alpha.values()
             ):
                 raise ValueError(f"Invalid CAA coefficients for {c['id']}")
+            options = caa_options(config, c, selected if c.get("alpha") is None else {}, alpha)
         resolved.append(
             {
                 **c,
+                **options,
                 "alpha": {f: alpha[f] for f in active},
                 "beta": {f: HYS_BETA[f] for f in active} if m == "hys" else {},
             }
@@ -98,12 +171,12 @@ def plan(job, banks, device):
                     "min": 1.0,
                     "median": 1.0,
                     "max": 1.0,
-                    "per_layer": dict.fromkeys(LAYERS, 1.0),
+                    "per_layer": dict.fromkeys(c.get("layers", LAYERS), 1.0),
                 },
             )
         elif method == "caa24":
             prepared[c["id"]] = caa_phases(
-                *args, job["norm_mode"], mode, job["use_windows"], device
+                *args, c["norm_mode"], mode, c["use_windows"], device, c["layers"], c["windows"]
             )
         else:
             prepared[c["id"]] = hys_coefficients(*args, mode)
@@ -141,7 +214,8 @@ def export_judge(path, generations, fingerprint):
         if p["scenario"] != r["prompt"]:
             raise ValueError(f"Conflicting text for {r['prompt_id']}")
         p["answers"].append({"answer_id": r["answer_id"], "text": r["response"]})
-    write_rows(path / "judge_input.jsonl", grouped.values())
+    for name in ("judge_input.jsonl", "blind.jsonl"):
+        atomic_rows(path / name, grouped.values())
     atomic_json(
         path / "judge_input_manifest.json",
         {
@@ -162,7 +236,37 @@ def atomic_json(path, record):
     temp.replace(path)
 
 
-def run_job(job, prompts, output, *, resume=False, model_path=None, mock=False):
+def atomic_rows(path, rows):
+    temp = path.with_suffix(path.suffix + ".tmp")
+    write_rows(temp, rows)
+    temp.replace(path)
+
+
+def fingerprint_of(frozen):
+    return sha256(json.dumps(frozen, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+
+
+def opaque_id(fingerprint, key):
+    return "answer-" + sha256(json.dumps([fingerprint, *key]).encode()).hexdigest()[:24]
+
+
+@contextmanager
+def output_lock(output):
+    output.mkdir(parents=True, exist_ok=True)
+    lock = output / "run.lock"
+    try:
+        fd = os.open(lock, os.O_EXCL | os.O_CREAT | os.O_WRONLY)
+    except FileExistsError:
+        raise RuntimeError(f"Output is locked: {lock}") from None
+    try:
+        with os.fdopen(fd, "w", encoding="ascii") as handle:
+            handle.write(f"{os.getpid()}\n")
+        yield
+    finally:
+        lock.unlink()
+
+
+def run_job(job, prompts, output, *, resume=False, model_path=None, mock=False, namespace=None):
     methods = sorted({c["method"] for c in job["conditions"]})
     if mock:
         from mock_runtime import mock_backend
@@ -178,18 +282,10 @@ def run_job(job, prompts, output, *, resume=False, model_path=None, mock=False):
         device = torch.device("cuda", 0)
     system = read(PACKAGE / "directions/manifest.json")["system_prompt"]
     frozen = identity(job, prompts, sources, runtime, system)
-    fingerprint = sha256(
-        json.dumps(frozen, sort_keys=True, ensure_ascii=False).encode()
-    ).hexdigest()
-    output.mkdir(parents=True, exist_ok=True)
-    lock = output / "run.lock"
-    try:
-        fd = os.open(lock, os.O_EXCL | os.O_CREAT | os.O_WRONLY)
-    except FileExistsError:
-        raise RuntimeError(f"Output is locked: {lock}") from None
-    try:
-        with os.fdopen(fd, "w", encoding="ascii") as handle:
-            handle.write(f"{os.getpid()}\n")
+    if namespace:
+        frozen["parallel_namespace"] = namespace
+    fingerprint = fingerprint_of(frozen)
+    with output_lock(output):
         _run_locked(
             job,
             prompts,
@@ -202,8 +298,6 @@ def run_job(job, prompts, output, *, resume=False, model_path=None, mock=False):
             (model, tokenizer) if mock else None,
             model_path,
         )
-    finally:
-        lock.unlink()
 
 
 def _run_locked(
@@ -220,10 +314,8 @@ def _run_locked(
 ):
     manifest_path = output / "manifest.json"
     raw = output / "generations.jsonl"
-    scheduled = {(c["id"], p["id"]): (c, p) for c in job["conditions"] for p in prompts}
-
-    def opaque_id(key):
-        return "answer-" + sha256(json.dumps([fingerprint, *key]).encode()).hexdigest()[:24]
+    scheduled = scheduled_tasks(job, prompts)
+    namespace = frozen.get("parallel_namespace", fingerprint)
 
     if raw.exists() and not manifest_path.exists():
         raise ValueError("Missing provenance for existing generations")
@@ -235,7 +327,7 @@ def _run_locked(
     seen = set()
     for row in saved:
         key = row["condition_id"], row["question_id"]
-        if key not in scheduled or key in seen or row["answer_id"] != opaque_id(key):
+        if key not in scheduled or key in seen or row["answer_id"] != opaque_id(namespace, key):
             raise ValueError("Output contains an unexpected or duplicate generation row")
         seen.add(key)
     if raw.exists() and raw.stat().st_size:
@@ -291,7 +383,7 @@ def _run_locked(
                 recurrent=recurrent,
             )
             row = {
-                "answer_id": opaque_id(key),
+                "answer_id": opaque_id(namespace, key),
                 "question_id": prompt["id"],
                 "prompt_id": prompt["id"],
                 "prompt": prompt["text"],
@@ -303,6 +395,19 @@ def _run_locked(
                 "active_features": list(c["active"]),
                 "lambda": c["lambda"],
                 "runtime_mode": frozen["runtime"]["kind"],
+                **{
+                    k: c[k]
+                    for k in (
+                        "family",
+                        "layer_set",
+                        "layers",
+                        "norm_mode",
+                        "use_windows",
+                        "windows",
+                        "alpha_or_gain",
+                    )
+                    if k in c
+                },
                 **result,
             }
             output_stream.write(json.dumps(row, ensure_ascii=False, allow_nan=False) + "\n")
@@ -323,7 +428,9 @@ def main():
     parser.add_argument("--job", type=Path)
     parser.add_argument("--model", type=Path, help="Local BF16 Qwen3.5-9B snapshot")
     parser.add_argument("--output", type=Path)
-    parser.add_argument("--gains", type=Path)
+    parser.add_argument("--gains", "--selected-caa-config", type=Path)
+    parser.add_argument("--mock", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--parallel-namespace", help=argparse.SUPPRESS)
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--max-new-tokens", type=int)
     parser.add_argument("--norm-mode", choices=("natural", "unit"))
@@ -387,13 +494,21 @@ def main():
             for method in {c["method"] for c in job["conditions"]}:
                 load_directions(method)
         print(
-            f"Valid: {len(job['conditions'])} conditions × {len(prompts)} prompts, {job['expected_answers']} answers"
+            f"Valid: {len(job['conditions'])} conditions, {len(prompts)} prompts, {job['expected_answers']} answers"
         )
         return
-    mock = args.command == "smoke-cpu"
+    mock = args.command == "smoke-cpu" or args.mock
     if not args.output or (not mock and not args.model):
         parser.error("--output and, for a GPU run, --model are required")
-    run_job(job, prompts, args.output, resume=args.resume, model_path=args.model, mock=mock)
+    run_job(
+        job,
+        prompts,
+        args.output,
+        resume=args.resume,
+        model_path=args.model,
+        mock=mock,
+        namespace=args.parallel_namespace,
+    )
 
 
 if __name__ == "__main__":

@@ -68,7 +68,7 @@ def load_model(path):
     return model, tokenizer, device
 
 
-def model_provenance(path):
+def model_provenance(path, *, inspect_device=True):
     import transformers
     from build_job_configs import sha
 
@@ -102,7 +102,9 @@ def model_provenance(path):
         "torch": str(torch.__version__),
         "transformers": transformers.__version__,
         "cuda": torch.version.cuda,
-        "device": torch.cuda.get_device_name() if torch.cuda.is_available() else None,
+        "device": torch.cuda.get_device_name()
+        if inspect_device and torch.cuda.is_available()
+        else None,
         "attention": "sdpa",
         "recurrent_kernels": "pure-torch",
     }
@@ -176,7 +178,8 @@ def generate(
     with ExitStack() as stack:
         if caa:
             blocks = decoder_blocks(model)
-            for layer in LAYERS:
+            caa_layers = caa[1]
+            for layer in caa_layers:
                 handle = blocks[layer].register_forward_hook(caa_hook(step, layer, caa, caa_calls))
                 stack.callback(handle.remove)
         bulk = forward(ids[:, :-1], mask[:, :-1], "bulk")
@@ -196,7 +199,7 @@ def generate(
         expected_calls = sum(
             bool(caa[max(i for i in caa if i <= call)]) for call in range(1, step.token_call + 1)
         )
-        if set(caa_calls) != set(LAYERS) or set(caa_calls.values()) != {expected_calls}:
+        if set(caa_calls) != set(caa_layers) or set(caa_calls.values()) != {expected_calls}:
             raise RuntimeError("CAA schedule did not run at every expected layer/step")
     if recurrent:
         expected = 1 if recurrent.mode == "no_clamp" else 1 + step.token_call

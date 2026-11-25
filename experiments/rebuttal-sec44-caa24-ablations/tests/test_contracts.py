@@ -1,5 +1,6 @@
 import json
 import math
+import subprocess
 import sys
 from collections import Counter
 from pathlib import Path
@@ -22,6 +23,7 @@ from build_job_configs import (
 )
 from interventions import (
     FEATURES,
+    LAYER_SETS,
     LAYERS,
     RecurrentWrite,
     apply_clamp,
@@ -30,6 +32,7 @@ from interventions import (
     make_clamp_runtime,
     rss_sum,
 )
+from jobs import run_parallel
 from mock_runtime import MockTokenizer, mock_backend, smoke_config
 from native_runtime import generate
 from run_experiment import resolve_job, run_job
@@ -220,9 +223,11 @@ def test_real_9b_directions_shape_sha_finite(method, shape):
     actual = load_directions(method)
     assert set(actual) == set(FEATURES)
     for vectors in actual.values():
-        assert tuple(vectors) == LAYERS and all(
+        assert tuple(vectors) == (tuple(range(32)) if method == "caa24" else LAYERS) and all(
             v.shape == shape and v.dtype == torch.float32 for v in vectors.values()
         )
+        if method == "caa24":
+            assert all(torch.isfinite(v).all() and v.double().norm() > 0 for v in vectors.values())
 
 
 def test_job_counts_grid_and_disjoint_banks():
@@ -233,16 +238,183 @@ def test_job_counts_grid_and_disjoint_banks():
     selected = {m: block["grid"][2] for m, block in grid.items()}
     counts = [
         (240, {"rss": 30}),
+        (3832, {"rss": 479}),
         (80, {"rss": 5}),
         (1216, {"no_rss": 12, "no_gram": 12, "no_clamp": 12, "full": 2}),
         (1440, {"rss": 33, "raw": 12}),
         (300, {"full": 3, "rss": 3}),
+        (200, {"full": 4}),
     ]
     for f, (n, modes) in zip(sorted((PACKAGE / "jobs").glob("job*.json")), counts, strict=True):
         cfg = read(f)
         assert cfg["expected_answers"] == n
         assert Counter(c["mode"] for c in cfg["conditions"]) == modes
         resolve_job(cfg, banks[cfg["bank"]], selected)
+
+
+@pytest.mark.parametrize("name", tuple(LAYER_SETS))
+@pytest.mark.parametrize("norm", ["natural", "unit"])
+def test_caa_layer_sets_rss_and_hooks(name, norm):
+    layers = LAYER_SETS[name]
+    expected = {
+        "all32": tuple(range(32)),
+        "mid12_gdn": (8, 9, 10, 12, 13, 14, 16, 17, 18, 20, 21, 22),
+        "mid16_all": tuple(range(8, 24)),
+        "early_mid12_gdn": (4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18),
+        "gdn24": LAYERS,
+    }
+    assert layers == expected[name]
+    model, tokenizer, device, dirs = mock_backend()
+    bank = dirs["caa24"]
+    mixed, stats = caa_phases(bank, {"N": 2, "F": 3}, 0.75, norm, "rss", False, device, layers)
+    single, single_stats = caa_phases(bank, {"N": 2}, 0.75, norm, "rss", False, device, layers)
+    assert set(mixed[1]) == set(stats[0]["per_layer"]) == set(layers)
+    for i in layers:
+
+        def contribution(tag, dose):
+            d = bank[tag][i]
+            return (
+                0.75 * dose * d
+                if norm == "natural"
+                else 0.75 * dose * d / (d.norm() * math.sqrt(len(layers)))
+            )
+
+        a, b = contribution("N", 2), contribution("F", 3)
+        g = math.sqrt(float(a.square().sum() + b.square().sum())) / float((a + b).norm())
+        assert stats[0]["per_layer"][i] == pytest.approx(g)
+        assert single_stats[0]["per_layer"][i] == 1.0
+        torch.testing.assert_close(mixed[1][i], (a + b) * g)
+        torch.testing.assert_close(single[1][i], a)
+    result = generate(model, tokenizer, device, "hi", "sys", 2, caa=mixed)
+    assert result["audit"]["caa_layer_calls"] == dict.fromkeys(layers, 2)
+
+
+def test_mega_and_selected_caa_config_contract():
+    jobs = PACKAGE / "jobs"
+    mega = read(jobs / "job1_caa_mega_calib_selection8.json")
+    cases = mega["conditions"]
+    assert sum(not c["active"] for c in cases) == 1
+    assert mega["max_new_tokens"] == 1024
+    assert len(cases) == 479 and len({c["id"] for c in cases}) == 479
+    singleton = [c for c in cases if c["active"]]
+    assert {len(c["active"]) for c in singleton} == {1}
+    assert len({c["family"] for c in singleton}) == 13
+    assert sum(c["supplemental"] for c in singleton) == 10
+    for c in singleton:
+        assert c["layers"] == list(LAYER_SETS[c["layer_set"]])
+        assert c["alpha_or_gain"] == c["alpha"][c["active"]]
+        assert not c["use_windows"] or c["active"] in "NP"
+    external = read(jobs / "job4a_hys_external_simple50.json")
+    assert external["bank"] == "simple50"
+    assert [(c["active"], c["lambda"]) for c in external["conditions"]] == [
+        ("", 1),
+        (FEATURES, 0.5),
+        (FEATURES, 0.75),
+        (FEATURES, 1),
+    ]
+    selected = {
+        **read(jobs / "selected_caa_config.json"),
+        "family": "mid12_gdn_unit_win",
+        "norm_mode": "unit",
+        "use_windows": True,
+        "windows": {"N": 28, "P": 32},
+        "layers": list(LAYER_SETS["mid12_gdn"]),
+        "values": dict.fromkeys(FEATURES, 2.5),
+    }
+    for prefix in ("job1b", "job3", "job4_"):
+        cfg = read(next(jobs.glob(prefix + "*.json")))
+        prompts = read_rows(PACKAGE / "banks" / f"{cfg['bank']}.jsonl")
+        result = resolve_job(cfg, prompts, selected)
+        for c in result["conditions"]:
+            if c["method"] == "caa24":
+                assert all(
+                    c[k] == selected[k]
+                    for k in ("family", "layers", "norm_mode", "use_windows", "windows")
+                )
+                assert c["alpha"] == {m: 2.5 for m in c["active"]}
+            else:
+                assert "family" not in c
+        with pytest.raises(ValueError, match="Invalid CAA"):
+            resolve_job(cfg, prompts, {**selected, "layers": [0, 0]})
+
+
+def test_parallel_cpu_mock_failure_resume_and_blind(tmp_path, monkeypatch):
+    cfg, _ = smoke_config()
+    cfg.update(bank="selection8", max_new_tokens=2, expected_answers=48)
+    source = tmp_path / "tiny.json"
+    source.write_text(json.dumps(cfg), encoding="utf-8")
+    output = tmp_path / "mock"
+    args = [
+        "run_parallel.py",
+        "--runner",
+        "caa24",
+        "--job",
+        str(source),
+        "--output",
+        str(output),
+        "--mock",
+        "--gpus",
+        "0",
+        "--workers-per-gpu",
+        "3",
+        "--stagger-sec",
+        "0",
+    ]
+    monkeypatch.setattr(sys, "argv", [*args, "--dry-run"])
+    assert run_parallel.main() == 0 and not output.exists()
+    real_popen = subprocess.Popen
+    wrapper = """import sys, run_experiment as r
+generate = r.generate
+def fail_after_one(*args, **kwargs):
+    r.generate = lambda *a, **kw: sys.exit('intentional after one durable row')
+    return generate(*args, **kwargs)
+r.generate = fail_after_one
+r.main()
+"""
+
+    def popen(cmd, **kwargs):
+        if Path(cmd[cmd.index("--output") + 1]).name == "worker_01":
+            cmd = [*cmd[:2], "-c", wrapper, *cmd[3:]]
+        return real_popen(cmd, **kwargs)
+
+    monkeypatch.setattr(run_parallel.subprocess, "Popen", popen)
+    monkeypatch.setattr(sys, "argv", args)
+    assert run_parallel.main() == 1
+    assert read(output / "manifest.json")["completed"] == 33
+    assert not (output / "blind.jsonl").exists()
+    workers = output / "workers"
+    prompts = read_rows(PACKAGE / "banks/selection8.jsonl")
+    keys = [[c["id"], p["id"]] for c in cfg["conditions"] for p in prompts]
+    for i in range(3):
+        shard = read(workers / f"worker_{i:02d}" / "shard_job.json")
+        assert shard["tasks"] == keys[i::3]
+    raw = workers / "worker_01" / "generations.jsonl"
+    survived = read_rows(raw)[0]
+    with raw.open("ab") as stream:  # Simulate a killed process's torn final line.
+        stream.write(b'{"incomplete":')
+
+    monkeypatch.setattr(run_parallel.subprocess, "Popen", real_popen)
+    monkeypatch.setattr(sys, "argv", [*args, "--resume"])
+    assert run_parallel.main() == 0
+    rows = read_rows(output / "generations.jsonl")
+    assert [[r["condition_id"], r["question_id"]] for r in rows] == keys
+    assert len({r["answer_id"] for r in rows}) == 48 and survived in rows
+    manifest = read(output / "manifest.json")
+    assert manifest["status"] == "complete" and manifest["completed"] == 48
+    assert set(manifest["gamma_by_condition"]) == {c["id"] for c in cfg["conditions"]}
+    assert (
+        sum(len(read(workers / f"worker_{i:02d}" / "shard_job.json")["tasks"]) for i in range(3, 6))
+        == 15
+    )
+    blind = read_rows(output / "blind.jsonl")
+    assert len(blind) == 8
+    assert all(set(p) == {"prompt_id", "scenario", "answers"} for p in blind)
+    assert all(set(a) == {"answer_id", "text"} for p in blind for a in p["answers"])
+    assert {a["answer_id"] for p in blind for a in p["answers"]} == {r["answer_id"] for r in rows}
+    assert (output / "blind.jsonl").read_bytes() == (output / "judge_input.jsonl").read_bytes()
+    assert run_parallel.main() == 0
+    assert read_rows(output / "generations.jsonl") == rows
+    assert len(list(workers.iterdir())) == 6
 
 
 def test_frozen_calibration_grid_and_doses():

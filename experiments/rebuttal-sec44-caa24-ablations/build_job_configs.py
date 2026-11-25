@@ -11,7 +11,7 @@ from itertools import combinations
 from pathlib import Path
 
 import torch
-from interventions import FEATURES, LAYERS
+from interventions import FEATURES, LAYER_SETS, LAYERS, WINDOWS
 from safetensors.torch import load_file
 
 PACKAGE = Path(__file__).resolve().parent
@@ -198,13 +198,15 @@ def load_directions(method):
         if set(tensors) != {f"layer_{i}" for i in stored}:
             raise ValueError(f"Unexpected stored layers for {method}/{tag}")
         result[tag] = {}
-        for i in LAYERS:
+        for i in stored:
             tensor = tensors[f"layer_{i}"]
+            norm = tensor.norm().item()
             if (
                 tuple(tensor.shape) != shape
                 or tensor.dtype != torch.float32
                 or not bool(torch.isfinite(tensor).all())
-                or tensor.norm().item() <= 0
+                or not math.isfinite(norm)
+                or norm <= 0
             ):
                 raise ValueError(f"Invalid direction {method}/{tag}/layer_{i}")
             result[tag][i] = tensor
@@ -224,7 +226,7 @@ DOSE_LAYERS = (0, 8, 16, 30)
 def calibration(directions):
     result = {}
     for tag, (gain, ref) in REFERENCES.items():
-        norms = {i: float(v.double().norm()) for i, v in directions[tag].items()}
+        norms = {i: float(directions[tag][i].double().norm()) for i in LAYERS}
         each = gain / math.sqrt(len(ref))
         ratios = [each / norms[i] for i in ref]
         anchor = math.exp(sum(math.log(v) for v in ratios) / len(ratios))
@@ -265,6 +267,81 @@ def condition(method, mode, active, strength=1.0, alpha=None, suffix=""):
     return c
 
 
+def log_grid(low, high, n=8):
+    return [float(f"{low * (high / low) ** (i / (n - 1)):.6g}") for i in range(n)]
+
+
+def mega_conditions():
+    natural = {m: [0.02, 0.035, 0.06, 0.10, 0.17, 0.28, 0.46, 0.75, 1.20, 1.90] for m in FEATURES}
+    natural["F"] = [0.015, 0.025, 0.04, 0.065, 0.105, 0.17, 0.27, 0.43, 0.68, 1.10]
+    natural["P"] = [0.03, 0.055, 0.10, 0.18, 0.32, 0.56, 1.00, 1.75, 3.00, 5.00]
+    unit = {m: [1.0, 1.6, 2.5, 4.0, 6.3, 10, 15.8, 25, 40, 63] for m in FEATURES}
+    unit["F"] = [0.6, *unit["F"][:-1]]
+    mid_bounds = {"F": (0.02, 1.6), "P": (0.05, 6.0)}
+    cells = [condition("caa24", "rss", "", alpha={})]
+
+    def add(layer_set, norm, grids, windows=False, supplemental=False):
+        family = f"{layer_set}_{norm}" + ("_win" if windows else "")
+        for tag, doses in grids.items():
+            for dose in doses:
+                cells.append(
+                    {
+                        **condition(
+                            "caa24", "rss", tag, alpha={tag: dose}, suffix=f"__{family}__{dose:g}"
+                        ),
+                        "family": family,
+                        "layer_set": layer_set,
+                        "layers": list(LAYER_SETS[layer_set]),
+                        "norm_mode": norm,
+                        "use_windows": windows,
+                        "windows": WINDOWS if windows else {},
+                        "alpha_or_gain": dose,
+                        "supplemental": supplemental,
+                    }
+                )
+
+    for name, layers in LAYER_SETS.items():
+        if name == "gdn24":
+            add(name, "natural", natural)
+            add(name, "unit", unit)
+        else:
+            scale = 24 / len(layers)
+            scaled = {}
+            for m, grid in natural.items():
+                lo, hi = grid[0] * scale, grid[-1] * scale
+                if name != "all32":
+                    floor, ceiling = mid_bounds.get(m, (0.03, 3.0))
+                    lo, hi = max(floor, lo), min(ceiling, hi)
+                scaled[m] = log_grid(lo, hi)
+            add(name, "natural", scaled)
+            add(
+                name,
+                "unit",
+                {m: log_grid(0.6, 32) if m == "F" else log_grid(1, 50) for m in FEATURES},
+            )
+        if name in ("gdn24", "all32"):
+            # The specified core grids total 468 cells. Add five per family
+            # to reach the requested 478 without replacing any core point.
+            add(
+                name,
+                "natural",
+                {
+                    m: [float(f"{math.sqrt(grid[0] * grid[1]):.6g}")]
+                    for m, grid in (natural if name == "gdn24" else scaled).items()
+                },
+                supplemental=True,
+            )
+    add(
+        "gdn24",
+        "natural",
+        {m: log_grid(natural[m][0], natural[m][-1]) for m in WINDOWS},
+        windows=True,
+    )
+    for name in ("gdn24", "mid12_gdn"):
+        add(name, "unit", {m: log_grid(1.5, 63) for m in WINDOWS}, windows=True)
+    return cells
+
+
 def build_jobs(grid):
     subsets = ["".join(c) for k in range(1, 6) for c in combinations(FEATURES, k)]
     reduced = [(s, 1.0) for s in subsets if len(s) in (1, 4, 5)] + [(FEATURES, 0.75)]
@@ -287,11 +364,25 @@ def build_jobs(grid):
             ],
         ),
         (
+            "job1_caa_mega_calib_selection8",
+            "selection8",
+            8,
+            1024,
+            mega_conditions(),
+        ),
+        (
             "job1b_caa24_val_independent16",
             "independent16",
             16,
             1024,
             conditions("caa24", "rss", [(m, 1.0) for m in FEATURES]),
+        ),
+        (
+            "job4a_hys_external_simple50",
+            "simple50",
+            50,
+            4096,
+            conditions("hys", "full", [("", 1.0), (FEATURES, 0.5), *independent[1:]]),
         ),
         (
             "job2_hys_ablations_and_ctrl",
@@ -337,6 +428,17 @@ def build_jobs(grid):
         )
     template = PACKAGE / "jobs/selected_alpha.example.json"
     dump(template, {tag: None for tag in FEATURES})
+    dump(
+        PACKAGE / "jobs/selected_caa_config.json",
+        {
+            "family": "gdn24_natural",
+            "layers": list(LAYERS),
+            "norm_mode": "natural",
+            "use_windows": False,
+            "windows": {},
+            "values": dict.fromkeys(FEATURES),
+        },
+    )
 
 
 if __name__ == "__main__":

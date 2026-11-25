@@ -30,57 +30,57 @@ sha256sum -c directions/SHA256SUMS.txt
 
 ## Jobs
 
-Jobs 1 and 2 are ready immediately. Run on separate allocated GPUs if running in parallel. If there is only one GPU, run them in sequence using its index for both commands.
+Drop #1 is ready immediately and runs Job 1 mega → Job 2 → Job 4a. On one H200, start with four workers. Use `GPUS=0,1` to shard each job over two allocated GPUs. Each worker loads its own BF16 copy. Treat 4–5 workers on H200 141 GB, 2–3 on A100/H100 80 GB, and one on 40/48 GB as starting points, not measured capacity. Reduce `WORKERS_PER_GPU` if the first run hits OOM, then resume without changing the job. The default 12-second stagger limits concurrent host-side loading.
 
 ```bash
-CUDA_VISIBLE_DEVICES=0 bash jobs/run_job.sh caa24 --model "$MODEL" \
-  --job jobs/job1_caa24_calib_selection8.json --output outputs/job1 --resume
-
-CUDA_VISIBLE_DEVICES=1 bash jobs/run_job.sh hys --model "$MODEL" \
-  --job jobs/job2_hys_ablations_and_ctrl.json --output outputs/job2 --resume
+MODEL="$MODEL" GPUS=0 WORKERS_PER_GPU=4 bash jobs/run_drop1_h200.sh
 ```
+
+**Return `outputs/job1_mega` as soon as Job 1 finishes, while Job 2 is still running.** Job 4a is HyS-only and does not wait for CAA calibration. Restart the same script to resume.
 
 | Job | Prompts | Conditions | Generated answers | Token cap |
 |---|---|---|---:|---:|
-| 1 | selection8 | 5 singleton concepts × 6 natural α values | 240 | 1,024 |
+| 1 mega | selection8 | 13 families, 478 singleton configs + 1 baseline | 3,832 | 1,024 |
+| 1 legacy | selection8 | 5 singleton concepts × 6 natural α values | 240 | 1,024 |
 | 1b | independent16 | 5 singletons with selected α | 80 | 1,024 |
 | 2 | heldout32 | 3 HyS ablations × 12 conditions + 2 runtime controls | 1,216 | 4,096 |
 | 3 | heldout32 | 33 CAA24 RSS conditions + 12 CAA24 raw conditions | 1,440 | 4,096 |
 | 4 | simple50 | 3 conditions × each of full HyS and CAA24 RSS | 300 | 4,096 |
+| 4a | simple50 | full HyS baseline + NFTRP λ=0.5, 0.75, 1 | 200 | 4,096 |
 
 The 12-condition slice consists of five singletons, five quadruples, and NFTRP at λ=1 and 0.75. Job 2’s two controls are full HyS baseline and full NFTRP λ=0.75, both on single GPU. Job 3’s RSS slice includes baseline, all 31 nonempty subsets at λ=1, and NFTRP λ=0.75. Job 4 has separate baseline IDs for both methods and the same two NFTRP doses.
 
-Review Job 1 on `selection8`. Record one scalar per concept in `selected_alpha.json`, based on `jobs/selected_alpha.example.json`. Use the exact values from `jobs/calibration_grid.json`. Freeze that file before Job 1b. Use Job 1b as an independent check of trait strength, quality and EOS. Record failures and the selection rule before deciding whether to promote the same gains to the final runs.
+Review Job 1 mega on `selection8`. Copy `jobs/selected_caa_config.json` to `selected_caa_config.json` and fill in the selected family, layers, norm mode, window settings, and all five measured doses. Prefer one family that works across concepts. Windowed families only sweep N and P; use a dose for F/T/R from the matching no-window family (same layers and norm), since the windows never affect F/T/R. Freeze the choice before Job 1b. Use Job 1b to validate trait strength, quality, and EOS independently before promoting the same configuration. The old five-number file still works for the legacy default; it does not select a family.
 
 ```bash
-CUDA_VISIBLE_DEVICES=0 bash jobs/run_job.sh caa24 --model "$MODEL" \
-  --job jobs/job1b_caa24_val_independent16.json --gains selected_alpha.json \
-  --output outputs/job1b --resume
+python -B jobs/run_parallel.py --runner caa24 --model "$MODEL" --gpus 0 --resume \
+  --job jobs/job1b_caa24_val_independent16.json --selected-caa-config selected_caa_config.json \
+  --output outputs/job1b
 
-CUDA_VISIBLE_DEVICES=0 bash jobs/run_job.sh caa24 --model "$MODEL" \
-  --job jobs/job3_caa24_final_template.json --gains selected_alpha.json \
-  --output outputs/job3 --resume
+python -B jobs/run_parallel.py --runner caa24 --model "$MODEL" --gpus 0 --resume \
+  --job jobs/job3_caa24_final_template.json --selected-caa-config selected_caa_config.json \
+  --output outputs/job3
 
-CUDA_VISIBLE_DEVICES=0 bash jobs/run_job.sh job --model "$MODEL" \
-  --job jobs/job4_external_lambda_simple50.json --gains selected_alpha.json \
-  --output outputs/job4 --resume
+python -B jobs/run_parallel.py --runner caa24 --model "$MODEL" --gpus 0 --resume \
+  --job jobs/job4_external_lambda_simple50.json --selected-caa-config selected_caa_config.json \
+  --output outputs/job4
 ```
 
-`--check-config` verifies a job and the relevant direction files on CPU. `--max-new-tokens` is available for an explicitly separate run. The default for CAA24 is natural norms and continuous single-token intervention. `--norm-mode unit` uses unit directions and gain divided by √24. `--use-windows` enables N through call 28 and P through call 32, starting with bridge call 1. `--composition-mode` and `--hys-mode` override single-mode configs. Mixed-mode jobs already specify their mode for each condition.
+The launcher detects mixed-method Job 4 and dispatches both methods. Append `--dry-run` to any launcher command to print the shard plan without loading weights or writing outputs. For single-process use, `jobs/run_job.sh` still works and accepts `--check-config` for CPU validation of directions. Job 4a and Job 4 remain distinct runs, each with its own provenance.
 
 ## Calibration and intervention contract
 
-The six-point natural grid is frozen per feature in `jobs/calibration_grid.json`. It includes lower doses for screening without windows. Historical reference-layer norms and gains are retained as context. The JSON also supplies measured `alpha * ||d_l||` at each grid endpoint for L0, L8, L16 and L30. Select doses on dev only.
+The legacy six-point grid and physical doses are still in `jobs/calibration_grid.json`. The 13 core-family grids in Job 1 mega add up to 468 configs. To reach the requested 478 without dropping or changing a core point, the job adds one geometric midpoint between the two lowest doses per trait in each of `gdn24_natural` and `all32_natural` (10 configs, marked `supplemental`). Middle-layer natural grids scale by `24 / |layers|` and clip to the stated trait-specific bounds. The shared baseline is never steered.
 
-CAA leaves bulk prefill untouched. The additive intervention applies to the 24 selected decoder blocks on the newline bridge and cached decode forwards. With windows enabled, RSS is recomputed for each active-set phase. Natural mode scales all layers of a concept by one scalar and preserves relative norms.
+CAA leaves bulk prefill untouched. Additions apply only to selected decoder blocks on the newline bridge and decode forwards. Natural mode uses `λ × α × d_l`; unit mode uses `λ × gain / √|layers| × d_l / ‖d_l‖`. RSS acts per layer on those contributions and is exactly 1 for singletons. Windows count from bridge call 1, retaining N through call 28 and P through call 32, with an RSS recalculation after each cutoff. The default remains `gdn24`, natural, and no windows when no family is specified.
 
 HyS uses the archived split prefill. Its first recurrent write occurs **after** the bulk forward and **before** the newline bridge. Full, no-RSS and no-Gram then apply the per-concept β after the bridge and each decode forward. Single-write keeps that initial write, then leaves cache evolution to the model. The no-Gram variant shares the first write and uses independent targets from its projected result. This isolates the correction solver, including cross terms created by the common initial write. The other variants keep the original regularized Gram solver.
 
 ## Outputs and resume
 
-Return each job’s `generations.jsonl`, `manifest.json`, `judge_input.jsonl`, and `judge_input_manifest.json`, plus `selected_alpha.json` and the dev selection notes. Return partial outputs with their manifest if the job is interrupted. Keep EOS, length stops and empty model outputs. `generations.jsonl` contains condition and question IDs, token IDs and write/finite audits. Both frozen Judges accept the separate shuffled `judge_input.jsonl` directly.
+Return each completed job’s `generations.jsonl`, `manifest.json`, `blind.jsonl` (identical to `judge_input.jsonl`), and `judge_input_manifest.json`, plus `selected_caa_config.json` and dev selection notes when available. Keep EOS, length stops, and empty model outputs. Resolved CAA settings are in the raw rows and manifest, never in the shuffled blind export. For interrupted jobs, retain the entire directory including `workers/`.
 
-Re-run the same command with `--resume`. It skips completed `(condition_id, question_id)` pairs and checks frozen input, code, direction and runtime fingerprints. Use one process per output directory. An OS-killed process may leave `run.lock`. Confirm its PID is gone before removing the stale lock. If a crash breaks the last JSONL line, preserve a backup and repair the incomplete final line before resume.
+Re-run the launcher with `--resume`. It skips completed `(condition_id, question_id)` pairs from the merged file and all worker files, ignoring only a torn final worker line. It keeps logs and old shards, and validates the frozen input and runtime fingerprint. Worker count and GPU assignment may change across attempts. Outputs are atomically replaced after coverage checks; `manifest.json` is marked `complete` last. Use one launcher per output directory. A hard kill may leave `run.lock`; confirm its PID **and its workers** are gone before removing the stale root lock. Do not share an output directory between the parallel and single-process runners.
 
 ## Source provenance
 

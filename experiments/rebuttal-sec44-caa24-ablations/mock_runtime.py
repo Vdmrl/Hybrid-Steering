@@ -91,6 +91,8 @@ def mock_backend():
     g = torch.Generator().manual_seed(20260911)
     caa = {m: {i: torch.randn(8, generator=g) * 0.01 for i in LAYERS} for m in FEATURES}
     hys = {m: {i: torch.randn(1, 2, 2, 2, generator=g) * 0.01 for i in LAYERS} for m in FEATURES}
+    for m in FEATURES:
+        caa[m].update({i: torch.randn(8, generator=g) * 0.01 for i in range(3, 32, 4)})
     return MockModel(), MockTokenizer(), torch.device("cpu"), {"caa24": caa, "hys": hys}
 
 
