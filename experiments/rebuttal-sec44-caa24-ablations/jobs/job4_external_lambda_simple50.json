@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "job_id": "job4_external_lambda_simple50",
+  "bank": "simple50",
+  "max_new_tokens": 4096,
+  "norm_mode": "natural",
+  "use_windows": false,
+  "expected_answers": 300,
+  "conditions": [
+    {
+      "id": "hys_full__baseline__l1",
+      "method": "hys",
+      "mode": "full",
+      "active": "",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_full__NFTRP__l0.75",
+      "method": "hys",
+      "mode": "full",
+      "active": "NFTRP",
+      "lambda": 0.75
+    },
+    {
+      "id": "hys_full__NFTRP__l1",
+      "method": "hys",
+      "mode": "full",
+      "active": "NFTRP",
+      "lambda": 1.0
+    },
+    {
+      "id": "caa24_rss__baseline__l1",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "",
+      "lambda": 1.0,
+      "alpha": null
+    },
+    {
+      "id": "caa24_rss__NFTRP__l0.75",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "NFTRP",
+      "lambda": 0.75,
+      "alpha": null
+    },
+    {
+      "id": "caa24_rss__NFTRP__l1",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "NFTRP",
+      "lambda": 1.0,
+      "alpha": null
+    }
+  ]
+}

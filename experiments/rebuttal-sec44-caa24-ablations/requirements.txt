@@ -1,0 +1,7 @@
+# Install the CUDA 12.8 PyTorch wheel first, as shown in HANDOFF.md.
+torch==2.7.1
+transformers==5.14.1
+safetensors==0.8.0
+accelerate==1.15.0
+huggingface_hub
+pytest

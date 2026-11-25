@@ -1,0 +1,277 @@
+{
+  "schema_version": 1,
+  "job_id": "job2_hys_ablations_and_ctrl",
+  "bank": "heldout32",
+  "max_new_tokens": 4096,
+  "norm_mode": "natural",
+  "use_windows": false,
+  "expected_answers": 1216,
+  "conditions": [
+    {
+      "id": "hys_no_rss__N__l1",
+      "method": "hys",
+      "mode": "no_rss",
+      "active": "N",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_rss__F__l1",
+      "method": "hys",
+      "mode": "no_rss",
+      "active": "F",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_rss__T__l1",
+      "method": "hys",
+      "mode": "no_rss",
+      "active": "T",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_rss__R__l1",
+      "method": "hys",
+      "mode": "no_rss",
+      "active": "R",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_rss__P__l1",
+      "method": "hys",
+      "mode": "no_rss",
+      "active": "P",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_rss__NFTR__l1",
+      "method": "hys",
+      "mode": "no_rss",
+      "active": "NFTR",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_rss__NFTP__l1",
+      "method": "hys",
+      "mode": "no_rss",
+      "active": "NFTP",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_rss__NFRP__l1",
+      "method": "hys",
+      "mode": "no_rss",
+      "active": "NFRP",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_rss__NTRP__l1",
+      "method": "hys",
+      "mode": "no_rss",
+      "active": "NTRP",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_rss__FTRP__l1",
+      "method": "hys",
+      "mode": "no_rss",
+      "active": "FTRP",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_rss__NFTRP__l1",
+      "method": "hys",
+      "mode": "no_rss",
+      "active": "NFTRP",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_rss__NFTRP__l0.75",
+      "method": "hys",
+      "mode": "no_rss",
+      "active": "NFTRP",
+      "lambda": 0.75
+    },
+    {
+      "id": "hys_no_gram__N__l1",
+      "method": "hys",
+      "mode": "no_gram",
+      "active": "N",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_gram__F__l1",
+      "method": "hys",
+      "mode": "no_gram",
+      "active": "F",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_gram__T__l1",
+      "method": "hys",
+      "mode": "no_gram",
+      "active": "T",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_gram__R__l1",
+      "method": "hys",
+      "mode": "no_gram",
+      "active": "R",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_gram__P__l1",
+      "method": "hys",
+      "mode": "no_gram",
+      "active": "P",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_gram__NFTR__l1",
+      "method": "hys",
+      "mode": "no_gram",
+      "active": "NFTR",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_gram__NFTP__l1",
+      "method": "hys",
+      "mode": "no_gram",
+      "active": "NFTP",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_gram__NFRP__l1",
+      "method": "hys",
+      "mode": "no_gram",
+      "active": "NFRP",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_gram__NTRP__l1",
+      "method": "hys",
+      "mode": "no_gram",
+      "active": "NTRP",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_gram__FTRP__l1",
+      "method": "hys",
+      "mode": "no_gram",
+      "active": "FTRP",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_gram__NFTRP__l1",
+      "method": "hys",
+      "mode": "no_gram",
+      "active": "NFTRP",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_gram__NFTRP__l0.75",
+      "method": "hys",
+      "mode": "no_gram",
+      "active": "NFTRP",
+      "lambda": 0.75
+    },
+    {
+      "id": "hys_no_clamp__N__l1",
+      "method": "hys",
+      "mode": "no_clamp",
+      "active": "N",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_clamp__F__l1",
+      "method": "hys",
+      "mode": "no_clamp",
+      "active": "F",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_clamp__T__l1",
+      "method": "hys",
+      "mode": "no_clamp",
+      "active": "T",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_clamp__R__l1",
+      "method": "hys",
+      "mode": "no_clamp",
+      "active": "R",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_clamp__P__l1",
+      "method": "hys",
+      "mode": "no_clamp",
+      "active": "P",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_clamp__NFTR__l1",
+      "method": "hys",
+      "mode": "no_clamp",
+      "active": "NFTR",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_clamp__NFTP__l1",
+      "method": "hys",
+      "mode": "no_clamp",
+      "active": "NFTP",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_clamp__NFRP__l1",
+      "method": "hys",
+      "mode": "no_clamp",
+      "active": "NFRP",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_clamp__NTRP__l1",
+      "method": "hys",
+      "mode": "no_clamp",
+      "active": "NTRP",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_clamp__FTRP__l1",
+      "method": "hys",
+      "mode": "no_clamp",
+      "active": "FTRP",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_clamp__NFTRP__l1",
+      "method": "hys",
+      "mode": "no_clamp",
+      "active": "NFTRP",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_no_clamp__NFTRP__l0.75",
+      "method": "hys",
+      "mode": "no_clamp",
+      "active": "NFTRP",
+      "lambda": 0.75
+    },
+    {
+      "id": "hys_full__baseline__l1",
+      "method": "hys",
+      "mode": "full",
+      "active": "",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_full__NFTRP__l0.75",
+      "method": "hys",
+      "mode": "full",
+      "active": "NFTRP",
+      "lambda": 0.75
+    }
+  ]
+}

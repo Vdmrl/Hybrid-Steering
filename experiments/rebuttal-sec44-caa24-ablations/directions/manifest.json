@@ -1,0 +1,61 @@
+{
+  "model": "Qwen/Qwen3.5-9B",
+  "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+  "system_prompt": "Answer the user's request directly and accurately. Preserve supplied facts and do not invent details. Use enough words to complete the task, without padding.",
+  "methods": {
+    "caa24": {
+      "N": {
+        "path": "directions/caa24/N.safetensors",
+        "sha256": "3c319cfd3bd770fca225309cfc240211d38024f55acd3eaca7e970eea08add0b",
+        "source": ".worktrees/caa-fr-p18w32-final-20261011/experiments/caa-fr-p18w32-final-20261011/directions/numbered.safetensors"
+      },
+      "F": {
+        "path": "directions/caa24/F.safetensors",
+        "sha256": "21cc665e49907065b8a2e0612149a351a2b74bb41bc3634ee673052d11fbb59e",
+        "source": ".worktrees/caa-fr-p18w32-final-20261011/experiments/caa-fr-p18w32-final-20261011/directions/french.safetensors"
+      },
+      "T": {
+        "path": "directions/caa24/T.safetensors",
+        "sha256": "738b5dd79a63371138d31e81d05e76059363954f5af07037c1b85ac7c5d1bb5f",
+        "source": ".worktrees/caa-fr-p18w32-final-20261011/experiments/caa-fr-p18w32-final-20261011/directions/technical.safetensors"
+      },
+      "R": {
+        "path": "directions/caa24/R.safetensors",
+        "sha256": "b3d7c1c5ac28333ac495f3069e9eeaacda72e87217881d4387cbdeb4640fb7f4",
+        "source": ".worktrees/caa-fr-p18w32-final-20261011/experiments/caa-fr-p18w32-final-20261011/directions/theistic_framing.safetensors"
+      },
+      "P": {
+        "path": "directions/caa24/P.safetensors",
+        "sha256": "660020062ee2108411f4cc4caa151cfbca82915095462302de4bf383a32a6708",
+        "source": ".worktrees/caa-fr-p18w32-final-20261011/experiments/caa-fr-p18w32-final-20261011/directions/probabilistic_framing.safetensors"
+      }
+    },
+    "hys": {
+      "N": {
+        "path": "directions/hys/N.safetensors",
+        "sha256": "6442c72172854bf515c115930164569811baadc7bd0fbde3ad858d169a049099",
+        "source": "local/gdn-handoff-20261009/source/numbered/rank1.safetensors"
+      },
+      "F": {
+        "path": "directions/hys/F.safetensors",
+        "sha256": "37c10e6678ad39d787c72629234b7c606adfb4530e9883f09a8e2d060a8d44f2",
+        "source": "local/gdn-handoff-20261009/source/french/rank1.safetensors"
+      },
+      "T": {
+        "path": "directions/hys/T.safetensors",
+        "sha256": "76f0bd2ba22c5d1710a7a7e02cdf85bd5227df175799c8e6f1ef2422921bebb0",
+        "source": "local/gdn-handoff-20261009/source/technical/rank1.safetensors"
+      },
+      "R": {
+        "path": "directions/hys/R.safetensors",
+        "sha256": "b79fafcd076e8aa7fa082aaebdf1766bdc91806f9c39d440f261b59cbab67828",
+        "source": "local/gdn-handoff-20261009/source/theistic_framing/rank1.safetensors"
+      },
+      "P": {
+        "path": "directions/hys/P.safetensors",
+        "sha256": "4bde3a4fa09c8e9ccee924f1ae3c6a74db70e08e969a5414999e1f5d184a9624",
+        "source": "local/gdn-handoff-20261009/source/probabilistic_framing/rank1.safetensors"
+      }
+    }
+  }
+}
