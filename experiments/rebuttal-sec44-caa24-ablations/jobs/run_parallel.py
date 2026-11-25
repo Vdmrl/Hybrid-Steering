@@ -139,6 +139,10 @@ def execute(plan, args):
             folder.mkdir(parents=True)
             atomic_json(folder / "shard_job.json", shard)
             env = {**os.environ, "CUDA_VISIBLE_DEVICES": "" if args.mock else gpu}
+            if os.name == "posix" and not args.mock:
+                # Sibling outputs from Drop #1 share a lock. The kernel
+                # releases it on exit, including an OOM kill.
+                env["HYS_CAA_MODEL_LOAD_LOCK"] = str(folder.parents[2] / ".model-load.lock")
             with (folder / "worker.log").open("w", encoding="utf-8") as log:
                 worker = subprocess.Popen(
                     cmd, cwd=PACKAGE, stdout=log, stderr=subprocess.STDOUT, env=env

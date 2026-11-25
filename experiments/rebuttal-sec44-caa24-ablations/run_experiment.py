@@ -266,6 +266,19 @@ def output_lock(output):
         lock.unlink()
 
 
+@contextmanager
+def model_load_lock():
+    path = os.environ.get("HYS_CAA_MODEL_LOAD_LOCK")
+    if not path:
+        yield
+        return
+    import fcntl
+
+    with Path(path).open("a") as file:
+        fcntl.flock(file, fcntl.LOCK_EX)
+        yield
+
+
 def run_job(job, prompts, output, *, resume=False, model_path=None, mock=False, namespace=None):
     methods = sorted({c["method"] for c in job["conditions"]})
     if mock:
@@ -347,7 +360,8 @@ def _run_locked(
         return
 
     if backend is None:
-        model, tokenizer, actual = load_model(model_path)
+        with model_load_lock():
+            model, tokenizer, actual = load_model(model_path)
         if actual != device:
             raise RuntimeError("Unexpected model device")
     else:

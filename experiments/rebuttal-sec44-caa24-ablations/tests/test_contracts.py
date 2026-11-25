@@ -394,6 +394,7 @@ r.main()
         stream.write(b'{"incomplete":')
 
     monkeypatch.setattr(run_parallel.subprocess, "Popen", real_popen)
+    args[args.index("--workers-per-gpu") + 1] = "2"
     monkeypatch.setattr(sys, "argv", [*args, "--resume"])
     assert run_parallel.main() == 0
     rows = read_rows(output / "generations.jsonl")
@@ -402,10 +403,10 @@ r.main()
     manifest = read(output / "manifest.json")
     assert manifest["status"] == "complete" and manifest["completed"] == 48
     assert set(manifest["gamma_by_condition"]) == {c["id"] for c in cfg["conditions"]}
-    assert (
-        sum(len(read(workers / f"worker_{i:02d}" / "shard_job.json")["tasks"]) for i in range(3, 6))
-        == 15
-    )
+    assert [len(read(workers / f"worker_{i:02d}" / "shard_job.json")["tasks"]) for i in (3, 4)] == [
+        8,
+        7,
+    ]
     blind = read_rows(output / "blind.jsonl")
     assert len(blind) == 8
     assert all(set(p) == {"prompt_id", "scenario", "answers"} for p in blind)
@@ -414,7 +415,7 @@ r.main()
     assert (output / "blind.jsonl").read_bytes() == (output / "judge_input.jsonl").read_bytes()
     assert run_parallel.main() == 0
     assert read_rows(output / "generations.jsonl") == rows
-    assert len(list(workers.iterdir())) == 6
+    assert len(list(workers.iterdir())) == 5
 
 
 def test_frozen_calibration_grid_and_doses():

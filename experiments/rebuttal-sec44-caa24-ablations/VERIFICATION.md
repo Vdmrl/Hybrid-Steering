@@ -1,5 +1,12 @@
 # Local verification
 
+## H200 preflight
+
+- The three original HyS shard manifests and both frozen CAA P18/W32 task configs match the packaged system prompt byte-for-byte. Held-out IDs and text match all 32 questions for both methods. The shared system prompt SHA-256 is `f0a723858a43abeb9c7e00f675140de26bdf1b34379abcf92d2a81b1936f7c14` and is also used for `simple50`. Original HyS generation was TP=2; the new job is a single-GPU reproduction/control, not a claim of token parity.
+- Both frozen judge parsers accepted the same 3,832 opaque IDs in a synthetic blind export, including an empty answer. No judge API or GPU generation was used.
+- The two pinned Hugging Face revisions and all ten assets matched authenticated metadata. The anonymous dataset request returned HTTP 401. Local and mocked GitHub fetch tests require matching hashes and leave installed files untouched when the staged data does not pass verification.
+- **40 tests passed** on CPU, including the three-to-two-worker resume and one-/two-GPU shell scheduling with stubs. Four-worker H200 capacity and end-to-end native Linux/CUDA execution were not measured. The final article PDF was not available for a direct comparison; the comparison uses frozen original configs and code.
+
 ## Drop #1 update
 
 - **36 passed** on CPU. Checked 160/160 real CAA vectors including every attention layer; arbitrary layer subsets, natural and unit dose, per-layer RSS, and the selected-family config on Jobs 1b, 3 and 4.

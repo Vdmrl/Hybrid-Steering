@@ -12,7 +12,7 @@ python3.11 -m venv .venv
 source .venv/bin/activate
 python -m pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu128
 python -m pip install -r requirements.txt
-bash directions/fetch.sh
+bash directions/fetch.sh  # requires hf auth login or an authorized HF_TOKEN
 sha256sum -c directions/SHA256SUMS.txt
 REV=c202236235762e1c871ad0ccb60c8ee5ba337b9a
 MODEL="$(hf download Qwen/Qwen3.5-9B --revision "$REV")"
@@ -21,16 +21,18 @@ python -B -m pytest -q -p no:cacheprovider --basetemp .test-tmp tests/test_contr
 
 If the checkpoint is already on the server, set `MODEL` to its local snapshot directory. The runtime loads with `local_files_only=True`. Native CUDA and the 32-layer/24-GDN model layout are checked on startup. Use an environment without the optional FLA or causal-conv1d kernels so that both methods use the same pure-Torch recurrence. The manifest records model metadata hashes, checkpoint shard sizes, software/device identity, and the HF revision when available from a cache snapshot path. The directory path alone is not proof of the revision for a manually copied checkpoint.
 
-`directions/fetch.sh` copies only the five CAA and five HyS files from pinned published Hugging Face dataset revisions into their local runtime paths. On an offline node, transfer the package's two direction subdirectories from a connected machine instead:
+`directions/fetch.sh` defaults to the access-controlled Hugging Face dataset `hybrid-steering/hybrid-steering-concepts` (CAA revision `aeff2166d7406fcb59de83e7602f1a736a142a32`, HyS revision `82be2f9a41bdc480a8cd1cb86a06b6fb7978f3e4`). GitHub clone access does not grant HF access. Use a read token from a Hugging Face account with dataset access. On an offline node, point at a staged directory containing `caa24/` and `hys/` (or their parent package):
 
 ```bash
-cp -R /path/to/provisioned-package/directions/{caa24,hys} directions/
+bash directions/fetch.sh --from-dir /path/to/provisioned-package/directions
 sha256sum -c directions/SHA256SUMS.txt
 ```
 
 ## Jobs
 
-Drop #1 is ready immediately and runs Job 1 mega → Job 2 → Job 4a. On one H200, start with four workers. Use `GPUS=0,1` to shard each job over two allocated GPUs. Each worker loads its own BF16 copy. Treat 4–5 workers on H200 141 GB, 2–3 on A100/H100 80 GB, and one on 40/48 GB as starting points, not measured capacity. Reduce `WORKERS_PER_GPU` if the first run hits OOM, then resume without changing the job. The default 12-second stagger limits concurrent host-side loading.
+If your team already hosts a GitHub Release mirror, use `bash directions/fetch.sh --github-release OWNER/REPO TAG` with `gh auth login`, `GH_TOKEN` or `GITHUB_TOKEN`. The release must contain `caa24-{N,F,T,R,P}.safetensors` and `hys-{N,F,T,R,P}.safetensors` as ten separate assets. No GitHub mirror is assumed to exist. All three input modes verify every staged file before installing it.
+
+With `GPUS=0`, Drop #1 runs Job 1 mega → Job 2 → Job 4a. With `GPUS=0,1`, Job 1 uses GPU 0 and Job 2 independently uses GPU 1; Job 4a starts after both complete and uses the full list. Pass GPU IDs actually allocated on the host. Each worker loads its own BF16 copy. Treat 4–5 workers on H200 141 GB, 2–3 on A100/H100 80 GB, and one on 40/48 GB as starting points, not measured capacity. Linux workers sharing the same parent output directory serialize model loading; the default launch stagger also avoids starting every Torch import at once. Neither limit guarantees enough RAM. If the scheduler or a worker reports OOM, lower `WORKERS_PER_GPU` and rerun with `--resume`.
 
 ```bash
 MODEL="$MODEL" GPUS=0 WORKERS_PER_GPU=4 bash jobs/run_drop1_h200.sh
@@ -80,7 +82,7 @@ HyS uses the archived split prefill. Its first recurrent write occurs **after** 
 
 Return each completed job’s `generations.jsonl`, `manifest.json`, `blind.jsonl` (identical to `judge_input.jsonl`), and `judge_input_manifest.json`, plus `selected_caa_config.json` and dev selection notes when available. Keep EOS, length stops, and empty model outputs. Resolved CAA settings are in the raw rows and manifest, never in the shuffled blind export. For interrupted jobs, retain the entire directory including `workers/`.
 
-Re-run the launcher with `--resume`. It skips completed `(condition_id, question_id)` pairs from the merged file and all worker files, ignoring only a torn final worker line. It keeps logs and old shards, and validates the frozen input and runtime fingerprint. Worker count and GPU assignment may change across attempts. Outputs are atomically replaced after coverage checks; `manifest.json` is marked `complete` last. Use one launcher per output directory. A hard kill may leave `run.lock`; confirm its PID **and its workers** are gone before removing the stale root lock. Do not share an output directory between the parallel and single-process runners.
+Re-run the launcher with `--resume`. It skips completed `(condition_id, question_id)` pairs from the merged file and all worker files, ignoring only a torn final worker line. It keeps logs and old shards, and validates the frozen input and runtime fingerprint. Worker count and GPU assignment may change across attempts; code and inputs may not. Do not mix output from different commits. Outputs are atomically replaced after coverage checks; `manifest.json` is marked `complete` last. Use one launcher per output directory. A hard kill may leave `run.lock`; confirm its PID **and its workers** are gone before removing the stale root lock. Do not share an output directory between the parallel and single-process runners.
 
 ## Source provenance
 
