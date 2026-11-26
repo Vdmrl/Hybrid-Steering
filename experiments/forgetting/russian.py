@@ -481,7 +481,7 @@ def generate(args: argparse.Namespace) -> None:
     falcon = getattr(model.config, "model_type", None) == "falcon_h1"
     if falcon:
         hook = MambaRunner(model, tokenizer)
-        texts = [layout(tokenizer, question, "")[0] for question in tune]
+        texts = [layout(tokenizer, row["question"], "")[0] for row in tune]
         states = hook.final_states(texts)
         total = None
         for state in states.values():

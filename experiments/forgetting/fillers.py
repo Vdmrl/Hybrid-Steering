@@ -216,7 +216,7 @@ The square also served as a meeting point because it was easy to describe. Peopl
 
 The arrangement was practical and changed little from week to week. Benches, signs, paths, and doorways gave people enough landmarks to find one another without detailed instructions.
 
-Nothing about the square required unusual interpretation.
+Nothing about the square required unusual interpretation. People crossed it and went on.
 """,
     """
 A small factory produced basic metal components used in common machines, assemblies, and repair parts. It was not a large or highly automated facility. Raw material arrived in standardized pieces, was checked and stored, then moved through a sequence of operations before the finished components were inspected, packed, and shipped elsewhere. Most days followed the same broad pattern even though the exact product and workload changed.
