@@ -1,0 +1,21 @@
+experiments/forgetting/russian.py
+  s_927c163ede5d53::t_bb89dd2ab03ac8 484
+experiments/forgetting/fillers.py
+  s_927c163ede5d53::t_b22fc826f3b418 219
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "78ea3857d333e2a043f7e81df9eab3d29a8f23bd",
+  "prompts": {},
+  "sessions": {
+    "s_927c163ede5d53": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "07039075-6b29-47dd-89ee-44b4ed989838",
+        "model": "grok-4.7"
+      },
+      "human_author": "Slava Chaunin <67190162+Ssslakter@users.noreply.github.com>"
+    }
+  }
+}
