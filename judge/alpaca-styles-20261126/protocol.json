@@ -1,0 +1,40 @@
+{
+  "model": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+  "temperature": 1,
+  "top_p": 1,
+  "max_tokens": 1,
+  "logprobs": true,
+  "top_logprobs": 20,
+  "chat_template_kwargs": {
+    "enable_thinking": false,
+    "thinking": false
+  },
+  "digits": [
+    "0",
+    "1",
+    "2"
+  ],
+  "user_payload": {
+    "coherence": [
+      "answer"
+    ],
+    "relevance": [
+      "answer",
+      "question"
+    ],
+    "technical": [
+      "answer",
+      "question"
+    ],
+    "theistic": [
+      "answer",
+      "question"
+    ],
+    "probabilistic": [
+      "answer",
+      "question"
+    ]
+  },
+  "score": "P(1) + 2 * P(2), conditional on digits 0, 1, 2",
+  "technical_rubric": "v3"
+}

@@ -18,6 +18,10 @@ A direction is the mean of `target - source`. Positive `scale` moves the state
 toward the target. Natural languages are detected locally. Other concepts use
 the steering judge and the guides in `concepts/features.yaml`.
 
+## Alpaca style training pairs and judges
+
+[Benchmark data and scoring guide](judge/alpaca-styles-20261126/README.md) for Numbered, Technical, Theistic and Probabilistic steering. Each concept has 150 paired DeepSeek answers to the same 150 Stanford Alpaca tasks. The release includes the original user prompts, separate generation instructions, the five DeepSeek judge prompts on the 0–2 scale, and the deterministic Numbered scorer.
+
 ## Setup
 
 ```bash

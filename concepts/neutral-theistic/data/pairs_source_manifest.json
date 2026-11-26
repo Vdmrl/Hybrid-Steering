@@ -1,0 +1,27 @@
+{
+  "concept": "theistic",
+  "release": "alpaca-styles-20261126",
+  "n_pairs": 150,
+  "split": "train",
+  "upstream": "https://github.com/tatsu-lab/stanford_alpaca/blob/main/alpaca_data.json",
+  "upstream_sha256": "2eddafc6b977608d778aaab8dfc7e50e547b3af9826dfb9e909d9fc362e4a419",
+  "sampling": "Manually selected 75 interrogatives and 75 imperatives; randomized order, seed 261127",
+  "source_index": "zero-based",
+  "model": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+  "generation_parameters": {
+    "temperature": 0.75,
+    "top_p": 0.95,
+    "max_tokens": 768,
+    "chat_template_kwargs": {
+      "thinking": false,
+      "enable_thinking": false
+    }
+  },
+  "extraction_model": "Qwen/Qwen3.5-9B",
+  "extraction_chat": "user_prompt in the user role, assistant generation prefix with thinking disabled, then the answer text; no explicit system message",
+  "readout": "last token of the assistant answer",
+  "original_extraction_pairs_sha256": "6a0163f642d6db1eef65674e041996ae5d7cd9cdb500079f4648cf2dfcda46f1",
+  "published_pairs_sha256": "8b6156d86b22c0bc8a3bbf333ae1be6edcfc73c889d679c430dca96309a9c5b8",
+  "generation_systems_sha256": "5c0bc2fa3bd599753820db5a4ba828a8434a86993dd90770ae9e27d4456da2ad",
+  "text_changes": false
+}
