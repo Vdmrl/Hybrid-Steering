@@ -1,0 +1,31 @@
+experiments/forgetting/russian.py
+  s_927c163ede5d53::t_cbf2e05e7c556e 286,290-296,298
+  s_927c163ede5d53::t_ee307d21a57ced 1-52,54-109,119-169,173-240,244-285,287-289,297,299-315,318-319,323-328,332-434,444-446,450-464,466-498,501-503,505-525,529-533,535,538-593,597-673,677-695
+  s_927c163ede5d53::t_5fdd3c4e5b0da4 110-118
+  s_927c163ede5d53::t_f9cdf95d3d8e13 435-443
+  s_927c163ede5d53::t_95aa614634fd08 534
+  s_927c163ede5d53::t_942f8173f8b391 465
+  s_927c163ede5d53::t_de759a668b6166 316-317,320-322
+  s_927c163ede5d53::t_1c125d3a1a3ddb 53,170-172,241-243,329-331,447-449,499-500,504,526-528,536-537,594-596,674-676
+tests/test_russian_alignment.py
+  s_927c163ede5d53::t_99b0f78785e863 2
+  s_927c163ede5d53::t_a4adba3caaeab2 3-7,14-43
+  s_927c163ede5d53::t_140826e34f9f47 1,8-13
+  s_927c163ede5d53::t_86c262251c8bd9 44-87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "70054e46d1306ed2fb3852e12e504cbc658ec836",
+  "prompts": {},
+  "sessions": {
+    "s_927c163ede5d53": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "07039075-6b29-47dd-89ee-44b4ed989838",
+        "model": "grok-4.7"
+      },
+      "human_author": "Slava Chaunin <67190162+Ssslakter@users.noreply.github.com>"
+    }
+  }
+}
