@@ -1,0 +1,316 @@
+{
+  "schema_version": 1,
+  "job_id": "job3_caa_best_multilayer_heldout32",
+  "bank": "heldout32",
+  "max_new_tokens": 4096,
+  "norm_mode": "natural",
+  "use_windows": false,
+  "expected_answers": 1088,
+  "conditions": [
+    {
+      "id": "caa24_rss__baseline__l1",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "",
+      "lambda": 1.0,
+      "alpha": null
+    },
+    {
+      "id": "caa24_rss__N__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "N",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__F__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "F",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__T__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "T",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__R__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "R",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__P__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "P",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__NF__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "NF",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__NT__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "NT",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__NR__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "NR",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__NP__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "NP",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__FT__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "FT",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__FR__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "FR",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__FP__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "FP",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__TR__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "TR",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__TP__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "TP",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__RP__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "RP",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__NFT__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "NFT",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__NFR__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "NFR",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__NFP__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "NFP",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__NTR__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "NTR",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__NTP__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "NTP",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__NRP__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "NRP",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__FTR__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "FTR",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__FTP__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "FTP",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__FRP__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "FRP",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__TRP__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "TRP",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__NFTR__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "NFTR",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__NFTP__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "NFTP",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__NFRP__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "NFRP",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__NTRP__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "NTRP",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__FTRP__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "FTRP",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__NFTRP__l1__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "NFTRP",
+      "lambda": 1.0,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__NFTRP__l0.75__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "NFTRP",
+      "lambda": 0.75,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    },
+    {
+      "id": "caa24_rss__NFTRP__l0.5__best_multilayer",
+      "method": "caa24",
+      "mode": "rss",
+      "active": "NFTRP",
+      "lambda": 0.5,
+      "alpha": null,
+      "caa_config": "best_multilayer"
+    }
+  ]
+}

@@ -75,7 +75,7 @@ def write_rows(path, rows):
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="\n") as stream:
         for r in rows:
-            stream.write(json.dumps(r, ensure_ascii=False, allow_nan=False) + "\n")
+            stream.write(json.dumps(r, ensure_ascii=True, allow_nan=False) + "\n")
 
 
 def simple_questions(source, count=50, seed=42):
@@ -441,6 +441,116 @@ def build_jobs(grid):
     )
 
 
+def build_drop2_jobs():
+    def spec(family, value, window=None):
+        layer_set, norm = family.removesuffix("_win").rsplit("_", 1)
+        return {
+            "family": family,
+            "layers": list(LAYER_SETS[layer_set]),
+            "norm_mode": norm,
+            "value": value,
+            "window": window,
+        }
+
+    frozen = {
+        "best_multilayer": {
+            "N": spec("mid12_gdn_unit_win", 7.44337, 28),
+            "F": spec("all32_unit", 1.05893),
+            "T": spec("mid12_gdn_natural", 0.254482),
+            "R": spec("early_mid12_gdn_unit", 5.34724),
+            "P": spec("all32_unit", 3.05788),
+        },
+        "gdn24_strict": {
+            "N": spec("gdn24_unit_win", 36.9358, 28),
+            "F": spec("gdn24_unit", 1.0),
+            "T": spec("gdn24_unit", 1.0),
+            "R": spec("gdn24_natural", 0.28),
+            "P": spec("gdn24_natural_win", 1.15919, 32),
+        },
+    }
+    for name, settings in frozen.items():
+        dump(
+            PACKAGE / f"jobs/configs/selected_caa_{name}.json",
+            {"family": name, "per_concept": settings},
+        )
+
+    def caa(active, lam=1.0, ref="best_multilayer"):
+        c = condition("caa24", "rss", active, lam, suffix=f"__{ref}" if active else "")
+        return {**c, "caa_config": ref} if active else c
+
+    subsets = ["".join(c) for k in range(1, 6) for c in combinations(FEATURES, k)]
+    reduced = [(s, 1.0) for s in subsets if len(s) in (1, 4, 5)]
+    reduced += [(FEATURES, 0.5)]
+    micro = []
+    for m, family, doses, window in [
+        ("T", "gdn24_natural", (0.125, 0.145, 0.158), None),
+        ("R", "gdn24_natural", (0.32, 0.36, 0.40), None),
+        ("T", "gdn24_unit", (1.15, 1.30, 1.45), None),
+        ("N", "gdn24_unit_win", (43.0, 50.0, 57.0), 28),
+    ]:
+        for v in doses:
+            micro.append(
+                {
+                    **condition("caa24", "rss", m, suffix=f"__{family}__{v:g}"),
+                    "family": family,
+                    "per_concept": {m: spec(family, v, window)},
+                }
+            )
+    jobs = [
+        (
+            "job2b_hys_full_singlegpu_parity",
+            "heldout32",
+            32,
+            4096,
+            [condition("hys", "full", s, lam) for s, lam in reduced],
+        ),
+        (
+            "job1b_caa_val_independent16",
+            "independent16",
+            16,
+            1024,
+            [caa("")] + [caa(t, ref=f) for f in frozen for t in FEATURES],
+        ),
+        (
+            "job4b_caa_best_multilayer_simple50",
+            "simple50",
+            50,
+            4096,
+            [caa(FEATURES, lam) for lam in (0.5, 0.75, 1.0)],
+        ),
+        (
+            "job3_caa_best_multilayer_heldout32",
+            "heldout32",
+            32,
+            4096,
+            [caa(s) for s in ("", *subsets)] + [caa(FEATURES, lam) for lam in (0.75, 0.5)],
+        ),
+        (
+            "job3b_caa_gdn24_ctrl_heldout32",
+            "heldout32",
+            32,
+            4096,
+            [caa(s, lam, "gdn24_strict") for s, lam in reduced]
+            + [caa(FEATURES, 0.75, "gdn24_strict")],
+        ),
+        ("job1c_gdn24_micro_selection8", "selection8", 8, 1024, micro),
+    ]
+    for name, bank, n, cap, cells in jobs:
+        dump(
+            PACKAGE / f"jobs/{name}.json",
+            {
+                "schema_version": 1,
+                "job_id": name,
+                "bank": bank,
+                "max_new_tokens": cap,
+                "norm_mode": "natural",
+                "use_windows": False,
+                "expected_answers": n * len(cells),
+                "conditions": cells,
+            },
+        )
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -453,5 +563,6 @@ if __name__ == "__main__":
     data = calibration(load_directions("caa24"))
     dump(PACKAGE / "jobs/calibration_grid.json", data)
     build_jobs(data)
+    build_drop2_jobs()
     for tag, report in data.items():
         print(tag, report["reference_norms"], report["grid"])

@@ -196,10 +196,13 @@ def generate(
             mask = torch.cat((mask, torch.ones_like(mask[:, :1])), dim=1)
             out = forward(token[:, None], mask, "decode", out.past_key_values)
     if caa:
-        expected_calls = sum(
-            bool(caa[max(i for i in caa if i <= call)]) for call in range(1, step.token_call + 1)
-        )
-        if set(caa_calls) != set(caa_layers) or set(caa_calls.values()) != {expected_calls}:
+        expected_calls = {}
+        for start, end in zip(caa, [*list(caa)[1:], step.token_call + 1], strict=True):
+            count = max(0, min(end, step.token_call + 1) - start)
+            if count:
+                for layer in caa[start]:
+                    expected_calls[layer] = expected_calls.get(layer, 0) + count
+        if caa_calls != expected_calls:
             raise RuntimeError("CAA schedule did not run at every expected layer/step")
     if recurrent:
         expected = 1 if recurrent.mode == "no_clamp" else 1 + step.token_call

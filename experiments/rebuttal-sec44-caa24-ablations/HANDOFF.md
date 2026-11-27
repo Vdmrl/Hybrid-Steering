@@ -78,6 +78,31 @@ CAA leaves bulk prefill untouched. Additions apply only to selected decoder bloc
 
 HyS uses the archived split prefill. Its first recurrent write occurs **after** the bulk forward and **before** the newline bridge. Full, no-RSS and no-Gram then apply the per-concept β after the bridge and each decode forward. Single-write keeps that initial write, then leaves cache evolution to the model. The no-Gram variant shares the first write and uses independent targets from its projected result. This isolates the correction solver, including cross terms created by the common initial write. The other variants keep the original regularized Gram solver.
 
+## Drop #2
+
+```bash
+MODEL=/absolute/path/to/pinned/Qwen3.5-9B/snapshot GPUS=0 WORKERS_PER_GPU=4 \
+  bash jobs/run_drop2.sh --resume
+```
+
+With one GPU, the jobs run in table order. With `GPUS=0,1` (or more), the first listed GPU runs Job 2b and the rest run the CAA queue in order. `--resume` is already the default. Append `--dry-run` to print the plan without loading model weights. Return `generations.jsonl`, `blind.jsonl`, and `manifest.json` per completed output; return Job 2b and Job 1b as soon as each finishes.
+
+| Job | Bank | Answers | Cap | Output under `outputs/` |
+|---|---|---:|---:|---|
+| Job 2b HyS full | heldout32 | 384 | 4,096 | `job2b` |
+| Job 1b both CAA selections + baseline | independent16 | 176 | 1,024 | `job1b` |
+| Job 4b CAA best, three λ values | simple50 | 150 | 4,096 | `job4b` |
+| Job 3 CAA best, factorial + extra λ | heldout32 | 1,088 | 4,096 | `job3_best_multilayer` |
+| Job 3b CAA strict, matched 24 GDN layers | heldout32 | 416 | 4,096 | `job3b_gdn24_ctrl` |
+| Job 1c 24-layer gap sweep | selection8 | 96 | 1,024 | `job1c_gdn24_micro` |
+| **Total** | | **2,310** | | |
+
+Job 2b reuses the Drop #1 Job 2 baseline and λ=0.75 control for reporting; Job 4b reuses the Job 4a baseline. These baselines are not regenerated in the corresponding jobs. Do not pool Job 1c dev tuning with Job 1b independent validation or change these frozen selections based on the same independent evaluation.
+
+The packaged selections in `jobs/configs/` are explicitly referenced by each active CAA condition. A custom selected JSON may instead contain a `per_concept` map with keys `N,F,T,R,P` and entries `layers`, `norm_mode`, `value`, and `window`; pass it to a template via `--selected-caa-config`. The old five-number and homogeneous selection formats remain supported; an output generated with another code hash still requires a separate directory. At layer `l`, RSS combines only concepts assigned to that layer whose windows are still active. A unit dose is divided by the square root of that concept's own layer count. Bridge call 1 is generated-token index 0, so N=28 is off at index 28 (call 29). The raw and merged JSONL use ASCII escapes without changing decoded text or the blind schema.
+
+These are the exact requested frozen settings, not a claim of zero cross-talk. In Drop #1, the selected `all32_unit` F point (gain 1.05893) measured F=91.67%, Q=3.75 and maximum off-target uplift +12.50 pp (T), not 0. It differs from the alternative 24-layer F point in the selection analysis. The other four best-multilayer points have zero maximum measured positive uplift. The strict T control (gain 1 on 24 GDN layers) has no Stage B measurement. No heterogeneous five-way composition was measured in Drop #1. Job 1b provides a new check; it does not automatically retune the other jobs.
+
 ## Outputs and resume
 
 Return each completed job’s `generations.jsonl`, `manifest.json`, `blind.jsonl` (identical to `judge_input.jsonl`), and `judge_input_manifest.json`, plus `selected_caa_config.json` and dev selection notes when available. Keep EOS, length stops, and empty model outputs. Resolved CAA settings are in the raw rows and manifest, never in the shuffled blind export. For interrupted jobs, retain the entire directory including `workers/`.

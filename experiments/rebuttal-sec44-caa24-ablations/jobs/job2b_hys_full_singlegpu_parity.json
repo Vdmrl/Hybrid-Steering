@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "job_id": "job2b_hys_full_singlegpu_parity",
+  "bank": "heldout32",
+  "max_new_tokens": 4096,
+  "norm_mode": "natural",
+  "use_windows": false,
+  "expected_answers": 384,
+  "conditions": [
+    {
+      "id": "hys_full__N__l1",
+      "method": "hys",
+      "mode": "full",
+      "active": "N",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_full__F__l1",
+      "method": "hys",
+      "mode": "full",
+      "active": "F",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_full__T__l1",
+      "method": "hys",
+      "mode": "full",
+      "active": "T",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_full__R__l1",
+      "method": "hys",
+      "mode": "full",
+      "active": "R",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_full__P__l1",
+      "method": "hys",
+      "mode": "full",
+      "active": "P",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_full__NFTR__l1",
+      "method": "hys",
+      "mode": "full",
+      "active": "NFTR",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_full__NFTP__l1",
+      "method": "hys",
+      "mode": "full",
+      "active": "NFTP",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_full__NFRP__l1",
+      "method": "hys",
+      "mode": "full",
+      "active": "NFRP",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_full__NTRP__l1",
+      "method": "hys",
+      "mode": "full",
+      "active": "NTRP",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_full__FTRP__l1",
+      "method": "hys",
+      "mode": "full",
+      "active": "FTRP",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_full__NFTRP__l1",
+      "method": "hys",
+      "mode": "full",
+      "active": "NFTRP",
+      "lambda": 1.0
+    },
+    {
+      "id": "hys_full__NFTRP__l0.5",
+      "method": "hys",
+      "mode": "full",
+      "active": "NFTRP",
+      "lambda": 0.5
+    }
+  ]
+}

@@ -75,6 +75,49 @@ def caa_options(config, condition, selected, alpha):
     )
 
 
+def heterogeneous_options(specs, active, family):
+    if not isinstance(specs, dict) or set(specs) != set(active):
+        raise ValueError("Per-concept settings must match the active features")
+    for s in specs.values():
+        if not isinstance(s, dict) or not {"layers", "norm_mode", "value", "window"} <= s.keys():
+            raise ValueError("Per-concept settings need layers, norm_mode, value and window")
+        layers, dose, window = s["layers"], s["value"], s["window"]
+        if (
+            not isinstance(layers, list)
+            or not layers
+            or any(type(i) is not int or not 0 <= i < 32 for i in layers)
+            or len(set(layers)) != len(layers)
+            or s["norm_mode"] not in ("natural", "unit")
+            or type(dose) not in (int, float)
+            or not math.isfinite(dose)
+            or dose <= 0
+            or (window is not None and (type(window) is not int or window <= 0))
+        ):
+            raise ValueError(f"Invalid per-concept settings: {s}")
+    scoped = {m: specs[m] for m in active}
+    layers = sorted({i for s in scoped.values() for i in s["layers"]})
+    windows = {m: s["window"] for m, s in scoped.items() if s["window"] is not None}
+    alpha = {m: s["value"] for m, s in scoped.items()}
+    return alpha, dict(
+        family=family,
+        layers=layers,
+        layer_set=next((name for name, ix in LAYER_SETS.items() if tuple(layers) == ix), "custom"),
+        norm_mode="per_concept",
+        use_windows=bool(windows),
+        windows=windows,
+        per_concept=scoped,
+        alpha_or_gain=next(iter(alpha.values())) if len(alpha) == 1 else alpha,
+    )
+
+
+def selected_specs(selection):
+    if not isinstance(selection, dict):
+        raise ValueError("Selected CAA config must be a JSON object")
+    specs = selection.get("per_concept", selection)
+    heterogeneous_options(specs, FEATURES, "selection")
+    return specs
+
+
 def scheduled_tasks(config, prompts):
     all_tasks = {(c["id"], p["id"]): (c, p) for c in config["conditions"] for p in prompts}
     if "tasks" not in config:
@@ -102,7 +145,17 @@ def resolve_job(config, prompts, gains=None):
         or type(config["use_windows"]) is not bool
     ):
         raise ValueError("Invalid decoding or CAA options")
-    selected = {}
+    if gains is not None and not isinstance(gains, dict):
+        raise ValueError("Selected CAA config must be a JSON object")
+    selected, per_selected, named = {}, None, {}
+    selection_name = "per_concept"
+    if gains is not None and (
+        "per_concept" in gains
+        or (set(gains) == set(FEATURES) and any(isinstance(v, dict) for v in gains.values()))
+    ):
+        per_selected = selected_specs(gains)
+        selection_name = gains.get("family", selection_name)
+        gains = None
     if gains is not None and "values" in gains:
         required = {"family", "layers", "norm_mode", "use_windows", "windows"}
         if not required <= gains.keys():
@@ -131,7 +184,29 @@ def resolve_job(config, prompts, gains=None):
             or strength <= 0
         ):
             raise ValueError(f"Invalid condition: {c}")
-        if m == "hys":
+        specs = c.get("per_concept")
+        if m == "caa24" and active and specs is None:
+            if (ref := c.get("caa_config")) is not None:
+                if ref not in ("best_multilayer", "gdn24_strict"):
+                    raise ValueError(f"Unknown packaged CAA selection {ref}")
+                if ref not in named:
+                    named[ref] = selected_specs(
+                        read(PACKAGE / "jobs/configs" / f"selected_caa_{ref}.json")
+                    )
+                specs = {f: named[ref][f] for f in active}
+            elif per_selected is not None and c.get("alpha") is None:
+                specs = {f: per_selected[f] for f in active}
+        if specs is not None:
+            if m != "caa24" or not active:
+                raise ValueError("Only active CAA conditions accept per-concept settings")
+            alpha, options = heterogeneous_options(
+                specs,
+                active,
+                c.get("family", c.get("caa_config", selection_name)),
+            )
+            if c.get("alpha") is not None and c["alpha"] != alpha:
+                raise ValueError("Frozen alpha conflicts with per-concept values")
+        elif m == "hys":
             if "alpha" in c:
                 raise ValueError("HyS Table 4 gains are fixed by the runner")
             alpha = {f: HYS_ALPHA[f] for f in active}
@@ -176,7 +251,14 @@ def plan(job, banks, device):
             )
         elif method == "caa24":
             prepared[c["id"]] = caa_phases(
-                *args, c["norm_mode"], mode, c["use_windows"], device, c["layers"], c["windows"]
+                *args,
+                c["norm_mode"],
+                mode,
+                c["use_windows"],
+                device,
+                c["layers"],
+                c["windows"],
+                per_concept=c.get("per_concept"),
             )
         else:
             prepared[c["id"]] = hys_coefficients(*args, mode)
@@ -419,12 +501,13 @@ def _run_locked(
                         "use_windows",
                         "windows",
                         "alpha_or_gain",
+                        "per_concept",
                     )
                     if k in c
                 },
                 **result,
             }
-            output_stream.write(json.dumps(row, ensure_ascii=False, allow_nan=False) + "\n")
+            output_stream.write(json.dumps(row, ensure_ascii=True, allow_nan=False) + "\n")
             output_stream.flush()
             os.fsync(output_stream.fileno())
             saved.append(row)

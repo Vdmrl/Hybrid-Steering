@@ -82,6 +82,68 @@ printf '%s %s merged\n' "$job" "$gpus" >> "$TEST_LOG"
     assert "Return outputs/job1_mega now" in result.stdout
 
 
+@pytest.mark.parametrize("gpus", ["2", "2,4,7"])
+def test_drop2_gpu_lanes_and_caa_priority(tmp_path, bash, gpus):
+    stub = tmp_path / "launcher"
+    stub.write_text(
+        """#!/usr/bin/env bash
+set -eu
+resume=no
+while (($#)); do
+  case $1 in
+    --output) job=${2##*/}; shift ;;
+    --gpus) gpus=$2; shift ;;
+    --resume) resume=yes ;;
+  esac
+  shift
+done
+[[ $resume == yes ]]
+printf '%s %s\n' "$job" "$gpus" >> "$TEST_LOG"
+if [[ $job == job2b && $TEST_GPUS == *,* ]]; then
+  for i in {1..80}; do
+    grep -q '^job1b 4,7$' "$TEST_LOG" && exit 0
+    sleep 0.05
+  done
+  exit 1
+fi
+""",
+        encoding="utf-8",
+        newline="\n",
+    )
+    stub.chmod(0o755)
+    log = tmp_path / "drop2.log"
+    subprocess.run(
+        [bash, str(PACKAGE / "jobs/run_drop2.sh"), "--resume"],
+        env={
+            **os.environ,
+            "MODEL": "/unused",
+            "GPUS": gpus,
+            "PYTHON_BIN": stub.as_posix(),
+            "TEST_GPUS": gpus,
+            "TEST_LOG": log.as_posix(),
+        },
+        text=True,
+        capture_output=True,
+        timeout=30,
+        check=True,
+    )
+    seen = log.read_text().splitlines()
+    assert "job2b 2" in seen
+    if "," not in gpus:
+        assert seen[0] == "job2b 2"
+    caa_gpus = gpus.split(",", 1)[-1]
+    assert [row for row in seen if not row.startswith("job2b")] == [
+        f"{job} {caa_gpus}"
+        for job in (
+            "job1b",
+            "job4b",
+            "job3_best_multilayer",
+            "job3b_gdn24_ctrl",
+            "job1c_gdn24_micro",
+        )
+    ]
+
+
 @pytest.mark.parametrize("mode", ["local", "github"])
 def test_fetch_validates_before_install(tmp_path, bash, mode):
     directions = tmp_path / "package/directions"

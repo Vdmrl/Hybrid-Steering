@@ -58,33 +58,50 @@ def caa_phases(
     device,
     layers=LAYERS,
     windows=WINDOWS,
+    *,
+    per_concept=None,
 ):
+    if per_concept is None:
+        per_concept = {
+            m: {
+                "layers": layers,
+                "norm_mode": norm_mode,
+                "value": alpha,
+                "window": windows.get(m) if use_windows else None,
+            }
+            for m, alpha in alphas.items()
+        }
+    else:
+        layers = sorted({i for spec in per_concept.values() for i in spec["layers"]})
     pieces = {}
-    for m, alpha in alphas.items():
-        per_layer = {i: directions[m][i] for i in layers}
-        if norm_mode == "unit":
+    for m, spec in per_concept.items():
+        per_layer = {i: directions[m][i] for i in spec["layers"]}
+        mode = spec["norm_mode"]
+        alpha = spec["value"]
+        if mode == "unit":
             pieces[m] = {
-                i: (v / v.norm()) * (strength * alpha / math.sqrt(len(layers)))
+                i: (v / v.norm()) * (strength * alpha / math.sqrt(len(per_layer)))
                 for i, v in per_layer.items()
             }
-        elif norm_mode == "natural":
+        elif mode == "natural":
             pieces[m] = {i: v * (strength * alpha) for i, v in per_layer.items()}
         else:
-            raise ValueError(f"Unknown CAA norm mode: {norm_mode}")
-    starts = [1] + sorted({windows[m] + 1 for m in alphas if use_windows and m in windows})
+            raise ValueError(f"Unknown CAA norm mode: {mode}")
+    ends = {m: s["window"] for m, s in per_concept.items() if s["window"] is not None}
+    # Bridge call 1 produces token t=0, so a window of n ends at call n+1.
+    starts = [1] + sorted({n + 1 for n in ends.values()})
     phases, stats = {}, []
     for start in starts:
-        members = [m for m in alphas if not use_windows or start <= windows.get(m, math.inf)]
+        members = [m for m in per_concept if start <= ends.get(m, math.inf)]
         offsets, gammas = {}, {}
         for i in layers:
-            offset, gamma = (
-                rss_sum([pieces[m][i] for m in members], composition_mode)
-                if members
-                else (None, 1.0)
-            )
-            if offset is not None:
+            layer_pieces = [pieces[m][i] for m in members if i in pieces[m]]
+            if layer_pieces:
+                offset, gamma = rss_sum(layer_pieces, composition_mode)
                 offsets[i] = offset.to(device=device)
-            gammas[i] = gamma
+                gammas[i] = gamma
+            else:
+                gammas[i] = 1.0
         phases[start] = offsets
         stats.append({"start_call": start, "active": "".join(members), **gamma_stats(gammas)})
     return phases, stats

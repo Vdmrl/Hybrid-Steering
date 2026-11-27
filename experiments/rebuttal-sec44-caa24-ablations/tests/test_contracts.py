@@ -1,5 +1,6 @@
 import json
 import math
+import os
 import subprocess
 import sys
 from collections import Counter
@@ -26,7 +27,9 @@ from interventions import (
     LAYER_SETS,
     LAYERS,
     RecurrentWrite,
+    Step,
     apply_clamp,
+    caa_hook,
     caa_phases,
     hys_coefficients,
     make_clamp_runtime,
@@ -35,7 +38,7 @@ from interventions import (
 from jobs import run_parallel
 from mock_runtime import MockTokenizer, mock_backend, smoke_config
 from native_runtime import generate
-from run_experiment import resolve_job, run_job
+from run_experiment import export_judge, opaque_id, plan, resolve_job, run_job, scheduled_tasks
 
 torch.set_num_threads(2)
 
@@ -245,7 +248,17 @@ def test_job_counts_grid_and_disjoint_banks():
         (300, {"full": 3, "rss": 3}),
         (200, {"full": 4}),
     ]
-    for f, (n, modes) in zip(sorted((PACKAGE / "jobs").glob("job*.json")), counts, strict=True):
+    names = (
+        "job1_caa24_calib_selection8",
+        "job1_caa_mega_calib_selection8",
+        "job1b_caa24_val_independent16",
+        "job2_hys_ablations_and_ctrl",
+        "job3_caa24_final_template",
+        "job4_external_lambda_simple50",
+        "job4a_hys_external_simple50",
+    )
+    for name, (n, modes) in zip(names, counts, strict=True):
+        f = PACKAGE / "jobs" / f"{name}.json"
         cfg = read(f)
         assert cfg["expected_answers"] == n
         assert Counter(c["mode"] for c in cfg["conditions"]) == modes
@@ -321,8 +334,12 @@ def test_mega_and_selected_caa_config_contract():
         "layers": list(LAYER_SETS["mid12_gdn"]),
         "values": dict.fromkeys(FEATURES, 2.5),
     }
-    for prefix in ("job1b", "job3", "job4_"):
-        cfg = read(next(jobs.glob(prefix + "*.json")))
+    for name in (
+        "job1b_caa24_val_independent16",
+        "job3_caa24_final_template",
+        "job4_external_lambda_simple50",
+    ):
+        cfg = read(jobs / f"{name}.json")
         prompts = read_rows(PACKAGE / "banks" / f"{cfg['bank']}.jsonl")
         result = resolve_job(cfg, prompts, selected)
         for c in result["conditions"]:
@@ -336,6 +353,202 @@ def test_mega_and_selected_caa_config_contract():
                 assert "family" not in c
         with pytest.raises(ValueError, match="Invalid CAA"):
             resolve_job(cfg, prompts, {**selected, "layers": [0, 0]})
+
+
+DROP2 = {
+    "job2b_hys_full_singlegpu_parity": (384, "heldout32", 4096),
+    "job1b_caa_val_independent16": (176, "independent16", 1024),
+    "job4b_caa_best_multilayer_simple50": (150, "simple50", 4096),
+    "job3_caa_best_multilayer_heldout32": (1088, "heldout32", 4096),
+    "job3b_caa_gdn24_ctrl_heldout32": (416, "heldout32", 4096),
+    "job1c_gdn24_micro_selection8": (96, "selection8", 1024),
+}
+
+
+def test_drop2_counts_condition_sets_and_unique_answer_ids():
+    total, all_ids = 0, set()
+    for name, (count, bank, cap) in DROP2.items():
+        cfg = read(PACKAGE / "jobs" / f"{name}.json")
+        assert cfg["bank"] == bank and cfg["max_new_tokens"] == cap
+        prompts = read_rows(PACKAGE / "banks" / f"{bank}.jsonl")
+        job = resolve_job(cfg, prompts)
+        ids = {opaque_id(name, key) for key in scheduled_tasks(job, prompts)}
+        assert len(ids) == count == job["expected_answers"] and not (all_ids & ids)
+        all_ids.update(ids)
+        total += count
+        c = job["conditions"]
+        cells = Counter((len(row["active"]), row["lambda"]) for row in c)
+        if "job2b" in name:
+            assert cells == {(1, 1): 5, (4, 1): 5, (5, 1): 1, (5, 0.5): 1}
+            assert {(row["method"], row["mode"]) for row in c} == {("hys", "full")}
+        elif "job1b" in name:
+            assert cells == {(0, 1): 1, (1, 1): 10}
+            assert Counter(row.get("caa_config") for row in c) == {
+                None: 1,
+                "best_multilayer": 5,
+                "gdn24_strict": 5,
+            }
+        elif "job4b" in name:
+            assert cells == {(5, 1): 1, (5, 0.75): 1, (5, 0.5): 1}
+        elif "job3b" in name:
+            assert cells == {(1, 1): 5, (4, 1): 5, (5, 1): 1, (5, 0.5): 1, (5, 0.75): 1}
+            assert all(row["layers"] == list(LAYERS) for row in c)
+        elif "job3_" in name:
+            assert cells == {
+                (0, 1): 1,
+                (1, 1): 5,
+                (2, 1): 10,
+                (3, 1): 10,
+                (4, 1): 5,
+                (5, 1): 1,
+                (5, 0.75): 1,
+                (5, 0.5): 1,
+            }
+        else:
+            assert cells == {(1, 1): 12}
+            assert {row["per_concept"]["N"]["window"] for row in c if row["active"] == "N"} == {28}
+        # The parallel launcher embeds resolved CAA conditions in its shards.
+        portable = [
+            {k: v for k, v in row.items() if k not in ("alpha", "beta")}
+            if row["method"] == "hys"
+            else row
+            for row in c
+        ]
+        assert resolve_job({**job, "conditions": portable}, prompts) == job
+    assert len(all_ids) == total == 2310
+
+
+def test_drop2_heterogeneous_rss_at_window_boundary():
+    cfg = read(PACKAGE / "jobs/job3_caa_best_multilayer_heldout32.json")
+    job = resolve_job(cfg, read_rows(PACKAGE / "banks/heldout32.jsonl"))
+    c = next(row for row in job["conditions"] if row["active"] == FEATURES and row["lambda"] == 0.5)
+    model, tokenizer, device, bank = mock_backend()
+    specs = c["per_concept"]
+    assert {t: specs[t]["window"] for t in FEATURES} == dict(N=28, F=None, T=None, R=None, P=None)
+    assert {t: specs[t]["layers"] for t in FEATURES} == {
+        t: list(LAYER_SETS[name])
+        for t, name in zip(
+            FEATURES, ("mid12_gdn", "all32", "mid12_gdn", "early_mid12_gdn", "all32"), strict=True
+        )
+    }
+    assert {t: specs[t]["value"] for t in FEATURES} == dict(
+        N=7.44337, F=1.05893, T=0.254482, R=5.34724, P=3.05788
+    )
+    phase, stats = plan({**job, "conditions": [c]}, bank, device)[c["id"]]
+    assert list(phase) == [1, 29]
+    step, audit = Step("decode", 28), {}
+    zeros = torch.zeros(1, 1, 8)
+    for t, idx in ((27, 0), (28, 1)):
+        step.token_call = t + 1
+        for layer in (0, 4, 8, 19, 22, 31):
+            pieces = []
+            for tag, s in specs.items():
+                if layer in s["layers"] and (s["window"] is None or t < s["window"]):
+                    d = bank["caa24"][tag][layer]
+                    if s["norm_mode"] == "unit":
+                        d = d / (d.norm() * math.sqrt(len(s["layers"])))
+                    pieces.append(d * (0.5 * s["value"]))
+            u = torch.stack(pieces).sum(dim=0)
+            gamma = math.sqrt(sum(float(p.square().sum()) for p in pieces)) / float(u.norm())
+            assert stats[idx]["per_layer"][layer] == pytest.approx(gamma)
+            torch.testing.assert_close(
+                caa_hook(step, layer, phase, audit)(None, (), zeros)[0, 0], u * gamma
+            )
+    assert torch.equal(phase[1][31], phase[29][31])
+    assert not torch.equal(phase[1][8], phase[29][8])
+    # Disjoint window: L8 has no delta after t=27, L0 has one concept
+    # throughout and gamma=1; the native loop must audit unequal counts.
+    specs = {
+        "N": {**specs["N"], "layers": [8]},
+        "F": {**specs["F"], "layers": [0]},
+    }
+    offsets, gamma = caa_phases(
+        bank["caa24"], {}, 0.5, "unit", "rss", False, device, per_concept=specs
+    )
+    assert set(offsets[29]) == {0} and gamma[0]["per_layer"] == {0: 1.0, 8: 1.0}
+    assert generate(model, tokenizer, device, "hi", "sys", 30, caa=offsets)["audit"][
+        "caa_layer_calls"
+    ] == {0: 30, 8: 28}
+
+
+def test_external_heterogeneous_selection_preserves_legacy_math():
+    cfg = read(PACKAGE / "jobs/job1b_caa24_val_independent16.json")
+    prompts = read_rows(PACKAGE / "banks/independent16.jsonl")
+    caps = {"N": 28, "P": 32}
+    values = dict.fromkeys(FEATURES, 2.5)
+    flat = {
+        "family": "gdn24_natural_win",
+        "layers": list(LAYERS),
+        "norm_mode": "natural",
+        "use_windows": True,
+        "windows": caps,
+        "values": values,
+    }
+    heterogeneous = {
+        tag: {
+            "layers": list(LAYERS),
+            "norm_mode": "natural",
+            "value": value,
+            "window": caps.get(tag),
+        }
+        for tag, value in values.items()
+    }
+    cfg["conditions"] = [
+        {
+            "id": "parity",
+            "method": "caa24",
+            "mode": "rss",
+            "active": FEATURES,
+            "lambda": 0.75,
+            "alpha": None,
+        }
+    ]
+    cfg["expected_answers"] = len(prompts)
+    _, _, device, bank = mock_backend()
+    old, new = [
+        plan(resolve_job(cfg, prompts, sel), bank, device)["parity"]
+        for sel in (flat, {"per_concept": heterogeneous})
+    ]
+    assert old[1] == new[1]
+    for k, deltas in old[0].items():
+        assert set(deltas) == set(new[0][k])
+        assert all(torch.equal(d, new[0][k][layer]) for layer, d in deltas.items())
+    with pytest.raises(ValueError, match="Invalid per-concept"):
+        resolve_job(cfg, prompts, {**heterogeneous, "N": {**heterogeneous["N"], "layers": [0, 0]}})
+
+
+def test_drop2_ascii_blind_both_judges(tmp_path):
+    text = "Français\u0085新\u2028ligne\u2029fin"
+    rows = [
+        {
+            "answer_id": "opaque-1",
+            "prompt_id": "q1",
+            "prompt": "décrire",
+            "response": text,
+            "family": "secret condition",
+        }
+    ]
+    export_judge(tmp_path, rows, "test")
+    f = tmp_path / "blind.jsonl"
+    raw = f.read_bytes()
+    assert raw.isascii() and b"\\u0085" in raw and b"\\u2028" in raw and b"\\u2029" in raw
+    assert len(raw.decode().splitlines()) == 1
+    judge = Path(os.environ.get("DROP2_TRAIT_JUDGE_PATH", PACKAGE.parents[1] / "judge"))
+    quality = os.environ.get("DROP2_QUALITY_JUDGE_PATH")
+    code = "import sys;from pathlib import Path;from ready_judge.core import input_rows; r=input_rows(Path(sys.argv[1])); assert len(r)==1 and r[0]['text']==sys.argv[2]"
+    subprocess.run(
+        [sys.executable, "-B", "-c", code, str(f), text],
+        check=True,
+        env={**os.environ, "PYTHONPATH": str(judge), "PYTHONUTF8": "1"},
+    )
+    if quality:
+        code = "import sys;from pathlib import Path;from hybrid_judge.runner import read_jsonl; r=read_jsonl(Path(sys.argv[1])); assert len(r)==1 and r[0].answers[0].text==sys.argv[2]"
+        subprocess.run(
+            [sys.executable, "-B", "-c", code, str(f), text],
+            check=True,
+            env={**os.environ, "PYTHONPATH": quality, "PYTHONUTF8": "1"},
+        )
+    assert "secret condition" not in raw.decode()
 
 
 def test_parallel_cpu_mock_failure_resume_and_blind(tmp_path, monkeypatch):
