@@ -81,11 +81,11 @@ HyS uses the archived split prefill. Its first recurrent write occurs **after** 
 ## Drop #2
 
 ```bash
-MODEL=/absolute/path/to/pinned/Qwen3.5-9B/snapshot GPUS=0 WORKERS_PER_GPU=4 \
+MODEL=/absolute/path/to/pinned/Qwen3.5-9B/snapshot GPUS=0,1 WORKERS_PER_GPU=2 \
   bash jobs/run_drop2.sh --resume
 ```
 
-With one GPU, the jobs run in table order. With `GPUS=0,1` (or more), the first listed GPU runs Job 2b and the rest run the CAA queue in order. `--resume` is already the default. Append `--dry-run` to print the plan without loading model weights. Return `generations.jsonl`, `blind.jsonl`, and `manifest.json` per completed output; return Job 2b and Job 1b as soon as each finishes.
+Jobs run in table order, and each job shards its answers across the entire `GPUS` list. HyS workers still run single-GPU; there is no tensor parallelism. For H100 80 GB, start with `WORKERS_PER_GPU=2` for the 4,096-token jobs; reduce to 1 if memory is insufficient. `--resume` is already the default. Append `--dry-run` to print the plan without loading model weights. Return `generations.jsonl`, `blind.jsonl`, and `manifest.json` per completed output; return Job 2b and Job 1b as soon as each finishes.
 
 | Job | Bank | Answers | Cap | Output under `outputs/` |
 |---|---|---:|---:|---|
